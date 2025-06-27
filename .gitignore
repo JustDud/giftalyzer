@@ -10,3 +10,6 @@ venv/
 .idea/
 .vscode/
 *.iml
+
+
+.DS_Store.DS_Store
