@@ -73,11 +73,8 @@ def scrape_collections():
             "supply": supply
         })
 
-    output_path = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections_summary.json")
-    with open(output_path, "w") as f:
-        json.dump(collections, f, indent=2)
+    # output_path = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections_summary.json")
+    # with open(output_path, "w") as f:
+    #     json.dump(collections, f, indent=2)
 
     return collections
-
-if __name__ == "__main__":
-    scrape_collections()

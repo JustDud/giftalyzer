@@ -12,12 +12,10 @@ def scrape_and_update_db():
     total_start = time.time()
 
     print("Scraping collections summary from MarketApp...")
-    scrape_collections()
-
-    collection_file_path = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections_summary.json")
-    with open(collection_file_path, "r") as f:
-        collection_summaries = json.load(f)
+    collection_summaries = scrape_collections()
     print(f"✅ Scraped {len(collection_summaries)} collections.\n")
+
+    upsert_many(collections_collection, collection_summaries, key="address")
 
     all_nfts = []
 
@@ -30,7 +28,6 @@ def scrape_and_update_db():
             nft["nft_id"] = nft.get("href", "").split("/")[-2] if "href" in nft else None
         all_nfts.extend(nfts)
 
-    upsert_many(collections_collection, collection_summaries, key="address")
     upsert_many(nfts_collection, all_nfts, key="nft_id")
 
     scraped_ids_by_collection = {}

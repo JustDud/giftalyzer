@@ -1,17 +1,115 @@
 [
   {
+    "nft_id": "EQAXJEh1sqt4NnAiC177t5d9xxjdm974hazlSSwOY12kBq95",
+    "name": "Durov\u2019s Cap #2540",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQAXJEh1sqt4NnAiC177t5d9xxjdm974hazlSSwOY12kBq95/",
+    "price": "670",
+    "last_sale": "52",
+    "rarity": "135550",
+    "owner": "EQAXQPr3IU4ec-0T4rP4kVDRvY9UP14l5qcrI5qFxkHeQyUx\n\nEQAXQPr3IU4ec-0T4rP4kVDRvY9UP14l5qcrI5qFxkHeQyUx",
+    "model": "Dipper",
+    "backdrop": "Cappuccino",
+    "symbol": "Lion King"
+  },
+  {
     "nft_id": "EQDHsolRbdfW21iFeoV6h8ATXI1fKSiVxlrx3bomKbkXSywb",
     "name": "Durov\u2019s Cap #2679",
     "status": "On Sale",
     "market": "Getgems",
     "href": "/nft/EQDHsolRbdfW21iFeoV6h8ATXI1fKSiVxlrx3bomKbkXSywb/",
-    "price": "745",
+    "price": "677",
     "last_sale": "",
     "rarity": "4479",
     "owner": "EQDiRhJqIxrpxVzo9wgqQp5HwFRDVEMvLVqvOqTbT_mvj0Ul\n\nEQDiRhJqIxrpxVzo9wgqQp5HwFRDVEMvLVqvOqTbT_mvj0Ul",
     "model": "Duskwave",
     "backdrop": "Carrot Juice",
     "symbol": "Sun Mountain"
+  },
+  {
+    "nft_id": "EQDjaosYjX_16bGIFVd04ApbB-SntI8TQ1-fKJHGlXgb8MRZ",
+    "name": "Durov\u2019s Cap #1723",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQDjaosYjX_16bGIFVd04ApbB-SntI8TQ1-fKJHGlXgb8MRZ/",
+    "price": "700",
+    "last_sale": "222",
+    "rarity": "775",
+    "owner": "EQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp\n\nEQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp",
+    "model": "Pink Pop",
+    "backdrop": "Sapphire",
+    "symbol": "Dolphin"
+  },
+  {
+    "nft_id": "EQA5SZRpdO9q_PmwyZWIDV79UgZ4mDdeV8FbDcSPTCI5TZj-",
+    "name": "Durov\u2019s Cap #3464",
+    "status": "On Sale",
+    "market": "Marketapp",
+    "href": "/nft/EQA5SZRpdO9q_PmwyZWIDV79UgZ4mDdeV8FbDcSPTCI5TZj-/",
+    "price": "700",
+    "last_sale": "435",
+    "rarity": "25510",
+    "owner": "dy_svip.t.me",
+    "model": "Nightshade",
+    "backdrop": "Burgundy",
+    "symbol": "Pomegranate"
+  },
+  {
+    "nft_id": "EQAbZmCqv0qdniFUSBq9EMmKYsIvvh6uCuTOlsLHbYyN_6iy",
+    "name": "Durov\u2019s Cap #1356",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQAbZmCqv0qdniFUSBq9EMmKYsIvvh6uCuTOlsLHbYyN_6iy/",
+    "price": "717.6",
+    "last_sale": "",
+    "rarity": "2604",
+    "owner": null,
+    "model": "Shadow",
+    "backdrop": "Satin Gold",
+    "symbol": "Moon"
+  },
+  {
+    "nft_id": "EQA5HLIQmWc3Sza0AN4J7JlaQ653NEQt4bZ6VhUYE7_Y2jQZ",
+    "name": "Durov\u2019s Cap #216",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQA5HLIQmWc3Sza0AN4J7JlaQ653NEQt4bZ6VhUYE7_Y2jQZ/",
+    "price": "722.8",
+    "last_sale": "95",
+    "rarity": "119750",
+    "owner": "gift-minter.ton",
+    "model": "Dipper",
+    "backdrop": "Silver Blue",
+    "symbol": "Ink Pen"
+  },
+  {
+    "nft_id": "EQAjhgVHrvEa7SkKPZIwivTJx8iSisp_wxkXxYmEMLE0VFXC",
+    "name": "Durov\u2019s Cap #1657",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQAjhgVHrvEa7SkKPZIwivTJx8iSisp_wxkXxYmEMLE0VFXC/",
+    "price": "728",
+    "last_sale": "",
+    "rarity": "169050",
+    "owner": null,
+    "model": "Candy Shade",
+    "backdrop": "Light Olive",
+    "symbol": "Oxen of Fire"
+  },
+  {
+    "nft_id": "EQDUYx2DFrd4n48w-BlgaH5_YsHMNraacLcBP4wBZHKzfMx_",
+    "name": "Durov\u2019s Cap #1658",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQDUYx2DFrd4n48w-BlgaH5_YsHMNraacLcBP4wBZHKzfMx_/",
+    "price": "740",
+    "last_sale": "707",
+    "rarity": "162650",
+    "owner": "EQBG171XwUaExziy3ijSN4v7ZRbMS598y4ExDGPb3Sh7fZ4l\n\nEQBG171XwUaExziy3ijSN4v7ZRbMS598y4ExDGPb3Sh7fZ4l",
+    "model": "Freshwave",
+    "backdrop": "Coral Red",
+    "symbol": "Sun Lion"
   },
   {
     "nft_id": "EQCF6kEkzu8eihrbtV5UtWn0A2Hy-18zMOZU6vDapTJqXmzX",
@@ -56,20 +154,6 @@
     "symbol": "White Deer"
   },
   {
-    "nft_id": "EQDjaosYjX_16bGIFVd04ApbB-SntI8TQ1-fKJHGlXgb8MRZ",
-    "name": "Durov\u2019s Cap #1723",
-    "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQDjaosYjX_16bGIFVd04ApbB-SntI8TQ1-fKJHGlXgb8MRZ/",
-    "price": "777",
-    "last_sale": "222",
-    "rarity": "775",
-    "owner": "EQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp\n\nEQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp",
-    "model": "Pink Pop",
-    "backdrop": "Sapphire",
-    "symbol": "Dolphin"
-  },
-  {
     "nft_id": "EQDaG9iI01FFB-94q6DZuO5_vRnnX6tZ1hQVLdQGHF18r5we",
     "name": "Durov\u2019s Cap #2011",
     "status": "On Sale",
@@ -98,18 +182,32 @@
     "symbol": "Dolphin"
   },
   {
-    "nft_id": "EQDUYx2DFrd4n48w-BlgaH5_YsHMNraacLcBP4wBZHKzfMx_",
-    "name": "Durov\u2019s Cap #1658",
+    "nft_id": "EQCu67V5c8PfoSEh1jXX4_3pVzdhEVzdEbXydVk8L_OIn_yG",
+    "name": "Durov\u2019s Cap #2091",
     "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQDUYx2DFrd4n48w-BlgaH5_YsHMNraacLcBP4wBZHKzfMx_/",
-    "price": "785",
-    "last_sale": "707",
-    "rarity": "162650",
-    "owner": "EQBG171XwUaExziy3ijSN4v7ZRbMS598y4ExDGPb3Sh7fZ4l\n\nEQBG171XwUaExziy3ijSN4v7ZRbMS598y4ExDGPb3Sh7fZ4l",
-    "model": "Freshwave",
-    "backdrop": "Coral Red",
-    "symbol": "Sun Lion"
+    "market": "Tonnel",
+    "href": "/nft/EQCu67V5c8PfoSEh1jXX4_3pVzdhEVzdEbXydVk8L_OIn_yG/",
+    "price": "780",
+    "last_sale": "280",
+    "rarity": "199950",
+    "owner": "gift-minter.ton",
+    "model": "Jetspin",
+    "backdrop": "Battleship Grey",
+    "symbol": "Coat of Arms"
+  },
+  {
+    "nft_id": "EQCLtCCajWGmStIgUn42gIJxtdzSnEJNFgOf2qJU5JbH_kSv",
+    "name": "Durov\u2019s Cap #4145",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQCLtCCajWGmStIgUn42gIJxtdzSnEJNFgOf2qJU5JbH_kSv/",
+    "price": "780",
+    "last_sale": "",
+    "rarity": "2398",
+    "owner": null,
+    "model": "Shadeux",
+    "backdrop": "Satin Gold",
+    "symbol": "Car"
   },
   {
     "nft_id": "EQAnY2sx41JJPlviwh16iZ3H8FxmUmdsX9OKW1jS-Tdk3L9y",
@@ -140,6 +238,20 @@
     "symbol": "Glasses"
   },
   {
+    "nft_id": "EQC5L5vbUKd_R0UexKOPLPlO4WI7v2YP_YX3tf8SiCia9UBM",
+    "name": "Durov\u2019s Cap #4673",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQC5L5vbUKd_R0UexKOPLPlO4WI7v2YP_YX3tf8SiCia9UBM/",
+    "price": "798.72",
+    "last_sale": "",
+    "rarity": "198150",
+    "owner": null,
+    "model": "Jetspin",
+    "backdrop": "Light Olive",
+    "symbol": "Coin"
+  },
+  {
     "nft_id": "EQDwSmm_D44BEd230Zm5C9Jmo0VqfBANw20-9PqeO3ubCBCt",
     "name": "Durov\u2019s Cap #2560",
     "status": "On Sale",
@@ -152,6 +264,20 @@
     "model": "Fun Time",
     "backdrop": "Silver Blue",
     "symbol": "Star"
+  },
+  {
+    "nft_id": "EQCIOEb2k-1v0gC5SKRGjHkrofROioQ7iGxRzDl0NAF7juev",
+    "name": "Durov\u2019s Cap #3428",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQCIOEb2k-1v0gC5SKRGjHkrofROioQ7iGxRzDl0NAF7juev/",
+    "price": "811.2",
+    "last_sale": "57",
+    "rarity": "3843",
+    "owner": "gift-minter.ton",
+    "model": "Dipper",
+    "backdrop": "Emerald",
+    "symbol": "Phoenix"
   },
   {
     "nft_id": "EQAI40R4t36hIRD2w2ddPJ2FMLZSQlvde_6nTLQhdlz5e0b2",
@@ -224,12 +350,26 @@
     "symbol": "Mafdet"
   },
   {
+    "nft_id": "EQCzNPrOQOWo4WEJ2GaoCGQBcraDp8XtgAepwpOBcolCJIWw",
+    "name": "Durov\u2019s Cap #2996",
+    "status": "On Sale",
+    "market": "Fragment",
+    "href": "/nft/EQCzNPrOQOWo4WEJ2GaoCGQBcraDp8XtgAepwpOBcolCJIWw/",
+    "price": "839",
+    "last_sale": "",
+    "rarity": "4281",
+    "owner": "smartinvesting.ton",
+    "model": "Shadeux",
+    "backdrop": "Emerald",
+    "symbol": "Star"
+  },
+  {
     "nft_id": "EQD_ORlKKHXc3VJ3CkVdGp0-Z0xJymC7KaFOEFJ9qBS9jzwx",
     "name": "Durov\u2019s Cap #645",
     "status": "On Sale",
     "market": "Fragment",
     "href": "/nft/EQD_ORlKKHXc3VJ3CkVdGp0-Z0xJymC7KaFOEFJ9qBS9jzwx/",
-    "price": "848",
+    "price": "839",
     "last_sale": "705",
     "rarity": "4037",
     "owner": "smartinvesting.ton",
@@ -243,13 +383,27 @@
     "status": "On Sale",
     "market": "Fragment",
     "href": "/nft/EQD4gxakPgL8U2ahoKcEn0oIcOgQ6GH2aajsn-eKG8sfenn7/",
-    "price": "849",
+    "price": "840",
     "last_sale": "190",
     "rarity": "51325",
     "owner": "EQAdLxnQX-wDWG-WlMePDg0U7NCBMK5-bWTaXaTvXTcCitcg\n\nEQAdLxnQX-wDWG-WlMePDg0U7NCBMK5-bWTaXaTvXTcCitcg",
     "model": "Classic",
     "backdrop": "Emerald",
     "symbol": "Heart"
+  },
+  {
+    "nft_id": "EQC6z1McvJBDZU-o9CaLDjuwdd_ctvjRMHtIrGUlNJoPGsbB",
+    "name": "Durov\u2019s Cap #256",
+    "status": "On Sale",
+    "market": "Fragment",
+    "href": "/nft/EQC6z1McvJBDZU-o9CaLDjuwdd_ctvjRMHtIrGUlNJoPGsbB/",
+    "price": "847",
+    "last_sale": "246",
+    "rarity": "179250",
+    "owner": "EQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa\n\nEQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa",
+    "model": "Mossy",
+    "backdrop": "Sapphire",
+    "symbol": "Dice"
   },
   {
     "nft_id": "EQCjYlt5tC4PVrrQUgkdjyjEKIxqHA84sW5LysBIxja8vHCr",
@@ -364,20 +518,6 @@
     "symbol": "Sun Lion"
   },
   {
-    "nft_id": "EQA5SZRpdO9q_PmwyZWIDV79UgZ4mDdeV8FbDcSPTCI5TZj-",
-    "name": "Durov\u2019s Cap #3464",
-    "status": "On Sale",
-    "market": "Marketapp",
-    "href": "/nft/EQA5SZRpdO9q_PmwyZWIDV79UgZ4mDdeV8FbDcSPTCI5TZj-/",
-    "price": "860",
-    "last_sale": "435",
-    "rarity": "25510",
-    "owner": "dy_svip.t.me",
-    "model": "Nightshade",
-    "backdrop": "Burgundy",
-    "symbol": "Pomegranate"
-  },
-  {
     "nft_id": "EQC70NW0qEw_6i44mTqo7wCOJBwHCneKGmi3ISzovVJOEQ-k",
     "name": "Durov\u2019s Cap #1645",
     "status": "On Sale",
@@ -420,32 +560,18 @@
     "symbol": "Flower Cross"
   },
   {
-    "nft_id": "EQCzNPrOQOWo4WEJ2GaoCGQBcraDp8XtgAepwpOBcolCJIWw",
-    "name": "Durov\u2019s Cap #2996",
+    "nft_id": "EQDDdvjWk_MEbj8hj3jDkWgUEtECcjjyMFRsJXFhrFZK7tYK",
+    "name": "Durov\u2019s Cap #629",
     "status": "On Sale",
     "market": "Fragment",
-    "href": "/nft/EQCzNPrOQOWo4WEJ2GaoCGQBcraDp8XtgAepwpOBcolCJIWw/",
-    "price": "875",
+    "href": "/nft/EQDDdvjWk_MEbj8hj3jDkWgUEtECcjjyMFRsJXFhrFZK7tYK/",
+    "price": "874",
     "last_sale": "",
-    "rarity": "4281",
-    "owner": "smartinvesting.ton",
-    "model": "Shadeux",
-    "backdrop": "Emerald",
-    "symbol": "Star"
-  },
-  {
-    "nft_id": "EQC6z1McvJBDZU-o9CaLDjuwdd_ctvjRMHtIrGUlNJoPGsbB",
-    "name": "Durov\u2019s Cap #256",
-    "status": "On Sale",
-    "market": "Fragment",
-    "href": "/nft/EQC6z1McvJBDZU-o9CaLDjuwdd_ctvjRMHtIrGUlNJoPGsbB/",
-    "price": "876",
-    "last_sale": "246",
-    "rarity": "179250",
+    "rarity": "3491",
     "owner": "EQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa\n\nEQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa",
-    "model": "Mossy",
-    "backdrop": "Sapphire",
-    "symbol": "Dice"
+    "model": "Apple Slice",
+    "backdrop": "Midnight Blue",
+    "symbol": "Spirit Impala"
   },
   {
     "nft_id": "EQD6k4daR0uzr_F7StR8ZKaOvEPEU-53DGpNwkfu5QL9Yzgj",
@@ -658,34 +784,6 @@
     "symbol": "Diamond"
   },
   {
-    "nft_id": "EQCIOEb2k-1v0gC5SKRGjHkrofROioQ7iGxRzDl0NAF7juev",
-    "name": "Durov\u2019s Cap #3428",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQCIOEb2k-1v0gC5SKRGjHkrofROioQ7iGxRzDl0NAF7juev/",
-    "price": "884",
-    "last_sale": "57",
-    "rarity": "3843",
-    "owner": "gift-minter.ton",
-    "model": "Dipper",
-    "backdrop": "Emerald",
-    "symbol": "Phoenix"
-  },
-  {
-    "nft_id": "EQAVsaQEisnXt3LI5g5R-YtnHTXEg_ZPmAUTtyIV83wv8kMO",
-    "name": "Durov\u2019s Cap #718",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQAVsaQEisnXt3LI5g5R-YtnHTXEg_ZPmAUTtyIV83wv8kMO/",
-    "price": "884",
-    "last_sale": "",
-    "rarity": "3568",
-    "owner": "gift-minter.ton",
-    "model": "Frosted Brew",
-    "backdrop": "Azure Blue",
-    "symbol": "Fehu Rune"
-  },
-  {
     "nft_id": "EQAn9q5Hwgsd4hyihM4d8Oji1DUhFhTQhxcdD_jEM4OtSCLA",
     "name": "Durov\u2019s Cap #158",
     "status": "On Sale",
@@ -896,34 +994,6 @@
     "symbol": "Wolf Rage"
   },
   {
-    "nft_id": "EQAl43jTGqw_dppqQPSDmij9VngwEEl8jMZ9hHOkOqqYsJad",
-    "name": "Durov\u2019s Cap #3028",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQAl43jTGqw_dppqQPSDmij9VngwEEl8jMZ9hHOkOqqYsJad/",
-    "price": "925.6",
-    "last_sale": "",
-    "rarity": "4525",
-    "owner": null,
-    "model": "Macintosh",
-    "backdrop": "Burgundy",
-    "symbol": "Pearl"
-  },
-  {
-    "nft_id": "EQDDdvjWk_MEbj8hj3jDkWgUEtECcjjyMFRsJXFhrFZK7tYK",
-    "name": "Durov\u2019s Cap #629",
-    "status": "On Sale",
-    "market": "Fragment",
-    "href": "/nft/EQDDdvjWk_MEbj8hj3jDkWgUEtECcjjyMFRsJXFhrFZK7tYK/",
-    "price": "926",
-    "last_sale": "",
-    "rarity": "3491",
-    "owner": "EQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa\n\nEQCjEIFqTdC9Nm9UQONehUhFwbkeD5onq27goe5njgz4j1wa",
-    "model": "Apple Slice",
-    "backdrop": "Midnight Blue",
-    "symbol": "Spirit Impala"
-  },
-  {
     "nft_id": "EQDL07Ui2bUqk9sDnWRWZEjBI0jwNZzo6DVz2_3LP09MaxMJ",
     "name": "Durov\u2019s Cap #2411",
     "status": "On Sale",
@@ -978,20 +1048,6 @@
     "model": "Goldrose",
     "backdrop": "Light Olive",
     "symbol": "Sparks"
-  },
-  {
-    "nft_id": "EQBy0pwdATTJzJtz4F6D-mDDj8iMMU10QJGDnu9CfQhOEmI8",
-    "name": "Durov\u2019s Cap #2254",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQBy0pwdATTJzJtz4F6D-mDDj8iMMU10QJGDnu9CfQhOEmI8/",
-    "price": "936",
-    "last_sale": "",
-    "rarity": "3310",
-    "owner": "gift-minter.ton",
-    "model": "Snowfall",
-    "backdrop": "Ivory White",
-    "symbol": "Scarab"
   },
   {
     "nft_id": "EQBP37VMzs1HamZzTVPbkKu-shy96j-TCewl5Em9EXSLNujZ",
@@ -1050,20 +1106,6 @@
     "symbol": "Eagle"
   },
   {
-    "nft_id": "EQBIz4tquYf_oltNGQvMq4g0h54P7d1UpsEWD_g3JzHgjFTZ",
-    "name": "Durov\u2019s Cap #3024",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQBIz4tquYf_oltNGQvMq4g0h54P7d1UpsEWD_g3JzHgjFTZ/",
-    "price": "988",
-    "last_sale": "",
-    "rarity": "3534",
-    "owner": null,
-    "model": "Seabreeze",
-    "backdrop": "Amber",
-    "symbol": "Hand of God"
-  },
-  {
     "nft_id": "EQAk4HdfxDf-fLK_qmiidUkrvToJRy0siFNt5urk1gW9OJxp",
     "name": "Durov\u2019s Cap #3104",
     "status": "On Sale",
@@ -1076,20 +1118,6 @@
     "model": "Jade",
     "backdrop": "Cobalt Blue",
     "symbol": "Mannaz Rune"
-  },
-  {
-    "nft_id": "EQChIem5GGfw-QW7d2nG7pZPXuSUdec6BOD5bP380RMswpB3",
-    "name": "Durov\u2019s Cap #3288",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQChIem5GGfw-QW7d2nG7pZPXuSUdec6BOD5bP380RMswpB3/",
-    "price": "988",
-    "last_sale": "",
-    "rarity": "37710",
-    "owner": null,
-    "model": "Tron",
-    "backdrop": "Fandango",
-    "symbol": "Oak Leaf"
   },
   {
     "nft_id": "EQA0uCPWN2RlgN3hHOMFCpVYdFPaHqe6JrcFqnp-lm1S9Ph7",
@@ -1134,18 +1162,18 @@
     "symbol": "Star"
   },
   {
-    "nft_id": "EQAjhgVHrvEa7SkKPZIwivTJx8iSisp_wxkXxYmEMLE0VFXC",
-    "name": "Durov\u2019s Cap #1657",
+    "nft_id": "EQCV0W63HgC1zALAj38OHxgXj61cuwtEoWgGfqy5CaC8fhmw",
+    "name": "Durov\u2019s Cap #1033",
     "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQAjhgVHrvEa7SkKPZIwivTJx8iSisp_wxkXxYmEMLE0VFXC/",
-    "price": "998.4",
-    "last_sale": "",
-    "rarity": "169050",
-    "owner": null,
-    "model": "Candy Shade",
-    "backdrop": "Light Olive",
-    "symbol": "Oxen of Fire"
+    "market": "Getgems",
+    "href": "/nft/EQCV0W63HgC1zALAj38OHxgXj61cuwtEoWgGfqy5CaC8fhmw/",
+    "price": "999",
+    "last_sale": "62",
+    "rarity": "3154",
+    "owner": "cryptosharks.ton",
+    "model": "Patriot",
+    "backdrop": "Strawberry",
+    "symbol": "Ram of Amun"
   },
   {
     "nft_id": "EQBkAyVhF9H4jNl4X6w5Bgl6uZRhNcJcyz9Xu3GMB7ieFoSD",
@@ -1160,20 +1188,6 @@
     "model": "Frosted Brew",
     "backdrop": "Cobalt Blue",
     "symbol": "Calm Wolf"
-  },
-  {
-    "nft_id": "EQBLFESyKZLFe3P5Ir-lZ8QHhzQ2hHvJOcDUgZbo8zzOqDmE",
-    "name": "Durov\u2019s Cap #1074",
-    "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQBLFESyKZLFe3P5Ir-lZ8QHhzQ2hHvJOcDUgZbo8zzOqDmE/",
-    "price": "1000",
-    "last_sale": "180",
-    "rarity": "3475",
-    "owner": "EQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp\n\nEQArShYwA15K0bpMa4ZLYR_9O7nwrYCXFLqbyZVK5YYkTAOp",
-    "model": "Duck Tales",
-    "backdrop": "Amber",
-    "symbol": "Cash"
   },
   {
     "nft_id": "EQCvS0wda2vohOJ6IvDuKPHxgsT-LZk1RK52y3x-fO1us26c",
@@ -1202,6 +1216,20 @@
     "model": "Macintosh",
     "backdrop": "Sapphire",
     "symbol": "Fehu Rune"
+  },
+  {
+    "nft_id": "EQCTEuT7mmqQYp8YvsI8tiTWmLit_nREj_xvwFCOQEKUy0cn",
+    "name": "Durov\u2019s Cap #176",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQCTEuT7mmqQYp8YvsI8tiTWmLit_nREj_xvwFCOQEKUy0cn/",
+    "price": "1000",
+    "last_sale": "444",
+    "rarity": "2680",
+    "owner": "EQAFaHF26qbtZ4hfBJfWA0wxXku4-y10uYuwAkmYN7HovJx9\n\nEQAFaHF26qbtZ4hfBJfWA0wxXku4-y10uYuwAkmYN7HovJx9",
+    "model": "Patriot",
+    "backdrop": "Carrot Juice",
+    "symbol": "Mountain Lion"
   },
   {
     "nft_id": "EQBCuW-EObTI0PVorA3V909xijQULsL_iO_d3GH-DT3lYLCh",
@@ -1316,6 +1344,20 @@
     "symbol": "Chili Pepper"
   },
   {
+    "nft_id": "EQDzmnxQb81tvaQsjMta8OLysLfDOTuq02Q46TS5R1Zipo4g",
+    "name": "Durov\u2019s Cap #1030",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQDzmnxQb81tvaQsjMta8OLysLfDOTuq02Q46TS5R1Zipo4g/",
+    "price": "1030",
+    "last_sale": "62",
+    "rarity": "2564",
+    "owner": "hellripper.t.me",
+    "model": "Aurora",
+    "backdrop": "Dark Lilac",
+    "symbol": "Inguz Rune"
+  },
+  {
     "nft_id": "EQCeqeFKYfGLWag1Oj2irkjajvPBReMkoAtpa1rDj4-vwiwe",
     "name": "Durov\u2019s Cap #4537",
     "status": "On Sale",
@@ -1342,6 +1384,20 @@
     "model": "Shadow",
     "backdrop": "Amber",
     "symbol": "Gear"
+  },
+  {
+    "nft_id": "EQD81dLIVifiClwD5N6qLQXkRi26PoprEFEXnYyJsFbHWah1",
+    "name": "Durov\u2019s Cap #4216",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQD81dLIVifiClwD5N6qLQXkRi26PoprEFEXnYyJsFbHWah1/",
+    "price": "1038.96",
+    "last_sale": "692",
+    "rarity": "3641",
+    "owner": "gift-minter.ton",
+    "model": "Voltage",
+    "backdrop": "Coral Red",
+    "symbol": "Baphomet"
   },
   {
     "nft_id": "EQAKeF1ydChalh1OVEk-P_bE-aV3g3OepqIBW671wHb6RJi3",
@@ -1456,6 +1512,20 @@
     "symbol": "Bee"
   },
   {
+    "nft_id": "EQDlxNACHFM7PyzsDO3S1YmIE42WIIqA88CwUULItH5vNcoW",
+    "name": "Durov\u2019s Cap #2359",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQDlxNACHFM7PyzsDO3S1YmIE42WIIqA88CwUULItH5vNcoW/",
+    "price": "1100",
+    "last_sale": "355",
+    "rarity": "3527",
+    "owner": "EQAFaHF26qbtZ4hfBJfWA0wxXku4-y10uYuwAkmYN7HovJx9\n\nEQAFaHF26qbtZ4hfBJfWA0wxXku4-y10uYuwAkmYN7HovJx9",
+    "model": "Cotton Candy",
+    "backdrop": "Amber",
+    "symbol": "Money Bag"
+  },
+  {
     "nft_id": "EQBLWaz0UyQZnVsXnxWQwKfmxJbg39g8mSbZKKWgWhYvsZTm",
     "name": "Durov\u2019s Cap #441",
     "status": "On Sale",
@@ -1496,20 +1566,6 @@
     "model": "Snowfall",
     "backdrop": "Aquamarine",
     "symbol": "Totem Bear"
-  },
-  {
-    "nft_id": "EQD81dLIVifiClwD5N6qLQXkRi26PoprEFEXnYyJsFbHWah1",
-    "name": "Durov\u2019s Cap #4216",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQD81dLIVifiClwD5N6qLQXkRi26PoprEFEXnYyJsFbHWah1/",
-    "price": "1155.44",
-    "last_sale": "692",
-    "rarity": "3641",
-    "owner": "gift-minter.ton",
-    "model": "Voltage",
-    "backdrop": "Coral Red",
-    "symbol": "Baphomet"
   },
   {
     "nft_id": "EQAPiQM8plCl8Wi8yVPGqw1uOZRT1iMC4Z9SxMCslG3ltcYs",
@@ -1624,6 +1680,20 @@
     "symbol": "Fehu Rune"
   },
   {
+    "nft_id": "EQAXiHEcQFe5838E_H07zpHQ14oSuuAho-dVLk6FwaKagsxj",
+    "name": "Durov\u2019s Cap #528",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQAXiHEcQFe5838E_H07zpHQ14oSuuAho-dVLk6FwaKagsxj/",
+    "price": "1200",
+    "last_sale": "",
+    "rarity": "4628",
+    "owner": "EQCPz2zvPwY4PUfEuAdTfCBzfeDWAuP94CHcmr8X0w2dT_kZ\n\nEQCPz2zvPwY4PUfEuAdTfCBzfeDWAuP94CHcmr8X0w2dT_kZ",
+    "model": "Shadow",
+    "backdrop": "Ivory White",
+    "symbol": "Firebird"
+  },
+  {
     "nft_id": "EQAJ5AnV5c-RHAgHqVxSzcib3l6803kfk-UfBg1e1O5fJ3Nm",
     "name": "Durov\u2019s Cap #4011",
     "status": "On Sale",
@@ -1650,20 +1720,6 @@
     "model": "Corkwood",
     "backdrop": "Neon Blue",
     "symbol": "Coin"
-  },
-  {
-    "nft_id": "EQAQtCyVPjNviwpBEG2mB5L6uTejEUHPpQA6F4sbMmSOYUPc",
-    "name": "Durov\u2019s Cap #1344",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQAQtCyVPjNviwpBEG2mB5L6uTejEUHPpQA6F4sbMmSOYUPc/",
-    "price": "1248",
-    "last_sale": "",
-    "rarity": "3743",
-    "owner": null,
-    "model": "Bog Moss",
-    "backdrop": "English Violet",
-    "symbol": "Spirit Impala"
   },
   {
     "nft_id": "EQDARzqdiI-Q9ItJ5_dMbiOlKgfSDxeyG1F0nXgj1coOlexv",
@@ -1762,20 +1818,6 @@
     "model": "Candy Shade",
     "backdrop": "Caramel",
     "symbol": "Coat of Arms"
-  },
-  {
-    "nft_id": "EQDzmnxQb81tvaQsjMta8OLysLfDOTuq02Q46TS5R1Zipo4g",
-    "name": "Durov\u2019s Cap #1030",
-    "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQDzmnxQb81tvaQsjMta8OLysLfDOTuq02Q46TS5R1Zipo4g/",
-    "price": "1300",
-    "last_sale": "62",
-    "rarity": "2564",
-    "owner": "hellripper.t.me",
-    "model": "Aurora",
-    "backdrop": "Dark Lilac",
-    "symbol": "Inguz Rune"
   },
   {
     "nft_id": "EQBmjwZ-_1jrA99SQfG81NoQyfFLfcT0IjFjxxzh_Nm_nJUo",
@@ -2282,6 +2324,20 @@
     "symbol": "Leaf"
   },
   {
+    "nft_id": "EQC-n46z33DUYvUorx_2QRg97l0iLinBvLNK5SCBO_JqUAKn",
+    "name": "Durov\u2019s Cap #580",
+    "status": "On Sale",
+    "market": "Getgems",
+    "href": "/nft/EQC-n46z33DUYvUorx_2QRg97l0iLinBvLNK5SCBO_JqUAKn/",
+    "price": "1499",
+    "last_sale": "69.99",
+    "rarity": "4630",
+    "owner": "EQC9tlKov2cvpVtNYO-ZmhJtARNW02xnxECgyiyKHq8oE3C6\n\nEQC9tlKov2cvpVtNYO-ZmhJtARNW02xnxECgyiyKHq8oE3C6",
+    "model": "Macintosh",
+    "backdrop": "Burgundy",
+    "symbol": "Cash"
+  },
+  {
     "nft_id": "EQB380znKNg7s_qCNZ42ZWtmJzYc-r-tJ73iUPz7lzbiwfx_",
     "name": "Durov\u2019s Cap #144",
     "status": "On Sale",
@@ -2492,6 +2548,20 @@
     "symbol": "Celtic Wolf"
   },
   {
+    "nft_id": "EQC3-bh0m1mVzXCmE8Rh-KXp3PD7vgBOtEYPJnnQhMY_GxPC",
+    "name": "Durov\u2019s Cap #2538",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQC3-bh0m1mVzXCmE8Rh-KXp3PD7vgBOtEYPJnnQhMY_GxPC/",
+    "price": "1560",
+    "last_sale": "",
+    "rarity": "3635",
+    "owner": "gift-minter.ton",
+    "model": "Pinkie Cap",
+    "backdrop": "Fandango",
+    "symbol": "Ouroboros"
+  },
+  {
     "nft_id": "EQD3NLdAAXqZ9kgMRg_FcKziVkRlQiU4Rb6j6xtnArgilqy-",
     "name": "Durov\u2019s Cap #260",
     "status": "On Sale",
@@ -2504,6 +2574,20 @@
     "model": "Sea Sunset",
     "backdrop": "Roman Silver",
     "symbol": "Fleur-de-lis"
+  },
+  {
+    "nft_id": "EQBIz4tquYf_oltNGQvMq4g0h54P7d1UpsEWD_g3JzHgjFTZ",
+    "name": "Durov\u2019s Cap #3024",
+    "status": "On Sale",
+    "market": "Tonnel",
+    "href": "/nft/EQBIz4tquYf_oltNGQvMq4g0h54P7d1UpsEWD_g3JzHgjFTZ/",
+    "price": "1560",
+    "last_sale": "",
+    "rarity": "3534",
+    "owner": null,
+    "model": "Seabreeze",
+    "backdrop": "Amber",
+    "symbol": "Hand of God"
   },
   {
     "nft_id": "EQBskwKpyCrjwUpiBmcsNvbk2GVbef5LAMZI5h9V6SCGZJlO",
@@ -2644,89 +2728,5 @@
     "model": "Voltage",
     "backdrop": "Fandango",
     "symbol": "Coffee Bean"
-  },
-  {
-    "nft_id": "EQAj67CyJADmheA6M4ZnH0B2Wj2-bIYLUEQyMnJMuRj5JmMM",
-    "name": "Durov\u2019s Cap #3673",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQAj67CyJADmheA6M4ZnH0B2Wj2-bIYLUEQyMnJMuRj5JmMM/",
-    "price": "1617.2",
-    "last_sale": "",
-    "rarity": "76025",
-    "owner": null,
-    "model": "Sunrise",
-    "backdrop": "Sky Blue",
-    "symbol": "Scorpion"
-  },
-  {
-    "nft_id": "EQCK3eBV-KoxIkFXMzq194WLG9gpkXnLf4yrY3zZ7ub9ibhW",
-    "name": "Durov\u2019s Cap #1498",
-    "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQCK3eBV-KoxIkFXMzq194WLG9gpkXnLf4yrY3zZ7ub9ibhW/",
-    "price": "1650",
-    "last_sale": "",
-    "rarity": "4305",
-    "owner": "EQAEnqomwC3dg323OcdgUsvk3T38VvYawX8q6x38ulfnCn7b\n\nEQAEnqomwC3dg323OcdgUsvk3T38VvYawX8q6x38ulfnCn7b",
-    "model": "Bordeaux",
-    "backdrop": "Steel Grey",
-    "symbol": "Kitsune"
-  },
-  {
-    "nft_id": "EQBZb-r7XXpTGiPevTKYsI727tGWQPqMo8E4JUdz1naP0nah",
-    "name": "Durov\u2019s Cap #3607",
-    "status": "On Sale",
-    "market": "Tonnel",
-    "href": "/nft/EQBZb-r7XXpTGiPevTKYsI727tGWQPqMo8E4JUdz1naP0nah/",
-    "price": "1664",
-    "last_sale": "",
-    "rarity": "2433",
-    "owner": null,
-    "model": "Villager",
-    "backdrop": "Sapphire",
-    "symbol": "Scarab"
-  },
-  {
-    "nft_id": "EQAg0CCDM0cb2tCXhm8to9EaY48kHlUpIA9sH77SVFw-iJY9",
-    "name": "Durov\u2019s Cap #1397",
-    "status": "On Sale",
-    "market": "Fragment",
-    "href": "/nft/EQAg0CCDM0cb2tCXhm8to9EaY48kHlUpIA9sH77SVFw-iJY9/",
-    "price": "1688",
-    "last_sale": "",
-    "rarity": "3421",
-    "owner": "wk555.t.me",
-    "model": "Sky High",
-    "backdrop": "Platinum",
-    "symbol": "Pegasus"
-  },
-  {
-    "nft_id": "EQBBqKtBDWpTXDSLgiZHb5S5GjiJZNrmN-_i3CAlja7uJX6I",
-    "name": "Durov\u2019s Cap #2129",
-    "status": "On Sale",
-    "market": "Getgems",
-    "href": "/nft/EQBBqKtBDWpTXDSLgiZHb5S5GjiJZNrmN-_i3CAlja7uJX6I/",
-    "price": "1688",
-    "last_sale": "",
-    "rarity": "3507",
-    "owner": "wk555.t.me",
-    "model": "Voltage",
-    "backdrop": "Ivory White",
-    "symbol": "Champagne"
-  },
-  {
-    "nft_id": "EQDNySW8AoAShtbWa8wdC2OUVPNrtjp5QOGPLSgWpIHQLO0N",
-    "name": "Durov\u2019s Cap #2201",
-    "status": "On Sale",
-    "market": "Fragment",
-    "href": "/nft/EQDNySW8AoAShtbWa8wdC2OUVPNrtjp5QOGPLSgWpIHQLO0N/",
-    "price": "1688",
-    "last_sale": "",
-    "rarity": "2562",
-    "owner": "wk555.t.me",
-    "model": "Voltage",
-    "backdrop": "English Violet",
-    "symbol": "Trophy"
   }
 ]
