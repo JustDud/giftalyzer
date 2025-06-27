@@ -1,12 +1,18 @@
 import pandas as pd
 from data_collection.mongo import collections_collection, nfts_collection
+import os
 
-# Load the CSV file
-df = pd.read_csv('Backdrop_Price_Multipliers.csv')
+csv_path = os.path.join(os.path.dirname(__file__), 'Backdrop_Price_Multipliers.csv')
+df = pd.read_csv(csv_path)
 
 
-def estimate_ton_price(nft_id, collection_address):
-    nft = nfts_collection.find_one({"nft_id": nft_id, "collection_address": collection_address})
+def estimate_ton_price(nft_id):
+    nft = nfts_collection.find_one({"nft_id": nft_id})
+    if not nft:
+        raise ValueError("NFT not found in the database.")
+    collection_address = nft.get("collection_address")
+    if not collection_address:
+        raise ValueError("Collection address not found in NFT data.")
     collection = collections_collection.find_one({"address": collection_address})
 
     if not nft or not collection:
