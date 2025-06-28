@@ -1,6 +1,5 @@
-import price_analyser
 from data_collection.marketapp import data_scraper
-from price_analyser import estimate_ton_price
+from analyser.price_analyser import estimate_ton_price
 
 
 def main():
