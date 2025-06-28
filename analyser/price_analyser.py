@@ -1,5 +1,5 @@
 import pandas as pd
-from data_collection.mongo import collections_collection, nfts_collection
+from mongo import collections_collection, nfts_collection
 import os
 
 csv_path = os.path.join(os.path.dirname(__file__), 'Backdrop_Price_Multipliers.csv')

@@ -1,11 +1,9 @@
 import time
-import os
-import json
 
 from data_collection.marketapp.collections_scraper import scrape_collections
 from data_collection.marketapp.nft_scraper import scrape_nfts
-from data_collection.mongo import nfts_collection, collections_collection, upsert_many
-from data_collection.mongo import remove_missing
+from mongo import nfts_collection, collections_collection, upsert_many
+from mongo import remove_missing
 
 
 def scrape_and_update_db():

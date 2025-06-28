@@ -21,11 +21,6 @@ def generate_response(system_prompt, user_message, model="openai/gpt-4"):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message}
         ],
-        """
-        The temperature parameter controls the randomness or creativity of the model’s output.
-	    Lower values (e.g. 0.0–0.3) = more deterministic, focused, repeatable, and conservative answers.
-	    Higher values (e.g. 0.7–1.0) = more diverse, creative, speculative, or exploratory answers.
-        """
         "temperature": 0.0
     }
 
