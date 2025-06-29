@@ -4,6 +4,7 @@ from data_collection.marketapp.collections_scraper import scrape_collections
 from data_collection.marketapp.nft_scraper import scrape_nfts
 from mongo import nfts_collection, collections_collection, upsert_many
 from mongo import remove_missing
+from mongo import upsert_and_notify_new_collections
 
 
 def scrape_and_update_db():
@@ -13,7 +14,7 @@ def scrape_and_update_db():
     collection_summaries = scrape_collections()
     print(f"✅ Scraped {len(collection_summaries)} collections.\n")
 
-    upsert_many(collections_collection, collection_summaries, key="address")
+    upsert_and_notify_new_collections(collections_collection, collection_summaries)
 
     all_nfts = []
 
