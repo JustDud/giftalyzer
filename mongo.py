@@ -21,6 +21,21 @@ collections_collection.create_index("address", unique=True)
 subscriptions_collection.create_index("user_id", unique=True)
 
 
+def upsert_and_notify_new_collections(collections_collection, collection_summaries):
+    existing_addresses = {
+        doc["address"] for doc in collections_collection.find({}, {"address": 1})
+    }
+    new_collections = [col for col in collection_summaries if col["address"] not in existing_addresses]
+
+    upsert_many(collections_collection, collection_summaries, key="address")
+
+    for new_col in new_collections:
+        print(f"📢 New collection published: {new_col['name']} ({new_col['address']})")
+        # Optionally send a message via Telegram bot, Discord webhook, email, etc.
+
+    return new_collections
+
+
 def upsert_many(collection: Collection, documents: List[Dict[str, Any]], key: str = "_id") -> None:
     """
     Efficiently upserts many documents based on a unique key.
