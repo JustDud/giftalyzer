@@ -1,0 +1,823 @@
+2025-07-01 22:54:26,149 - INFO - Start polling
+2025-07-01 22:54:26,174 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:54:26,227 - INFO - Update id=266423778 is not handled. Duration 0 ms by bot id=7589720562
+2025-07-01 22:54:28,064 - INFO - Update id=266423779 is handled. Duration 144 ms by bot id=7589720562
+2025-07-01 22:54:30,307 - INFO - Update id=266423780 is handled. Duration 40 ms by bot id=7589720562
+2025-07-01 22:54:37,628 - INFO - Update id=266423781 is not handled. Duration 150 ms by bot id=7589720562
+2025-07-01 22:54:37,629 - ERROR - Cause exception while process update id=266423781 by bot id=7589720562
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 31, in process_gift_id
+    data = get_data(gift_id)
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/analyser/price_analyser.py", line 35, in get_data
+    "top_order": float(collection.get("top_order", collection["floor"])),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+2025-07-01 22:55:27,169 - WARNING - Received SIGINT signal
+2025-07-01 22:55:27,172 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:55:27,172 - INFO - Polling stopped
+2025-07-01 22:55:30,764 - INFO - Start polling
+2025-07-01 22:55:30,798 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:55:39,131 - INFO - Update id=266423782 is handled. Duration 282 ms by bot id=7589720562
+2025-07-01 22:55:42,566 - INFO - Update id=266423783 is handled. Duration 59 ms by bot id=7589720562
+2025-07-01 22:55:44,417 - INFO - Update id=266423784 is not handled. Duration 327 ms by bot id=7589720562
+2025-07-01 22:55:44,417 - ERROR - Cause exception while process update id=266423784 by bot id=7589720562
+KeyError: 'toncoin'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 33, in process_gift_id
+    ton_to_usd = get_ton_to_usd_rate()
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 16, in get_ton_to_usd_rate
+    return response.json()["toncoin"]["usd"]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'toncoin'
+2025-07-01 22:56:44,413 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-01 22:56:44,415 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-01 22:56:52,820 - WARNING - Received SIGINT signal
+2025-07-01 22:56:52,821 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:56:52,822 - INFO - Polling stopped
+2025-07-01 22:56:56,434 - INFO - Start polling
+2025-07-01 22:56:56,452 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:57:03,777 - INFO - Update id=266423785 is handled. Duration 113 ms by bot id=7589720562
+2025-07-01 22:57:04,816 - INFO - Update id=266423786 is handled. Duration 134 ms by bot id=7589720562
+2025-07-01 22:57:06,770 - INFO - Update id=266423787 is not handled. Duration 513 ms by bot id=7589720562
+2025-07-01 22:57:06,770 - ERROR - Cause exception while process update id=266423787 by bot id=7589720562
+KeyError: "'toncoin' or 'usd' not found in API response: {}"
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 39, in process_gift_id
+    ton_to_usd = get_ton_to_usd_rate()
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 21, in get_ton_to_usd_rate
+    raise KeyError(f"'toncoin' or 'usd' not found in API response: {data}")
+KeyError: "'toncoin' or 'usd' not found in API response: {}"
+2025-07-01 22:58:03,997 - WARNING - Received SIGINT signal
+2025-07-01 22:58:03,999 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:58:04,001 - INFO - Polling stopped
+2025-07-01 22:58:08,573 - INFO - Start polling
+2025-07-01 22:58:08,594 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:58:10,979 - INFO - Update id=266423788 is handled. Duration 120 ms by bot id=7589720562
+2025-07-01 22:58:11,866 - INFO - Update id=266423789 is handled. Duration 56 ms by bot id=7589720562
+2025-07-01 22:58:13,347 - INFO - Update id=266423790 is not handled. Duration 92 ms by bot id=7589720562
+2025-07-01 22:58:13,347 - ERROR - Cause exception while process update id=266423790 by bot id=7589720562
+KeyError: 'gift_result'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 54, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'gift_result'
+2025-07-01 22:58:51,586 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-01 22:58:51,587 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-01 22:59:02,667 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-01 22:59:09,456 - WARNING - Received SIGINT signal
+2025-07-01 22:59:09,457 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:59:09,457 - INFO - Polling stopped
+2025-07-01 22:59:13,254 - INFO - Start polling
+2025-07-01 22:59:13,273 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:59:16,457 - INFO - Update id=266423791 is handled. Duration 113 ms by bot id=7589720562
+2025-07-01 22:59:17,410 - INFO - Update id=266423792 is handled. Duration 43 ms by bot id=7589720562
+2025-07-01 22:59:18,799 - INFO - Update id=266423793 is handled. Duration 137 ms by bot id=7589720562
+2025-07-01 22:59:37,755 - WARNING - Received SIGINT signal
+2025-07-01 22:59:37,756 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 22:59:37,756 - INFO - Polling stopped
+2025-07-01 23:00:30,936 - INFO - Start polling
+2025-07-01 23:00:30,957 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:00:32,608 - INFO - Update id=266423794 is handled. Duration 154 ms by bot id=7589720562
+2025-07-01 23:00:34,222 - INFO - Update id=266423795 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-01 23:00:35,514 - INFO - Update id=266423796 is handled. Duration 117 ms by bot id=7589720562
+2025-07-01 23:00:36,985 - INFO - Update id=266423797 is handled. Duration 167 ms by bot id=7589720562
+2025-07-01 23:00:41,931 - WARNING - Received SIGINT signal
+2025-07-01 23:00:41,931 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:00:41,931 - INFO - Polling stopped
+2025-07-01 23:06:10,484 - INFO - Start polling
+2025-07-01 23:06:10,503 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:06:21,249 - INFO - Update id=266423798 is handled. Duration 112 ms by bot id=7589720562
+2025-07-01 23:06:22,314 - INFO - Update id=266423799 is handled. Duration 110 ms by bot id=7589720562
+2025-07-01 23:06:23,908 - INFO - Update id=266423800 is handled. Duration 463 ms by bot id=7589720562
+2025-07-01 23:07:53,624 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-07-01 23:07:53,626 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-01 23:08:04,742 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-01 23:08:32,841 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-01 23:08:32,842 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-01 23:08:43,960 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-01 23:09:29,483 - WARNING - Received SIGINT signal
+2025-07-01 23:09:29,485 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:09:29,485 - INFO - Polling stopped
+2025-07-01 23:09:51,711 - INFO - Start polling
+2025-07-01 23:09:51,732 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:09:54,267 - INFO - Update id=266423801 is handled. Duration 114 ms by bot id=7589720562
+2025-07-01 23:09:55,338 - INFO - Update id=266423802 is handled. Duration 43 ms by bot id=7589720562
+2025-07-01 23:09:57,216 - INFO - Update id=266423803 is not handled. Duration 89 ms by bot id=7589720562
+2025-07-01 23:09:57,216 - ERROR - Cause exception while process update id=266423803 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 57, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:10:12,221 - WARNING - Received SIGINT signal
+2025-07-01 23:10:12,222 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:10:12,222 - INFO - Polling stopped
+2025-07-01 23:10:16,620 - INFO - Start polling
+2025-07-01 23:10:16,643 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:10:17,892 - INFO - Update id=266423804 is handled. Duration 125 ms by bot id=7589720562
+2025-07-01 23:10:36,045 - INFO - Update id=266423805 is handled. Duration 210 ms by bot id=7589720562
+2025-07-01 23:10:49,090 - WARNING - Received SIGINT signal
+2025-07-01 23:10:49,091 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:10:49,091 - INFO - Polling stopped
+2025-07-01 23:11:10,204 - INFO - Start polling
+2025-07-01 23:11:10,224 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:11:10,257 - INFO - Update id=266423806 is not handled. Duration 0 ms by bot id=7589720562
+2025-07-01 23:11:10,354 - INFO - Update id=266423805 is handled. Duration 97 ms by bot id=7589720562
+2025-07-01 23:11:14,189 - INFO - Update id=266423807 is not handled. Duration 98 ms by bot id=7589720562
+2025-07-01 23:11:14,190 - ERROR - Cause exception while process update id=266423807 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 57, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:11:29,224 - INFO - Update id=266423809 is handled. Duration 82 ms by bot id=7589720562
+2025-07-01 23:11:31,858 - INFO - Update id=266423810 is handled. Duration 52 ms by bot id=7589720562
+2025-07-01 23:11:33,500 - INFO - Update id=266423811 is not handled. Duration 395 ms by bot id=7589720562
+2025-07-01 23:11:33,501 - ERROR - Cause exception while process update id=266423811 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 57, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:11:59,101 - WARNING - Received SIGINT signal
+2025-07-01 23:11:59,103 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:11:59,103 - INFO - Polling stopped
+2025-07-01 23:11:59,355 - INFO - Update id=266423808 is not handled. Duration 30245 ms by bot id=7589720562
+2025-07-01 23:12:05,367 - INFO - Start polling
+2025-07-01 23:12:05,387 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:12:05,548 - INFO - Update id=266423812 is handled. Duration 116 ms by bot id=7589720562
+2025-07-01 23:12:05,826 - INFO - Update id=266423813 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-01 23:12:07,228 - INFO - Update id=266423814 is handled. Duration 203 ms by bot id=7589720562
+2025-07-01 23:12:08,725 - INFO - Update id=266423815 is not handled. Duration 121 ms by bot id=7589720562
+2025-07-01 23:12:08,726 - ERROR - Cause exception while process update id=266423815 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 57, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:12:52,385 - WARNING - Received SIGINT signal
+2025-07-01 23:12:52,387 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:12:52,388 - INFO - Polling stopped
+2025-07-01 23:12:56,121 - INFO - Start polling
+2025-07-01 23:12:56,140 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:12:57,697 - INFO - Update id=266423816 is handled. Duration 116 ms by bot id=7589720562
+2025-07-01 23:13:00,174 - INFO - Update id=266423817 is handled. Duration 52 ms by bot id=7589720562
+2025-07-01 23:13:01,858 - INFO - Update id=266423818 is not handled. Duration 340 ms by bot id=7589720562
+2025-07-01 23:13:01,859 - ERROR - Cause exception while process update id=266423818 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 57, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:13:40,469 - WARNING - Received SIGINT signal
+2025-07-01 23:13:40,471 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:13:40,471 - INFO - Polling stopped
+2025-07-01 23:13:44,072 - INFO - Start polling
+2025-07-01 23:13:44,092 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:13:44,226 - INFO - Update id=266423819 is handled. Duration 99 ms by bot id=7589720562
+2025-07-01 23:13:46,024 - INFO - Update id=266423820 is handled. Duration 50 ms by bot id=7589720562
+2025-07-01 23:13:49,475 - INFO - Update id=266423821 is not handled. Duration 91 ms by bot id=7589720562
+2025-07-01 23:13:49,475 - ERROR - Cause exception while process update id=266423821 by bot id=7589720562
+KeyError: 'usd\n'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 58, in process_gift_id
+    t.texts["gift_result"].format(**result),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'usd\n'
+2025-07-01 23:13:55,557 - WARNING - Received SIGINT signal
+2025-07-01 23:13:55,557 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:13:55,557 - INFO - Polling stopped
+2025-07-01 23:14:29,785 - INFO - Start polling
+2025-07-01 23:14:29,802 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:14:32,483 - INFO - Update id=266423822 is handled. Duration 392 ms by bot id=7589720562
+2025-07-01 23:14:33,728 - INFO - Update id=266423823 is handled. Duration 35 ms by bot id=7589720562
+2025-07-01 23:14:35,715 - INFO - Update id=266423824 is handled. Duration 127 ms by bot id=7589720562
+2025-07-01 23:14:49,485 - WARNING - Received SIGINT signal
+2025-07-01 23:14:49,486 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:14:49,486 - INFO - Polling stopped
+2025-07-01 23:14:53,029 - INFO - Start polling
+2025-07-01 23:14:53,052 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:14:53,675 - INFO - Update id=266423825 is handled. Duration 129 ms by bot id=7589720562
+2025-07-01 23:14:54,613 - INFO - Update id=266423826 is handled. Duration 37 ms by bot id=7589720562
+2025-07-01 23:14:56,140 - INFO - Update id=266423827 is not handled. Duration 93 ms by bot id=7589720562
+2025-07-01 23:14:56,140 - ERROR - Cause exception while process update id=266423827 by bot id=7589720562
+KeyError: 'market'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 51, in process_gift_id
+    "market": data["market"],
+              ~~~~^^^^^^^^^^
+KeyError: 'market'
+2025-07-01 23:15:26,184 - WARNING - Received SIGINT signal
+2025-07-01 23:15:26,186 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:15:26,186 - INFO - Polling stopped
+2025-07-01 23:16:31,479 - INFO - 🚀 Bot is starting...
+2025-07-01 23:16:31,480 - INFO - Start polling
+2025-07-01 23:16:31,508 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:16:37,699 - INFO - Update id=266423828 is handled. Duration 336 ms by bot id=7589720562
+2025-07-01 23:16:40,278 - INFO - Update id=266423829 is handled. Duration 37 ms by bot id=7589720562
+2025-07-01 23:16:44,574 - INFO - Update id=266423830 is not handled. Duration 97 ms by bot id=7589720562
+2025-07-01 23:16:44,575 - ERROR - Cause exception while process update id=266423830 by bot id=7589720562
+KeyError: 'market'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 51, in process_gift_id
+    "market": data["market"],
+              ~~~~^^^^^^^^^^
+KeyError: 'market'
+2025-07-01 23:16:49,209 - WARNING - Received SIGINT signal
+2025-07-01 23:16:49,209 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:16:49,210 - INFO - Polling stopped
+2025-07-01 23:18:56,105 - INFO - 🚀 Bot is starting...
+2025-07-01 23:18:56,106 - INFO - Start polling
+2025-07-01 23:18:56,125 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:18:56,787 - INFO - Update id=266423831 is handled. Duration 117 ms by bot id=7589720562
+2025-07-01 23:18:57,728 - INFO - Update id=266423832 is handled. Duration 43 ms by bot id=7589720562
+2025-07-01 23:18:59,022 - INFO - Update id=266423833 is handled. Duration 188 ms by bot id=7589720562
+2025-07-01 23:19:30,235 - WARNING - Received SIGINT signal
+2025-07-01 23:19:30,235 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-01 23:19:30,236 - INFO - Polling stopped
