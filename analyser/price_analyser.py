@@ -1,10 +1,23 @@
 import pandas as pd
 from mongo import collections_collection, nfts_collection
 import os
+import requests
 import math
 
 csv_path = os.path.join(os.path.dirname(__file__), 'Backdrop_Price_Multipliers.csv')
 df = pd.read_csv(csv_path)
+
+
+def convert_ton_to_usd(ton):
+    url = "https://api.binance.com/api/v3/ticker/price?symbol=TONUSDT"
+    try:
+        response = requests.get(url, timeout=5)
+        data = response.json()
+        rate = float(data["price"])
+        return round(ton * rate, 2)
+    except Exception as e:
+        print(f"[ERROR] Binance API failed, using fallback: {e}")
+        return round(ton * 2.0, 2)
 
 
 def get_data(nft_id):
