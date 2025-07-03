@@ -5,6 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, BotCommand
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.client.session.aiohttp import AiohttpSession
 import logging
 
 from bot_manager.handlers import register_all_handlers
@@ -30,7 +31,8 @@ logging.basicConfig(
     ]
 )
 
-bot = Bot(token=BOT_TOKEN)
+session = AiohttpSession(timeout=30)  # default is 10
+bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
 
