@@ -1,14 +1,18 @@
 from data_collection.marketapp import data_scraper
 from analyser.price_analyser import estimate_ton_price, convert_ton_to_usd
+from mongo import export_all_nft_prices_to_csv
 
 
 def main():
-    data_update_requested = False
-
+    data_update_requested = True
+    #
     if data_update_requested:
         data_scraper.scrape_and_update_db()
 
     test_estimate_price()
+
+    # Export all NFT prices to CSV
+    # export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd)
 
 
 
