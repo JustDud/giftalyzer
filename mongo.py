@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 from typing import List, Dict, Any
 from pymongo.collection import Collection
+import csv
+
 
 load_dotenv()
 
@@ -58,3 +60,39 @@ def remove_missing(collection: Collection, valid_ids: List[Any], match: Dict[str
     match[key] = {"$nin": valid_ids}
     result = collection.delete_many(match)
     print(f"Removed {result.deleted_count} documents not in the scraped list.")
+
+
+def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_path="nft_price_output.csv"):
+    """
+    Export all NFTs from the DB with their estimated price to a CSV.
+    """
+    nfts = list(nfts_collection.find())
+
+    with open(output_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["nft_id", "collection_name", "backdrop", "model", "symbol", "estimated_ton", "usd", "real_price"])
+
+        for nft in nfts:
+            nft_id = nft.get("nft_id")
+            collection_address = nft.get("collection_address")
+            collection_doc = collections_collection.find_one({"address": collection_address})
+            collection_name = collection_doc["name"] if collection_doc else ""
+
+            try:
+                estimated_price = estimate_ton_price(nft_id)
+                usd_price = convert_ton_to_usd(estimated_price)
+            except Exception as e:
+                print(f"Error estimating price for {nft_id}: {e}")
+                estimated_price = None
+                usd_price = None
+
+            writer.writerow([
+                nft_id,
+                collection_name,
+                nft.get("backdrop", ""),
+                nft.get("model", ""),
+                nft.get("symbol", ""),
+                estimated_price,
+                usd_price,
+                nft.get("last_sale") or nft.get("price") or ""
+            ])

@@ -67,13 +67,6 @@ async def go_back(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(t.texts["start"], reply_markup=main_menu)
 
-
-@router.message(F.text == t.texts["btn_manual_input"])
-async def ask_manual_input(message: types.Message, state: FSMContext):
-    await state.set_state(GiftStates.WaitingForManualInput)
-    await message.answer(t.texts["manual_input_prompt"], reply_markup=back_keyboard)
-
-
 @router.message(GiftStates.WaitingForManualInput)
 async def process_manual_input(message: types.Message, state: FSMContext):
     text = message.text.strip()
