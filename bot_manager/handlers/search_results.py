@@ -1,44 +1,48 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 from mongo import collections_collection, nfts_collection
 from analyser.price_analyser import estimate_ton_price, convert_ton_to_usd
 from aiogram.exceptions import TelegramBadRequest
+import asyncio
+from bot_manager.handlers.market_search import MarketSearchState
+from bot_manager.texts.ru import texts as t
 
 router = Router()
+
+def get_pagination_keyboard(current_page: int, total_pages: int):
+    buttons = []
+    if current_page > 0:
+        buttons.append(InlineKeyboardButton(text=t["btn_prev_page"], callback_data="page_prev"))
+    if current_page < total_pages - 1:
+        buttons.append(InlineKeyboardButton(text=t["btn_next_page"], callback_data="page_next"))
+    return InlineKeyboardMarkup(inline_keyboard=[buttons]) if buttons else None
 
 @router.callback_query(F.data == "show_filtered_results")
 async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
     await call.answer()
+    from aiogram.types import ReplyKeyboardRemove
+    temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
 
     data = await state.get_data()
     selected_models = data.get("selected_models", [])
     selected_backdrops = data.get("selected_backdrops", [])
+    await state.set_state(MarketSearchState.loading_results)
 
-    if not selected_models and not selected_backdrops:
-        await call.answer("❌ Выберите хотя бы одну модель и один фон.", show_alert=True)
-        return
-    elif not selected_models:
-        await call.answer("❌ Выберите хотя бы одну модель.", show_alert=True)
-        return
-    elif not selected_backdrops:
-        await call.answer("❌ Выберите хотя бы один фон.", show_alert=True)
-        return
-
+    from aiogram.types import ReplyKeyboardRemove
     await call.message.edit_reply_markup(reply_markup=None)
-    await call.answer("⏳ Подождите... Не закрывайте это окно.", show_alert=True)
-    await call.message.edit_text("🔎 Подбор подарков по выбранным параметрам...")
+    await call.answer(t["please_wait"], show_alert=True)
+    interim_messages = t["loading_phrases"]
+    await call.message.edit_text(interim_messages[0])
     collection_name = data.get("selected_collection")
 
     collection = collections_collection.find_one({"name": collection_name})
     if not collection:
-        await call.message.answer("Коллекция не найдена.")
+        await call.message.answer(t["collection_not_found"])
         return
 
+    await call.message.edit_text(interim_messages[1])
     collection_address = collection["address"]
-
-    await call.message.edit_text("🔄 Обработка запроса, пожалуйста, подождите...")
-
     nft_cursor = nfts_collection.find({
         "collection_address": collection_address,
         "model": {"$in": selected_models},
@@ -63,7 +67,7 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
             "name": nft.get("name", "Unknown"),
             "model": nft.get("model", ""),
             "symbol": nft.get("symbol", ""),
-            "background": nft.get("backdrop", ""),
+            "backdrop": nft.get("backdrop", ""),
             "ton": ton_price,
             "usd_estimated": convert_ton_to_usd(ton_price),
             "market": nft.get("market", "N/A"),
@@ -72,14 +76,61 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
         }
         results.append(result)
 
+        if len(results) % 15 == 0:
+            progress_text = interim_messages[(len(results) // 15 - 1) % len(interim_messages)]
+            try:
+                if call.message.text != progress_text:
+                    await call.message.edit_text(progress_text)
+                    await asyncio.sleep(1)
+            except TelegramBadRequest as e:
+                if "message is not modified" not in str(e):
+                    raise
+
     if not results:
-        await call.message.edit_text("❌ Нет результатов по выбранным параметрам.")
+        await call.message.edit_text(t["no_results_found"])
         return
 
-    from bot_manager.texts import ru as t
-    text_blocks = [t.texts["gift_result"].format(**r) for r in results[:10]]
-    full_text = "\n\n".join(text_blocks)
-    await call.message.edit_text(full_text, reply_markup=None)
+    from bot_manager.keyboards.default import main_menu
+    await temp.delete()
+    await call.message.answer(t["keyboard_restored"], reply_markup=main_menu)
+
+    await call.message.edit_text(interim_messages[2])
+    await state.update_data(filtered_results=results, results_page=0)
+    page = 0
+    total_pages = (len(results) + 7) // 8
+    chunk = results[page*8:(page+1)*8]
+    text_blocks = [t["gift_result"].format(**r) for r in chunk]
+    full_text = "\n\n-----------\n\n".join(text_blocks)
+
+    reply_markup = get_pagination_keyboard(page, total_pages)
+    await call.message.edit_text(t["processing_done"])
+    await call.message.answer(full_text, reply_markup=reply_markup)
+
+
+@router.callback_query(F.data.in_(["page_prev", "page_next"]))
+async def paginate_filtered_results(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    data = await state.get_data()
+    results = data.get("filtered_results", [])
+    page = data.get("results_page", 0)
+    total_pages = (len(results) + 7) // 8
+
+    if call.data == "page_next" and page < total_pages - 1:
+        page += 1
+    elif call.data == "page_prev" and page > 0:
+        page -= 1
+
+    chunk = results[page*8:(page+1)*8]
+    text_blocks = [t["gift_result"].format(**r) for r in chunk]
+    full_text = "\n\n-----------\n\n".join(text_blocks)
+
+    reply_markup = get_pagination_keyboard(page, total_pages)
+    try:
+        await call.message.edit_text(full_text, reply_markup=reply_markup)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            raise
+    await state.update_data(results_page=page)
 
 
 

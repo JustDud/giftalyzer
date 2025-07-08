@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from bot_manager.texts.ru import texts as t
 
 
 def get_nft_keyboard(
@@ -6,7 +7,9 @@ def get_nft_keyboard(
     page: int = 0,
     per_page: int = 30,
     selected_models: list[str] = None,
-    include_select_all: bool = False
+    include_select_all: bool = False,
+    next_label: str = t["btn_next_page"],
+    prev_label: str = t["btn_prev_page"]
 ) -> InlineKeyboardMarkup:
     selected_models = selected_models or []
     start = page * per_page
@@ -25,27 +28,27 @@ def get_nft_keyboard(
 
     if include_select_all:
         rows.append([
-            InlineKeyboardButton(text="✅ Выбрать всё", callback_data="select_all_models")
+            InlineKeyboardButton(text=t["btn_select_all_models"], callback_data="select_all_models")
         ])
 
     nav_buttons = []
     if page > 0:
-        nav_buttons.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"nft_prev_page:{page - 1}"))
+        nav_buttons.append(InlineKeyboardButton(text=prev_label, callback_data=f"nft_prev_page:{page - 1}"))
     if end < len(nfts):
-        nav_buttons.append(InlineKeyboardButton(text="➡️ Далее", callback_data=f"nft_next_page:{page + 1}"))
+        nav_buttons.append(InlineKeyboardButton(text=next_label, callback_data=f"nft_next_page:{page + 1}"))
 
     if nav_buttons:
         rows.append(nav_buttons)
 
     rows.append([
-        InlineKeyboardButton(text="➡️ К выбору фона", callback_data="proceed_to_backdrops")
+        InlineKeyboardButton(text=t["btn_proceed_to_backdrops"], callback_data="proceed_to_backdrops")
     ])
 
-    rows.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_collections")])
+    rows.append([InlineKeyboardButton(text=t["btn_back_to_collections"], callback_data="back_to_collections")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
-def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int = 30) -> InlineKeyboardMarkup:
+def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int = 30, next_label: str = t["btn_next_page"], prev_label: str = t["btn_prev_page"]) -> InlineKeyboardMarkup:
     start = page * per_page
     end = start + per_page
 
@@ -59,14 +62,14 @@ def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int
 
     nav_buttons = []
     if page > 0:
-        nav_buttons.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=f"prev_page:{page - 1}"))
+        nav_buttons.append(InlineKeyboardButton(text=prev_label, callback_data=f"prev_page:{page - 1}"))
     if end < len(collections):
-        nav_buttons.append(InlineKeyboardButton(text="➡️ Далее", callback_data=f"next_page:{page + 1}"))
+        nav_buttons.append(InlineKeyboardButton(text=next_label, callback_data=f"next_page:{page + 1}"))
 
     if nav_buttons:
         keyboard.inline_keyboard.append(nav_buttons)
 
-    keyboard.inline_keyboard.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_main")])
+    keyboard.inline_keyboard.append([InlineKeyboardButton(text=t["btn_back_to_main"], callback_data="back_to_main")])
     return keyboard
 
 
@@ -88,14 +91,14 @@ def get_backdrop_keyboard(
     ]
 
     rows.append([
-        InlineKeyboardButton(text="✅ Выбрать всё", callback_data="select_all_backdrops")
+        InlineKeyboardButton(text=t["btn_select_all_backdrops"], callback_data="select_all_backdrops")
     ])
 
     if include_show_results_button:
-        rows.append([InlineKeyboardButton(text="🔎 Показать результаты", callback_data="show_filtered_results")])
+        rows.append([InlineKeyboardButton(text=t["btn_show_filtered_results"], callback_data="show_filtered_results")])
 
     rows.append([
-        InlineKeyboardButton(text="🔙 Назад к моделям", callback_data="back_to_models")
+        InlineKeyboardButton(text=t["btn_back_to_models"], callback_data="back_to_models")
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)

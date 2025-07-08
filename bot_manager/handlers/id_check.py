@@ -17,28 +17,56 @@ async def ask_for_gift_id(message: types.Message, state: FSMContext):
     await message.answer(t.texts["id_input_prompt"], reply_markup=back_keyboard)
 
 
+@router.message(F.text == t.texts["btn_check_another"])
+async def repeat_gift_check(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer(t.texts["id_input_prompt"], reply_markup=back_keyboard)
+    await state.set_state(GiftStates.WaitingForGiftID)
+
+
+@router.message(F.text == t.texts["btn_back"])
+async def go_back(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer(t.texts["returned_to_menu"], reply_markup=main_menu)
+
+
 # Handle user ID input
 @router.message(GiftStates.WaitingForGiftID)
 async def process_gift_id(message: types.Message, state: FSMContext):
     gift_id = message.text.strip()
+
+    # Extract gift name or ID from link
+    if "/nft/" in gift_id:
+        gift_id = gift_id.split("/nft/")[-1]
+    elif "/" in gift_id:
+        gift_id = gift_id.rsplit("/", 1)[-1]
+
+    gift_id = gift_id.strip().strip("/")
+    print(f"[DEBUG] Normalized gift_id: {gift_id}")
     await state.clear()  # Clear early to prevent lingering state
 
-    try:
-        data = get_data(gift_id)
-    except ValueError:
-        await state.set_state(GiftStates.WaitingForGiftID)  # Re-set the state so user can retry
-        await message.answer(t.texts["nft_not_found"], reply_markup=check_again_keyboard)
+    from mongo import get_nft_by_id_or_name, normalize_nft_name
+
+    normalized_id = gift_id.strip().strip("/")
+    # Check if it's a name-formatted input
+    if "-" in normalized_id and not normalized_id.startswith("EQ"):
+        normalized_id = normalize_nft_name(normalized_id)
+
+    data = get_nft_by_id_or_name(normalized_id)
+    if data is None:
+        await state.set_state(GiftStates.WaitingForGiftID)
+        await message.answer(t.texts["nft_not_found"])
         return
 
-    price = estimate_ton_price(gift_id)
+    price = estimate_ton_price(data["nft_id"])
     usd_estimated = convert_ton_to_usd(price)
-    usd_market = convert_ton_to_usd(data["price"])
+    usd_market = convert_ton_to_usd(float(data["price"]))
 
     result = {
         "name": data["name"],
         "model": data["model"],
         "symbol": data["symbol"],
-        "background": data["background"],
+        "backdrop": data["backdrop"],
         "ton": price,
         "usd_estimated": usd_estimated,
         "market": data["market"],
@@ -51,24 +79,12 @@ async def process_gift_id(message: types.Message, state: FSMContext):
         t.texts["gift_result"].format(**result),
         reply_markup=check_again_keyboard
     )
-    await state.clear()
 
 
-
-@router.message(F.text == t.texts["btn_check_another"])
-async def repeat_gift_check(message: types.Message, state: FSMContext):
-    await state.clear()
-    await message.answer(t.texts["id_input_prompt"], reply_markup=back_keyboard)
-    await state.set_state(GiftStates.WaitingForGiftID)
-
-
-@router.message(F.text == t.texts["btn_back"])
-async def go_back(message: types.Message, state: FSMContext):
-    await state.clear()
-    await message.answer(t.texts["start"], reply_markup=main_menu)
 
 @router.message(GiftStates.WaitingForManualInput)
 async def process_manual_input(message: types.Message, state: FSMContext):
+    await state.clear()  # Clear early to prevent lingering state
     text = message.text.strip()
     # Here you would parse model, background, etc.
     # For now, just return placeholders
@@ -88,7 +104,6 @@ async def process_manual_input(message: types.Message, state: FSMContext):
         t.texts["gift_result"].format(**result),
         reply_markup=check_again_keyboard
     )
-    await state.clear()
 
 
 def register(dp):
