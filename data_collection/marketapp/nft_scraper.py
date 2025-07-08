@@ -4,8 +4,21 @@ from bs4 import BeautifulSoup
 import json
 import os
 import html
-
+import re
 from data_collection.marketapp.collections_scraper import scrape_collections
+
+
+# Helper to normalize NFT names to format "MadPumpkin-1218"
+def normalize_nft_name(name: str) -> str:
+    if not name:
+        return ""
+    name = name.strip()
+    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
+    if match:
+        prefix = match.group(1).replace(" ", "")
+        number = match.group(2)
+        return f"{prefix}-{number}"
+    return name.replace(" ", "")
 
 
 def scrape_nfts(address):
@@ -31,8 +44,9 @@ def scrape_nfts(address):
         soup = BeautifulSoup(res.text, "html.parser")
         rows = soup.select("tr.tm-row-selectable")
         for row in rows:
-            name = row.select_one(".tm-value")
-            name = name.text.strip() if name else "Unknown"
+            name_elem = row.select_one(".tm-value")
+            name = name_elem.text.strip() if name_elem else "Unknown"
+            name = normalize_nft_name(name)
             link = row.select_one("a")
             href = link['href'] if link else None
             nft_id = href.strip("/").split("/")[-1] if href else None
@@ -120,8 +134,9 @@ def scrape_nfts(address):
             break
 
         for row in rows:
-            name = row.select_one(".tm-value")
-            name = name.text.strip() if name else "Unknown"
+            name_elem = row.select_one(".tm-value")
+            name = name_elem.text.strip() if name_elem else "Unknown"
+            name = normalize_nft_name(name)
             link = row.select_one("a")
             href = link['href'] if link else None
             nft_id = href.strip("/").split("/")[-1] if href else None

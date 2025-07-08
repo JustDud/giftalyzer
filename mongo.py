@@ -1,3 +1,16 @@
+def normalize_nft_name(name: str) -> str:
+    if not name:
+        return ""
+    name = name.strip()
+    import re
+    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
+    if match:
+        prefix = match.group(1).replace(" ", "")
+        number = match.group(2)
+        return f"{prefix}-{number}"
+    return name.replace(" ", "")
+
+import re
 from pymongo import MongoClient, UpdateOne
 from dotenv import load_dotenv
 import os
@@ -70,7 +83,10 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
 
     with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["nft_id", "collection_name", "backdrop", "model", "symbol", "estimated_ton", "usd", "real_price"])
+        writer.writerow([
+            "nft_id", "collection_name", "backdrop", "model", "symbol",
+            "floor_price", "rarity", "real_price", "estimated_ton", "usd"
+        ])
 
         for nft in nfts:
             nft_id = nft.get("nft_id")
@@ -92,7 +108,50 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
                 nft.get("backdrop", ""),
                 nft.get("model", ""),
                 nft.get("symbol", ""),
+                nft.get("floor_price", ""),
+                nft.get("rarity", ""),
+                nft.get("last_sale") or nft.get("price") or "",
                 estimated_price,
-                usd_price,
-                nft.get("last_sale") or nft.get("price") or ""
+                usd_price
             ])
+
+
+def get_nft_by_id_or_name(gift_id: str):
+    """
+    Retrieve NFT document by its ID, normalized name, or collection address.
+    """
+    nft = nfts_collection.find_one({"nft_id": gift_id})
+    if nft:
+        return nft
+    # If it's a normalized name
+    if "-" in gift_id and not gift_id.startswith("EQ"):
+        nft = nfts_collection.find_one({"name": gift_id})
+        if nft:
+            return nft
+    return nfts_collection.find_one({"collection_address": gift_id})
+def normalize_collection_name(name: str) -> str:
+    if not name:
+        return ""
+    name = name.strip()
+    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
+    if match:
+        prefix = match.group(1).replace(" ", "")
+        number = match.group(2)
+        return f"{prefix}-{number}"
+    return name.replace(" ", "")
+
+# One-time migration script to normalize all collection names in the DB
+def migrate_collection_names():
+    for doc in collections_collection.find():
+        original = doc.get("name", "")
+        normalized = normalize_collection_name(original)
+        if normalized and normalized != original:
+            collections_collection.update_one({"_id": doc["_id"]}, {"$set": {"name": normalized}})
+    print("✅ Collection name normalization complete.")
+
+
+# Utility function to delete specific collections by name
+def delete_specific_collections():
+    to_delete = ["AnonymousTelegramNumbers", "TelegramUsernames"]
+    result = collections_collection.delete_many({"name": {"$in": to_delete}})
+    print(f"🗑 Deleted {result.deleted_count} collections: {', '.join(to_delete)}")

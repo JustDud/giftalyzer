@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.filters import StateFilter
 from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -14,6 +15,9 @@ class MarketSearchState(StatesGroup):
     selecting_collection = State()
     selecting_gift = State()
     selecting_backdrop = State()
+    confirming_selection = State()
+    loading_results = State()
+
 
 router = Router()
 
@@ -28,7 +32,7 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext):
 
     collection = collections_collection.find_one({"name": collection_name})
     if not collection:
-        await call.answer("Коллекция не найдена.")
+        await call.answer(t["collection_not_found"])
         return
     collection_address = collection["address"]
 
@@ -61,15 +65,12 @@ async def handle_pagination(call: CallbackQuery, state: FSMContext):
             raise
 
 
-
-
-
 @router.message(F.text == t["btn_enter_manual"])
 async def handle_manual_input(message: Message, state: FSMContext):
     collections_cursor = collections_collection.find({}, {"name": 1})
     collections = [col["name"] for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections)
-    await message.answer("Выберите коллекцию:", reply_markup=keyboard)
+    await message.answer(t["prompt_select_collection"], reply_markup=keyboard)
     await state.set_state(MarketSearchState.selecting_collection)
 
 
@@ -82,7 +83,7 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext):
 
     collection = collections_collection.find_one({"name": collection_name})
     if not collection:
-        await call.message.answer("Коллекция не найдена.")
+        await call.message.answer(t["collection_not_found"])
         return
 
     collection_address = collection["address"]
@@ -93,7 +94,7 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext):
 
     keyboard = get_nft_keyboard(nfts, selected_models=[], include_select_all=True)
 
-    await call.message.edit_text(f"Выберите модель из коллекции «{collection_name}»")
+    await call.message.edit_text(t["prompt_select_model"].format(collection_name=collection_name))
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
     except TelegramBadRequest as e:
@@ -111,7 +112,7 @@ async def handle_nft_pagination(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     collection_name = data.get("selected_collection")
     if not collection_name:
-        await call.answer("Коллекция не выбрана.")
+        await call.answer(t["collection_not_found"])
         return
 
     page = int(call.data.split(":")[1])
@@ -167,6 +168,14 @@ async def select_all_models(call: CallbackQuery, state: FSMContext):
         if "message is not modified" not in str(e):
             raise
 
+
+@router.callback_query(F.data == "back_to_main")
+async def handle_back_to_main_menu(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.clear()
+    await call.message.edit_text(t["returned_to_menu"])
+
+
 @router.callback_query(F.data == "back_to_collections")
 async def handle_back_to_collections(call: CallbackQuery, state: FSMContext):
     await call.answer()
@@ -184,18 +193,20 @@ async def handle_back_to_collections(call: CallbackQuery, state: FSMContext):
 
 @router.callback_query(MarketSearchState.selecting_gift, F.data == "proceed_to_backdrops")
 async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext):
-    await call.answer()
     data = await state.get_data()
-    collection_name = data.get("selected_collection")
     selected_models = data.get("selected_models", [])
+    print(f"[DEBUG] Proceeding to backdrops with selected_models: {selected_models}")
 
     if not selected_models:
-        await call.answer("Пожалуйста, выберите хотя бы одну модель перед переходом к фонам.", show_alert=True)
+        print("[DEBUG] No models selected. Showing alert.")
+        await call.answer("❌ " + t["select_one_model"], show_alert=True)
         return
+
+    collection_name = data.get("selected_collection")
 
     collection = collections_collection.find_one({"name": collection_name})
     if not collection:
-        await call.answer("Коллекция не найдена.")
+        await call.answer(t["collection_not_found"])
         return
     collection_address = collection["address"]
 
@@ -207,14 +218,14 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext):
     backdrops = list({doc["backdrop"] for doc in nft_cursor if "backdrop" in doc})
 
     if not backdrops:
-        await call.answer("Нет доступных фонов для выбранных моделей.", show_alert=True)
+        await call.answer(t["no_backdrops_available"], show_alert=True)
         await state.set_state(MarketSearchState.selecting_gift)
         return
 
     from bot_manager.keyboards.search_keyboard import get_backdrop_keyboard
     keyboard = get_backdrop_keyboard(backdrops, include_show_results_button=True)
     await state.update_data(cached_backdrops=backdrops, selected_backdrops=[])
-    await call.message.edit_text(f"Выберите фон для коллекции «{collection_name}»")
+    await call.message.edit_text(t["prompt_select_backdrop"].format(collection_name=collection_name))
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
     except TelegramBadRequest as e:
@@ -233,7 +244,7 @@ async def select_all_backdrops(call: CallbackQuery, state: FSMContext):
     await state.update_data(current_backdrop_page=0)
 
     from bot_manager.keyboards.search_keyboard import get_backdrop_keyboard
-    keyboard = get_backdrop_keyboard(backdrops, selected_backdrops=backdrops)
+    keyboard = get_backdrop_keyboard(backdrops, selected_backdrops=backdrops, include_show_results_button=True)
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
     except TelegramBadRequest as e:
@@ -254,12 +265,41 @@ async def toggle_backdrop_selection(call: CallbackQuery, state: FSMContext):
     await state.update_data(selected_backdrops=selected_backdrops)
 
     from bot_manager.keyboards.search_keyboard import get_backdrop_keyboard
-    keyboard = get_backdrop_keyboard(data.get("cached_backdrops", []), selected_backdrops)
+    keyboard = get_backdrop_keyboard(
+        data.get("cached_backdrops", []),
+        selected_backdrops,
+        include_show_results_button=True
+    )
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
     except TelegramBadRequest as e:
         if "message is not modified" not in str(e):
             raise
+
+
+@router.callback_query(MarketSearchState.selecting_backdrop, F.data == "show_filtered_results")
+async def validate_and_proceed_to_results(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    selected_models = data.get("selected_models", [])
+    selected_backdrops = data.get("selected_backdrops", [])
+
+    if not selected_models and not selected_backdrops:
+        await call.answer("❌ " + t["select_model_and_backdrop"], show_alert=True)
+        return
+    elif not selected_models:
+        await call.answer("❌ " + t["select_one_model"], show_alert=True)
+        return
+    elif not selected_backdrops:
+        try:
+            await call.answer("❌ " + t["select_one_backdrop"], show_alert=True)
+        except Exception as e:
+            import logging
+            logging.exception("Failed to send backdrop selection warning: %s", e)
+        return
+
+    await state.set_state(MarketSearchState.loading_results)
+    from bot_manager.handlers.search_results import show_filtered_nfts
+    await show_filtered_nfts(call, state)
 
 
 def register(dp):

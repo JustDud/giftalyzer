@@ -2,6 +2,18 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import json
+import re
+
+def normalize_collection_name(name: str) -> str:
+    if not name:
+        return ""
+    name = name.strip()
+    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
+    if match:
+        prefix = match.group(1).replace(" ", "")
+        number = match.group(2)
+        return f"{prefix}-{number}"
+    return name.replace(" ", "")
 
 def parse_ton_value(val):
     if val is None:
@@ -34,6 +46,7 @@ def scrape_collections():
         name_cell = row.select_one(".tm-value")
         name = name_cell.text.strip() if name_cell else "Unknown"
         name = name.encode("latin1", errors="ignore").decode("utf-8", errors="ignore")
+        name = normalize_collection_name(name)
 
         link_tag = name_cell.find_parent("a")
         href = link_tag["href"] if link_tag and "href" in link_tag.attrs else None
@@ -44,7 +57,7 @@ def scrape_collections():
         floor_value = floor_td.select_one(".tm-value") if floor_td else None
         floor = floor_value.text.strip().split("~")[0] if floor_value else None
 
-        if name in ["Anonymous Telegram Numbers", "Telegram Usernames"]:
+        if name in ["AnonymousTelegramNumbers", "TelegramUsernames"]:
             continue
 
         tds = row.find_all("td")[1:]
