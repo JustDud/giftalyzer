@@ -9,9 +9,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 import logging
 
 from bot_manager.handlers import register_all_handlers
-
-from dotenv import load_dotenv
-load_dotenv()
+from texts.ru import texts as t
 
 BOT_TOKEN = os.getenv("BOT_API")
 
@@ -51,10 +49,13 @@ async def main():
 
 async def set_commands():
     commands = [
-        BotCommand(command='start', description='Run the bot'),
-        BotCommand(command='help', description='help')
+        BotCommand(command='start', description=t["start_command"]),
+        BotCommand(command='about', description=t["about_command"]),
+        BotCommand(command='language', description=t["language_command"]),
+        BotCommand(command='support', description=t["support_command"])
     ]
     await bot.set_my_commands(commands)
+
 
 
 if __name__ == "__main__":
