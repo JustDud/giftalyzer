@@ -1,4 +1,8 @@
 texts = {
+    "start_command": "Запуск бота.",
+    "about_command": "Информация о боте и его функциях.",
+    "language_command": "Смена языка интерфейса бота.",
+    "support_command": "Связь со службой поддержки.",
     "start": ("Привет! Я — GiftValueBot.\n"
             "Помогу быстро и точно определить цену Telegram-подарков в TON и $.\n\n"
             "Что я умею:\n"
@@ -57,4 +61,14 @@ texts = {
     "btn_show_filtered_results": "🔎 Показать результаты",
     "btn_back_to_models": "🔙 Назад к моделям",
     "btn_back_to_main": "🔙 Назад",
+
+    "prompt_support_message": "✍️ Пожалуйста, опишите вашу проблему как можно подробнее:",
+    "support_received": "✅ Ваше сообщение отправлено в службу поддержки. Мы скоро с вами свяжемся.",
+    "support_thank_you": "Спасибо за обращение!",
+
+    "ticket_not_found": "❌ Тикет не найден.",
+    "reply_sent": "✅ Ответ отправлен.",
+    "reply_failed": "❌ Не удалось отправить ответ:",
+    "prompt_reply_message": "✍️ Введите ваш ответ на обращение:",
+    "support_reply": "💬 Ответ службы поддержки"
 }
