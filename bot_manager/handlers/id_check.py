@@ -6,6 +6,10 @@ from bot_manager.texts import ru as t
 from bot_manager.keyboards.default import check_again_keyboard, main_menu, back_keyboard
 
 from analyser.price_analyser import get_data, estimate_ton_price, convert_ton_to_usd
+from analyser.page_parser import parse_telegram_gift_page
+
+from mongo import get_nfts_strict_match, get_nfts_loose_match
+from mongo import get_nft_by_id_or_name, normalize_nft_name, get_nfts_model_only
 
 router = Router()
 
@@ -45,8 +49,6 @@ async def process_gift_id(message: types.Message, state: FSMContext):
     print(f"[DEBUG] Normalized gift_id: {gift_id}")
     await state.clear()  # Clear early to prevent lingering state
 
-    from mongo import get_nft_by_id_or_name, normalize_nft_name
-
     normalized_id = gift_id.strip().strip("/")
     # Check if it's a name-formatted input
     if "-" in normalized_id and not normalized_id.startswith("EQ"):
@@ -54,31 +56,95 @@ async def process_gift_id(message: types.Message, state: FSMContext):
 
     data = get_nft_by_id_or_name(normalized_id)
     if data is None:
-        await state.set_state(GiftStates.WaitingForGiftID)
-        await message.answer(t.texts["nft_not_found"])
+        # Попытка парсить страницу Telegram подарка
+        parsed_data = await parse_telegram_gift_page(normalized_id)
+        print(f"[DEBUG] Parsed data from Telegram page: {parsed_data}")
+
+        # Убираем цифры и дефисы, чтобы извлечь название коллекции
+        import re
+        collection_name = re.sub(r'\d+', '', normalized_id.split("-")[0])
+
+        if parsed_data is None:
+            await message.answer("❌ Не удалось извлечь параметры подарка. Возможно, ссылка недействительна или структура страницы изменилась.")
+            await state.set_state(GiftStates.WaitingForGiftID)
+            return
+
+        # Ищем сначала по всем трём параметрам
+        strict = get_nfts_strict_match(
+            model=parsed_data["model"],
+            symbol=parsed_data["symbol"],
+            backdrop=parsed_data["backdrop"],
+            collection_name=collection_name
+        )
+
+        # Затем ищем совпадения без символа
+        loose = get_nfts_loose_match(
+            model=parsed_data["model"],
+            backdrop=parsed_data["backdrop"],
+            collection_name=collection_name
+        )
+
+        # Убираем дубликаты
+        strict_ids = {gift["nft_id"] for gift in strict}
+        loose_filtered = [gift for gift in loose if gift["nft_id"] not in strict_ids]
+
+        # Затем ищем только по модели (если ничего не нашли)
+        model_only = get_nfts_model_only(
+            model=parsed_data["model"],
+            collection_name=collection_name
+        )
+
+        # Убираем уже найденные ранее
+        all_found_ids = strict_ids.union({gift["nft_id"] for gift in loose_filtered})
+        model_only_filtered = [gift for gift in model_only if gift["nft_id"] not in all_found_ids]
+
+        if not (strict or loose_filtered or model_only_filtered):
+            await message.answer("⚠️ Похожих подарков не найдено. Возможно, ваш подарок уникален или ещё не добавлен в базу. Попробуйте другое ID")
+            await state.set_state(GiftStates.WaitingForGiftID)
+            return
+
+        # Сортируем каждую группу отдельно
+        strict_sorted = sorted(strict, key=lambda x: float(x["price"]))
+        loose_sorted = sorted(loose_filtered, key=lambda x: float(x["price"]))
+        model_only_sorted = sorted(model_only_filtered, key=lambda x: float(x["price"]))
+
+        result_found = False
+
+        if strict_sorted:
+            await message.answer("✅ Найдены подарки с полной идентичностью (модель, символ, фон):")
+            for gift in strict_sorted[:5]:
+                await send_gift_result(message, gift)
+            result_found = True
+
+        if not result_found and loose_sorted:
+            await message.answer("⚠️ Найдены похожие подарки без совпадения по символу:")
+            for gift in loose_sorted[:5]:
+                await send_gift_result(message, gift)
+            result_found = True
+
+        if not result_found and model_only_sorted:
+            await message.answer("🔍 Найдены подарки только с совпадением по модели:")
+            for gift in model_only_sorted[:5]:
+                await send_gift_result(message, gift)
+            result_found = True
+
+        if not result_found:
+            await message.answer("😔 К сожалению, не удалось найти ни одного похожего подарка.")
         return
 
     price = estimate_ton_price(data["nft_id"])
     usd_estimated = convert_ton_to_usd(price)
     usd_market = convert_ton_to_usd(float(data["price"]))
-
-    result = {
+    await send_gift_result(message, {
         "name": data["name"],
         "model": data["model"],
         "symbol": data["symbol"],
         "backdrop": data["backdrop"],
-        "ton": price,
-        "usd_estimated": usd_estimated,
-        "market": data["market"],
+        "price": price,
         "market_price": data["price"],
-        "usd_market": usd_market
-    }
-    print(result)
-
-    await message.answer(
-        t.texts["gift_result"].format(**result),
-        reply_markup=check_again_keyboard
-    )
+        "market": data["market"],
+        "nft_id": data["nft_id"]
+    })
 
 
 
@@ -105,6 +171,30 @@ async def process_manual_input(message: types.Message, state: FSMContext):
         reply_markup=check_again_keyboard
     )
 
+
+async def send_gift_result(message: types.Message, gift: dict):
+    estimated_price = estimate_ton_price(gift["nft_id"]) if "nft_id" in gift else float(gift["price"])
+    market_price = float(gift["price"])
+
+    usd_estimated = convert_ton_to_usd(estimated_price)
+    usd_market = convert_ton_to_usd(market_price) if market_price is not None else "—"
+
+    result = {
+        "name": gift["name"],
+        "model": gift["model"],
+        "symbol": gift["symbol"],
+        "backdrop": gift["backdrop"],
+        "ton": estimated_price,
+        "usd_estimated": usd_estimated,
+        "market": gift.get("market", "N/A"),
+        "market_price": market_price if market_price is not None else "—",
+        "usd_market": usd_market
+    }
+
+    await message.answer(
+        t.texts["gift_result"].format(**result),
+        reply_markup=check_again_keyboard
+    )
 
 def register(dp):
     dp.include_router(router)

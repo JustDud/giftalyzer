@@ -4,7 +4,7 @@ from mongo import export_all_nft_prices_to_csv, migrate_collection_names, delete
 
 
 def main():
-    data_update_requested = False
+    data_update_requested = True
 
     # migrate_collection_names()
     # delete_specific_collections()

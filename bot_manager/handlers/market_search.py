@@ -38,7 +38,7 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext):
 
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = list({doc["model"] for doc in nft_cursor if "model" in doc})
+    nfts = sorted(list({doc["model"] for doc in nft_cursor if "model" in doc}))
 
     from bot_manager.keyboards.search_keyboard import get_nft_keyboard
     keyboard = get_nft_keyboard(nfts, page=page, selected_models=selected_models, include_select_all=True)
@@ -55,7 +55,7 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext):
 async def handle_pagination(call: CallbackQuery, state: FSMContext):
     await call.answer()
     page = int(call.data.split(":")[1])
-    collections_cursor = collections_collection.find({}, {"name": 1})
+    collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections, page=page)
     try:
@@ -67,7 +67,7 @@ async def handle_pagination(call: CallbackQuery, state: FSMContext):
 
 @router.message(F.text == t["btn_enter_manual"])
 async def handle_manual_input(message: Message, state: FSMContext):
-    collections_cursor = collections_collection.find({}, {"name": 1})
+    collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections)
     await message.answer(t["prompt_select_collection"], reply_markup=keyboard)
@@ -89,7 +89,7 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext):
     collection_address = collection["address"]
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = list({doc["model"] for doc in nft_cursor if "model" in doc})
+    nfts = sorted(list({doc["model"] for doc in nft_cursor if "model" in doc}))
     await state.update_data(cached_nfts=nfts)  # 💾 Кешируем модели
 
     keyboard = get_nft_keyboard(nfts, selected_models=[], include_select_all=True)
@@ -141,7 +141,7 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext):
         selected_models.append(model)
     await state.update_data(selected_models=selected_models)
 
-    nfts = data.get("cached_nfts", [])
+    nfts = sorted(data.get("cached_nfts", []))
     from bot_manager.keyboards.search_keyboard import get_nft_keyboard
     page = data.get("current_nft_page", 0)
     keyboard = get_nft_keyboard(nfts, page=page, selected_models=selected_models, include_select_all=True)
@@ -157,7 +157,7 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext):
 async def select_all_models(call: CallbackQuery, state: FSMContext):
     await call.answer()
     data = await state.get_data()
-    nfts = data.get("cached_nfts", [])
+    nfts = sorted(data.get("cached_nfts", []))
     await state.update_data(selected_models=nfts)
     from bot_manager.keyboards.search_keyboard import get_nft_keyboard
     page = data.get("current_nft_page", 0)
@@ -179,7 +179,7 @@ async def handle_back_to_main_menu(call: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "back_to_collections")
 async def handle_back_to_collections(call: CallbackQuery, state: FSMContext):
     await call.answer()
-    collections_cursor = collections_collection.find({}, {"name": 1})
+    collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections)
 
@@ -215,7 +215,7 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext):
         "collection_address": collection_address,
         "model": {"$in": selected_models}
     }, {"backdrop": 1})
-    backdrops = list({doc["backdrop"] for doc in nft_cursor if "backdrop" in doc})
+    backdrops = sorted(list({doc["backdrop"] for doc in nft_cursor if "backdrop" in doc}))
 
     if not backdrops:
         await call.answer(t["no_backdrops_available"], show_alert=True)
@@ -238,7 +238,7 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext):
 async def select_all_backdrops(call: CallbackQuery, state: FSMContext):
     await call.answer()
     data = await state.get_data()
-    backdrops = data.get("cached_backdrops", [])
+    backdrops = sorted(data.get("cached_backdrops", []))
 
     await state.update_data(selected_backdrops=backdrops)
     await state.update_data(current_backdrop_page=0)

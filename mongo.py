@@ -129,6 +129,7 @@ def get_nft_by_id_or_name(gift_id: str):
         if nft:
             return nft
     return nfts_collection.find_one({"collection_address": gift_id})
+
 def normalize_collection_name(name: str) -> str:
     if not name:
         return ""
@@ -140,18 +141,66 @@ def normalize_collection_name(name: str) -> str:
         return f"{prefix}-{number}"
     return name.replace(" ", "")
 
-# One-time migration script to normalize all collection names in the DB
-def migrate_collection_names():
-    for doc in collections_collection.find():
-        original = doc.get("name", "")
-        normalized = normalize_collection_name(original)
-        if normalized and normalized != original:
-            collections_collection.update_one({"_id": doc["_id"]}, {"$set": {"name": normalized}})
-    print("✅ Collection name normalization complete.")
+
+def get_nfts_by_params(model: str, symbol: str | None, backdrop: str) -> list[dict]:
+    query = {
+        "model": model,
+        "backdrop": backdrop,
+        "price": {"$ne": None}
+    }
+    if symbol:
+        query["symbol"] = symbol
+
+    return list(nfts_collection.find(query))
 
 
-# Utility function to delete specific collections by name
-def delete_specific_collections():
-    to_delete = ["AnonymousTelegramNumbers", "TelegramUsernames"]
-    result = collections_collection.delete_many({"name": {"$in": to_delete}})
-    print(f"🗑 Deleted {result.deleted_count} collections: {', '.join(to_delete)}")
+def get_nfts_strict_match(model: str, symbol: str, backdrop: str, collection_name: str = None) -> list[dict]:
+    query = {
+        "model": model,
+        "symbol": symbol,
+        "backdrop": backdrop,
+        "price": {"$ne": None}
+    }
+    if collection_name:
+        query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
+
+    return list(nfts_collection.find(query))
+
+def get_nfts_loose_match(model: str, backdrop: str, collection_name: str = None) -> list[dict]:
+    query = {
+        "model": model,
+        "backdrop": backdrop,
+        "price": {"$ne": None}
+    }
+    if collection_name:
+        query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
+
+    return list(nfts_collection.find(query))
+
+
+def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
+    query = {
+        "model": model,
+        "price": {"$ne": None}
+    }
+    if collection_name:
+        query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
+
+    return list(nfts_collection.find(query))
+
+
+# # One-time migration script to normalize all collection names in the DB
+# def migrate_collection_names():
+#     for doc in collections_collection.find():
+#         original = doc.get("name", "")
+#         normalized = normalize_collection_name(original)
+#         if normalized and normalized != original:
+#             collections_collection.update_one({"_id": doc["_id"]}, {"$set": {"name": normalized}})
+#     print("✅ Collection name normalization complete.")
+#
+#
+# # Utility function to delete specific collections by name
+# def delete_specific_collections():
+#     to_delete = ["AnonymousTelegramNumbers", "TelegramUsernames"]
+#     result = collections_collection.delete_many({"name": {"$in": to_delete}})
+#     print(f"🗑 Deleted {result.deleted_count} collections: {', '.join(to_delete)}")
