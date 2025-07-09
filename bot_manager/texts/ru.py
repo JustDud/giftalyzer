@@ -9,7 +9,7 @@ texts = {
             "👇 Выбери, как хочешь продолжить:"),
 
 
-    "id_input_prompt": "Пришли ID подарка (например: gift_12345678)",
+    "id_input_prompt": "Пришли ID подарка (например: MadPumpkin-1218)",
     "gift_result": (
             "🎁 Подарок: {name}\n"
             "💎 Модель: {model}\n"
