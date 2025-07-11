@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from bot_manager.texts import ru as t
-
+print("🧪 Кнопка из main_menu:", repr(t.texts["btn_help"]))
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text=t.texts["btn_enter_id"])],

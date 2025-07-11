@@ -6,11 +6,13 @@ clarify_kb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text=t["clarify"], callback_data="clarify_ticket")]
 ])
 
+
 send_request_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="📨 Confirm")],
-        [KeyboardButton(text="🔙 Back")]
+        [KeyboardButton(text="📨 Отправить")],
+        [KeyboardButton(text="🔙 Назад")]
     ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=False,
+    selective=True
 )
