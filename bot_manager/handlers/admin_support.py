@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from bot_manager.states.support_state import SupportState
 from mongo import support_collection
@@ -43,21 +43,63 @@ async def reply_to_support_ticket(message: Message):
 
     user_id = ticket["user_id"]
     try:
-        await message.bot.send_message(user_id, f"{t['support_reply']}:\n{message.text}")
+        clarify_keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="📝 Уточнить", callback_data=f"clarify_{ticket_id}")]
+            ]
+        )
+        await message.bot.send_message(
+            user_id,
+            f"{t['support_reply']}:\n{message.text}",
+            reply_markup=clarify_keyboard
+        )
         support_collection.update_one({"_id": ticket_id}, {"$set": {"status": "replied", "admin_response": message.text}})
         await message.answer(t["reply_sent"])
     except Exception as e:
         await message.answer(f"{t['reply_failed']} {e}")
 
 
+@router.callback_query(F.data.startswith("clarify_"))
+async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext):
+    ticket_id = callback_query.data.replace("clarify_", "")
+    ticket = support_collection.find_one({"_id": ticket_id})
+
+    if not ticket:
+        await callback_query.answer("Тикет не найден.", show_alert=True)
+        return
+
+    user_id = ticket["user_id"]
+
+    await state.set_state(SupportState.waiting_for_description)
+    await state.update_data(parent_ticket_id=ticket_id)
+
+    await callback_query.bot.send_message(
+        user_id,
+        t["prompt_support_message"]
+    )
 
 
+@router.message(F.text.lower().in_([t["btn_help"].lower(), "/support"]))
+async def support_entry(message: Message, state: FSMContext):
+    # Ensure ticket_counter is ahead of existing tickets
+    existing_max = support_collection.find_one(
+        {"_id": {"$regex": r"^\d+$"}},
+        sort=[("_id", -1)]
+    )
+    if existing_max:
+        current_max = int(existing_max["_id"])
+        counter_doc = support_collection.find_one({"_id": "ticket_counter"}) or {"seq": 0}
+        current_seq = counter_doc.get("seq", 0)
+        if current_seq < (current_max - 1000 + 1):
+            support_collection.update_one(
+                {"_id": "ticket_counter"},
+                {"$set": {"seq": current_max - 1000 + 1}},
+                upsert=True
+            )
 
-# @router.message(F.text.lower() == "🆘 помощь")
-# async def support_entry(message: Message, state: FSMContext):
-#     await message.answer(t["prompt_support_message"])
-#     await state.set_state(SupportState.waiting_for_description)
-
+    await state.set_state(SupportState.waiting_for_description)
+    await state.update_data(parent_ticket_id=None)
+    await message.answer(t["prompt_support_message"])
 
 
 def register(dp):

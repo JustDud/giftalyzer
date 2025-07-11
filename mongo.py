@@ -86,7 +86,7 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
         writer = csv.writer(f)
         writer.writerow([
             "nft_id", "collection_name", "backdrop", "model", "symbol",
-            "floor_price", "rarity", "real_price", "estimated_ton", "usd"
+            "floor_price", "rarity", "real_price", "estimated_ton", "usd", "last_sale_date"
         ])
 
         for nft in nfts:
@@ -113,7 +113,8 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
                 nft.get("rarity", ""),
                 nft.get("last_sale") or nft.get("price") or "",
                 estimated_price,
-                usd_price
+                usd_price,
+                nft.get("last_sale_date", "")
             ])
 
 
