@@ -21,6 +21,17 @@ def normalize_nft_name(name: str) -> str:
     return name.replace(" ", "")
 
 
+def get_human_readable_date_from_text(text: str) -> str:
+    text = text.lower()
+    now = time.localtime()
+    if "hour" in text or "minute" in text:
+        return time.strftime("%d-%m-%Y", now)
+    elif "day" in text:
+        yesterday = time.localtime(time.time() - 86400)
+        return time.strftime("%d-%m-%Y", yesterday)
+    return None
+
+
 def scrape_nfts(address):
     base_url = "https://marketapp.ws"
     collection_path = f"/collection/{address}/"
@@ -71,8 +82,19 @@ def scrape_nfts(address):
                     alt_price = price_td[2].select_one(".tm-value")
                     if alt_price:
                         price = alt_price.text.strip().replace(",", "")
-            last_sale = row.select_one("td:nth-of-type(4)")
-            last_sale = last_sale.text.strip() if last_sale else None
+            last_sale = last_sale_date = None
+            last_sale_td = row.select_one("td:nth-of-type(4)")
+            if last_sale_td:
+                last_sale = last_sale_td.text.strip()
+                time_tag = last_sale_td.select_one("time[timestamp]")
+                if time_tag and time_tag.has_attr("timestamp"):
+                    try:
+                        last_sale_date = time.strftime("%d-%m-%Y", time.localtime(int(time_tag["timestamp"])))
+                    except ValueError:
+                        if "ago" in time_tag.text:
+                            last_sale_date = get_human_readable_date_from_text(time_tag.text)
+                        else:
+                            last_sale_date = None
             owner = row.select_one("td:nth-of-type(5) a")
             owner = owner.text.strip() if owner else None
             attr_tooltip = row.select_one("span[data-bs-title]")
@@ -104,6 +126,7 @@ def scrape_nfts(address):
                     "href": href,
                     "price": price,
                     "last_sale": last_sale,
+                    "last_sale_date": last_sale_date,
                     "rarity": rarity,
                     "owner": owner,
                     "model": model,
@@ -159,8 +182,19 @@ def scrape_nfts(address):
                     alt_price = price_td[2].select_one(".tm-value")
                     if alt_price:
                         price = alt_price.text.strip().replace(",", "")
-            last_sale = row.select_one("td:nth-of-type(4)")
-            last_sale = last_sale.text.strip() if last_sale else None
+            last_sale = last_sale_date = None
+            last_sale_td = row.select_one("td:nth-of-type(4)")
+            if last_sale_td:
+                last_sale = last_sale_td.text.strip()
+                time_tag = last_sale_td.select_one("time[timestamp]")
+                if time_tag and time_tag.has_attr("timestamp"):
+                    try:
+                        last_sale_date = time.strftime("%d-%m-%Y", time.localtime(int(time_tag["timestamp"])))
+                    except ValueError:
+                        if "ago" in time_tag.text:
+                            last_sale_date = get_human_readable_date_from_text(time_tag.text)
+                        else:
+                            last_sale_date = None
             owner = row.select_one("td:nth-of-type(5) a")
             owner = owner.text.strip() if owner else None
             attr_tooltip = row.select_one("span[data-bs-title]")
@@ -192,6 +226,7 @@ def scrape_nfts(address):
                     "href": href,
                     "price": price,
                     "last_sale": last_sale,
+                    "last_sale_date": last_sale_date,
                     "rarity": rarity,
                     "owner": owner,
                     "model": model,

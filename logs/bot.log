@@ -2997,3 +2997,1705 @@ aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientOSError: [Errn
 2025-07-09 19:59:08,044 - WARNING - Received SIGINT signal
 2025-07-09 19:59:08,044 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
 2025-07-09 19:59:08,044 - INFO - Polling stopped
+2025-07-09 22:27:59,908 - INFO - 🚀 Bot is starting...
+2025-07-09 22:27:59,909 - INFO - Start polling
+2025-07-09 22:27:59,929 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:27:59,971 - INFO - Update id=266425384 is not handled. Duration 4 ms by bot id=7589720562
+2025-07-09 22:27:59,971 - INFO - Update id=266425386 is not handled. Duration 4 ms by bot id=7589720562
+2025-07-09 22:28:00,064 - INFO - Update id=266425385 is handled. Duration 96 ms by bot id=7589720562
+2025-07-09 22:28:00,064 - INFO - Update id=266425383 is handled. Duration 97 ms by bot id=7589720562
+2025-07-09 22:28:00,091 - INFO - Update id=266425387 is handled. Duration 124 ms by bot id=7589720562
+2025-07-09 22:28:03,470 - WARNING - Received SIGINT signal
+2025-07-09 22:28:03,470 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:28:03,470 - INFO - Polling stopped
+2025-07-09 22:29:09,707 - INFO - 🚀 Bot is starting...
+2025-07-09 22:29:09,708 - INFO - Start polling
+2025-07-09 22:29:09,770 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:29:20,016 - INFO - Update id=266425388 is handled. Duration 170 ms by bot id=7589720562
+2025-07-09 22:29:22,490 - INFO - Update id=266425389 is handled. Duration 68 ms by bot id=7589720562
+2025-07-09 22:29:25,879 - INFO - Update id=266425390 is handled. Duration 215 ms by bot id=7589720562
+2025-07-09 22:29:45,918 - INFO - Update id=266425392 is not handled. Duration 5 ms by bot id=7589720562
+2025-07-09 22:29:48,904 - WARNING - Received SIGINT signal
+2025-07-09 22:29:48,904 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:29:48,904 - INFO - Polling stopped
+2025-07-09 22:29:49,156 - INFO - Update id=266425391 is not handled. Duration 15493 ms by bot id=7589720562
+2025-07-09 22:35:58,814 - INFO - 🚀 Bot is starting...
+2025-07-09 22:35:58,814 - INFO - Start polling
+2025-07-09 22:35:58,835 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:35:59,585 - INFO - Update id=266425395 is handled. Duration 154 ms by bot id=7589720562
+2025-07-09 22:36:01,783 - INFO - Update id=266425396 is handled. Duration 134 ms by bot id=7589720562
+2025-07-09 22:36:06,323 - INFO - Update id=266425397 is handled. Duration 236 ms by bot id=7589720562
+2025-07-09 22:36:09,768 - INFO - Update id=266425398 is not handled. Duration 5 ms by bot id=7589720562
+2025-07-09 22:36:26,618 - WARNING - Received SIGINT signal
+2025-07-09 22:36:26,620 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:36:26,620 - INFO - Polling stopped
+2025-07-09 22:37:13,723 - INFO - 🚀 Bot is starting...
+2025-07-09 22:37:13,723 - INFO - Start polling
+2025-07-09 22:37:13,742 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:37:13,930 - INFO - Update id=266425399 is not handled. Duration 150 ms by bot id=7589720562
+2025-07-09 22:37:13,930 - ERROR - Cause exception while process update id=266425399 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 66, in handle_clarify_ticket
+    await callback.answer("⚠️ Не удалось определить ID тикета.")
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:37:17,811 - WARNING - Received SIGINT signal
+2025-07-09 22:37:17,812 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:37:17,813 - INFO - Polling stopped
+2025-07-09 22:37:21,462 - INFO - 🚀 Bot is starting...
+2025-07-09 22:37:21,462 - INFO - Start polling
+2025-07-09 22:37:21,482 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:37:25,655 - INFO - Update id=266425400 is handled. Duration 112 ms by bot id=7589720562
+2025-07-09 22:37:27,581 - INFO - Update id=266425401 is handled. Duration 234 ms by bot id=7589720562
+2025-07-09 22:37:32,282 - INFO - Update id=266425402 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-09 22:37:42,586 - INFO - Update id=266425403 is handled. Duration 141 ms by bot id=7589720562
+2025-07-09 22:38:04,607 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:38:04,609 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:38:05,690 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:38:05,783 - INFO - Update id=266425405 is handled. Duration 91 ms by bot id=7589720562
+2025-07-09 22:38:05,784 - INFO - Update id=266425404 is not handled. Duration 93 ms by bot id=7589720562
+2025-07-09 22:38:05,785 - ERROR - Cause exception while process update id=266425404 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 66, in handle_clarify_ticket
+    await callback.answer("⚠️ Не удалось определить ID тикета.")
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:38:09,695 - INFO - Update id=266425406 is handled. Duration 149 ms by bot id=7589720562
+2025-07-09 22:38:28,954 - WARNING - Received SIGINT signal
+2025-07-09 22:38:28,955 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:38:28,955 - INFO - Polling stopped
+2025-07-09 22:39:42,256 - INFO - 🚀 Bot is starting...
+2025-07-09 22:39:42,256 - INFO - Start polling
+2025-07-09 22:39:42,273 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:39:44,045 - INFO - Update id=266425407 is handled. Duration 83 ms by bot id=7589720562
+2025-07-09 22:39:45,784 - INFO - Update id=266425408 is handled. Duration 75 ms by bot id=7589720562
+2025-07-09 22:39:52,641 - INFO - Update id=266425409 is handled. Duration 194 ms by bot id=7589720562
+2025-07-09 22:39:59,678 - INFO - Update id=266425410 is handled. Duration 158 ms by bot id=7589720562
+2025-07-09 22:40:02,869 - INFO - Update id=266425411 is handled. Duration 191 ms by bot id=7589720562
+2025-07-09 22:40:20,762 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:40:20,763 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:40:21,890 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:40:22,113 - INFO - Update id=266425412 is handled. Duration 221 ms by bot id=7589720562
+2025-07-09 22:40:29,159 - INFO - Update id=266425413 is handled. Duration 138 ms by bot id=7589720562
+2025-07-09 22:40:32,904 - INFO - Update id=266425414 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-09 22:41:23,197 - WARNING - Received SIGINT signal
+2025-07-09 22:41:23,204 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:41:23,205 - INFO - Polling stopped
+2025-07-09 22:41:27,444 - INFO - 🚀 Bot is starting...
+2025-07-09 22:41:27,445 - INFO - Start polling
+2025-07-09 22:41:27,490 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:41:32,758 - INFO - Update id=266425415 is handled. Duration 176 ms by bot id=7589720562
+2025-07-09 22:41:38,124 - INFO - Update id=266425416 is handled. Duration 146 ms by bot id=7589720562
+2025-07-09 22:41:42,781 - INFO - Update id=266425417 is handled. Duration 145 ms by bot id=7589720562
+2025-07-09 22:41:54,866 - INFO - Update id=266425419 is handled. Duration 263 ms by bot id=7589720562
+2025-07-09 22:42:04,396 - INFO - Update id=266425420 is handled. Duration 230 ms by bot id=7589720562
+2025-07-09 22:42:26,012 - WARNING - Received SIGINT signal
+2025-07-09 22:42:26,014 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:42:26,014 - INFO - Polling stopped
+2025-07-09 22:42:26,266 - INFO - Update id=266425418 is not handled. Duration 37428 ms by bot id=7589720562
+2025-07-09 22:43:39,917 - INFO - 🚀 Bot is starting...
+2025-07-09 22:43:39,917 - INFO - Start polling
+2025-07-09 22:43:39,939 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:43:44,944 - INFO - Update id=266425421 is handled. Duration 162 ms by bot id=7589720562
+2025-07-09 22:43:47,120 - INFO - Update id=266425422 is handled. Duration 345 ms by bot id=7589720562
+2025-07-09 22:43:56,505 - INFO - Update id=266425423 is handled. Duration 295 ms by bot id=7589720562
+2025-07-09 22:44:08,524 - INFO - Update id=266425425 is handled. Duration 240 ms by bot id=7589720562
+2025-07-09 22:44:15,861 - INFO - Update id=266425426 is handled. Duration 228 ms by bot id=7589720562
+2025-07-09 22:44:18,731 - INFO - Update id=266425424 is not handled. Duration 18661 ms by bot id=7589720562
+2025-07-09 22:44:18,732 - ERROR - Cause exception while process update id=266425424 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 101, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:44:24,966 - INFO - Update id=266425427 is handled. Duration 198 ms by bot id=7589720562
+2025-07-09 22:44:50,337 - WARNING - Received SIGINT signal
+2025-07-09 22:44:50,339 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:44:50,339 - INFO - Polling stopped
+2025-07-09 22:46:36,080 - INFO - 🚀 Bot is starting...
+2025-07-09 22:46:36,081 - INFO - Start polling
+2025-07-09 22:46:36,105 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:46:36,314 - INFO - Update id=266425429 is not handled. Duration 171 ms by bot id=7589720562
+2025-07-09 22:46:36,315 - ERROR - Cause exception while process update id=266425429 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 99, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:46:36,320 - INFO - Update id=266425428 is not handled. Duration 177 ms by bot id=7589720562
+2025-07-09 22:46:36,320 - ERROR - Cause exception while process update id=266425428 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 99, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:46:40,443 - INFO - Update id=266425430 is handled. Duration 49 ms by bot id=7589720562
+2025-07-09 22:46:44,112 - INFO - Update id=266425431 is handled. Duration 133 ms by bot id=7589720562
+2025-07-09 22:46:49,827 - INFO - Update id=266425432 is handled. Duration 449 ms by bot id=7589720562
+2025-07-09 22:47:22,078 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:47:22,079 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:47:33,176 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:47:55,976 - WARNING - Received SIGINT signal
+2025-07-09 22:47:55,978 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:47:55,979 - INFO - Polling stopped
+2025-07-09 22:47:59,794 - INFO - 🚀 Bot is starting...
+2025-07-09 22:47:59,795 - INFO - Start polling
+2025-07-09 22:47:59,812 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:48:07,761 - INFO - Update id=266425433 is handled. Duration 127 ms by bot id=7589720562
+2025-07-09 22:48:09,851 - INFO - Update id=266425434 is handled. Duration 191 ms by bot id=7589720562
+2025-07-09 22:48:14,609 - INFO - Update id=266425435 is handled. Duration 289 ms by bot id=7589720562
+2025-07-09 22:48:27,058 - INFO - Update id=266425437 is handled. Duration 274 ms by bot id=7589720562
+2025-07-09 22:48:33,128 - INFO - Update id=266425438 is handled. Duration 237 ms by bot id=7589720562
+2025-07-09 22:48:41,496 - WARNING - Received SIGINT signal
+2025-07-09 22:48:41,497 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:48:41,498 - INFO - Polling stopped
+2025-07-09 22:48:41,751 - INFO - Update id=266425436 is not handled. Duration 17540 ms by bot id=7589720562
+2025-07-09 22:49:58,426 - INFO - 🚀 Bot is starting...
+2025-07-09 22:49:58,427 - INFO - Start polling
+2025-07-09 22:49:58,470 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:50:04,958 - INFO - Update id=266425439 is handled. Duration 119 ms by bot id=7589720562
+2025-07-09 22:50:08,682 - INFO - Update id=266425440 is handled. Duration 134 ms by bot id=7589720562
+2025-07-09 22:50:14,189 - INFO - Update id=266425441 is handled. Duration 247 ms by bot id=7589720562
+2025-07-09 22:50:25,706 - INFO - Update id=266425443 is handled. Duration 523 ms by bot id=7589720562
+2025-07-09 22:50:28,695 - INFO - Update id=266425444 is handled. Duration 314 ms by bot id=7589720562
+2025-07-09 22:50:37,361 - WARNING - Received SIGINT signal
+2025-07-09 22:50:37,361 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:50:37,361 - INFO - Polling stopped
+2025-07-09 22:50:37,613 - INFO - Update id=266425442 is not handled. Duration 17919 ms by bot id=7589720562
+2025-07-09 22:53:23,984 - INFO - 🚀 Bot is starting...
+2025-07-09 22:53:23,985 - INFO - Start polling
+2025-07-09 22:53:24,003 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:53:27,108 - INFO - Update id=266425445 is handled. Duration 135 ms by bot id=7589720562
+2025-07-09 22:53:29,875 - INFO - Update id=266425446 is handled. Duration 223 ms by bot id=7589720562
+2025-07-09 22:53:36,995 - INFO - Update id=266425447 is handled. Duration 187 ms by bot id=7589720562
+2025-07-09 22:53:43,657 - INFO - Update id=266425448 is handled. Duration 124 ms by bot id=7589720562
+2025-07-09 22:53:45,767 - INFO - Update id=266425449 is handled. Duration 152 ms by bot id=7589720562
+2025-07-09 22:54:03,698 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:54:03,699 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:54:04,805 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:54:05,101 - INFO - Update id=266425451 is handled. Duration 292 ms by bot id=7589720562
+2025-07-09 22:54:05,133 - INFO - Update id=266425450 is handled. Duration 325 ms by bot id=7589720562
+2025-07-09 22:54:54,912 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:54:54,914 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:55:06,108 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:55:10,174 - WARNING - Received SIGINT signal
+2025-07-09 22:55:10,177 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:55:10,178 - INFO - Polling stopped
+2025-07-09 22:55:13,635 - INFO - 🚀 Bot is starting...
+2025-07-09 22:55:13,635 - INFO - Start polling
+2025-07-09 22:55:13,655 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:55:24,321 - INFO - Update id=266425452 is handled. Duration 159 ms by bot id=7589720562
+2025-07-09 22:55:27,482 - INFO - Update id=266425453 is handled. Duration 192 ms by bot id=7589720562
+2025-07-09 22:55:33,982 - INFO - Update id=266425454 is handled. Duration 328 ms by bot id=7589720562
+2025-07-09 22:55:52,396 - WARNING - Received SIGINT signal
+2025-07-09 22:55:52,398 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:55:52,398 - INFO - Polling stopped
+2025-07-09 22:56:22,694 - INFO - 🚀 Bot is starting...
+2025-07-09 22:56:22,695 - INFO - Start polling
+2025-07-09 22:56:22,716 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:56:22,975 - INFO - Update id=266425457 is not handled. Duration 222 ms by bot id=7589720562
+2025-07-09 22:56:22,975 - ERROR - Cause exception while process update id=266425457 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,020 - INFO - Update id=266425459 is not handled. Duration 266 ms by bot id=7589720562
+2025-07-09 22:56:23,020 - ERROR - Cause exception while process update id=266425459 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,051 - INFO - Update id=266425454 is handled. Duration 299 ms by bot id=7589720562
+2025-07-09 22:56:23,062 - INFO - Update id=266425456 is not handled. Duration 309 ms by bot id=7589720562
+2025-07-09 22:56:23,062 - ERROR - Cause exception while process update id=266425456 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,077 - INFO - Update id=266425455 is not handled. Duration 325 ms by bot id=7589720562
+2025-07-09 22:56:23,077 - ERROR - Cause exception while process update id=266425455 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,128 - INFO - Update id=266425461 is not handled. Duration 375 ms by bot id=7589720562
+2025-07-09 22:56:23,128 - ERROR - Cause exception while process update id=266425461 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,136 - INFO - Update id=266425458 is not handled. Duration 383 ms by bot id=7589720562
+2025-07-09 22:56:23,137 - ERROR - Cause exception while process update id=266425458 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:23,151 - INFO - Update id=266425460 is not handled. Duration 397 ms by bot id=7589720562
+2025-07-09 22:56:23,151 - ERROR - Cause exception while process update id=266425460 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 97, in handle_clarify_ticket
+    await callback.answer()
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-09 22:56:33,148 - INFO - Update id=266425462 is handled. Duration 51 ms by bot id=7589720562
+2025-07-09 22:56:43,290 - INFO - Update id=266425463 is handled. Duration 208 ms by bot id=7589720562
+2025-07-09 22:57:01,158 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:57:01,160 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:57:02,243 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:57:02,335 - INFO - Update id=266425464 is handled. Duration 90 ms by bot id=7589720562
+2025-07-09 22:57:05,340 - INFO - Update id=266425465 is handled. Duration 173 ms by bot id=7589720562
+2025-07-09 22:57:14,074 - INFO - Update id=266425466 is handled. Duration 175 ms by bot id=7589720562
+2025-07-09 22:57:42,021 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:57:42,023 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:57:43,099 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 22:57:43,269 - INFO - Update id=266425467 is handled. Duration 167 ms by bot id=7589720562
+2025-07-09 22:57:43,290 - INFO - Update id=266425468 is handled. Duration 187 ms by bot id=7589720562
+2025-07-09 22:57:46,957 - INFO - Update id=266425469 is handled. Duration 143 ms by bot id=7589720562
+2025-07-09 22:57:54,211 - INFO - Update id=266425470 is handled. Duration 557 ms by bot id=7589720562
+2025-07-09 22:58:21,863 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 22:58:21,866 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 22:58:25,951 - WARNING - Received SIGINT signal
+2025-07-09 22:58:25,952 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:58:25,953 - INFO - Polling stopped
+2025-07-09 22:59:10,945 - INFO - 🚀 Bot is starting...
+2025-07-09 22:59:10,946 - INFO - Start polling
+2025-07-09 22:59:10,966 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:59:21,254 - INFO - Update id=266425471 is handled. Duration 121 ms by bot id=7589720562
+2025-07-09 22:59:23,456 - INFO - Update id=266425472 is handled. Duration 131 ms by bot id=7589720562
+2025-07-09 22:59:28,500 - INFO - Update id=266425473 is handled. Duration 87 ms by bot id=7589720562
+2025-07-09 22:59:40,350 - WARNING - Received SIGINT signal
+2025-07-09 22:59:40,352 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 22:59:40,352 - INFO - Polling stopped
+2025-07-09 22:59:58,013 - INFO - 🚀 Bot is starting...
+2025-07-09 22:59:58,013 - INFO - Start polling
+2025-07-09 22:59:58,036 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 23:00:01,484 - INFO - Update id=266425474 is handled. Duration 113 ms by bot id=7589720562
+2025-07-09 23:00:03,491 - INFO - Update id=266425475 is handled. Duration 229 ms by bot id=7589720562
+2025-07-09 23:00:06,705 - INFO - Update id=266425476 is handled. Duration 137 ms by bot id=7589720562
+2025-07-09 23:00:44,913 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 23:00:44,915 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 23:00:56,017 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-09 23:01:24,291 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-09 23:01:24,294 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-09 23:01:31,642 - WARNING - Received SIGINT signal
+2025-07-09 23:01:31,644 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 23:01:31,644 - INFO - Polling stopped
+2025-07-09 23:01:34,968 - INFO - 🚀 Bot is starting...
+2025-07-09 23:01:34,968 - INFO - Start polling
+2025-07-09 23:01:34,986 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 23:01:40,689 - INFO - Update id=266425477 is handled. Duration 121 ms by bot id=7589720562
+2025-07-09 23:01:46,692 - INFO - Update id=266425478 is handled. Duration 139 ms by bot id=7589720562
+2025-07-09 23:01:50,239 - INFO - Update id=266425479 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-09 23:01:52,283 - INFO - Update id=266425480 is handled. Duration 85 ms by bot id=7589720562
+2025-07-09 23:01:57,617 - WARNING - Received SIGINT signal
+2025-07-09 23:01:57,618 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-09 23:01:57,618 - INFO - Polling stopped
+2025-07-11 14:16:30,863 - INFO - 🚀 Bot is starting...
+2025-07-11 14:16:30,864 - INFO - Start polling
+2025-07-11 14:16:30,886 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:16:32,319 - INFO - Update id=266425481 is handled. Duration 245 ms by bot id=7589720562
+2025-07-11 14:16:36,185 - INFO - Update id=266425482 is handled. Duration 173 ms by bot id=7589720562
+2025-07-11 14:16:50,618 - WARNING - Received SIGINT signal
+2025-07-11 14:16:50,619 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:16:50,620 - INFO - Polling stopped
+2025-07-11 14:17:06,255 - INFO - 🚀 Bot is starting...
+2025-07-11 14:17:06,256 - INFO - Start polling
+2025-07-11 14:17:06,284 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:17:08,978 - INFO - Update id=266425483 is handled. Duration 220 ms by bot id=7589720562
+2025-07-11 14:17:11,240 - WARNING - Received SIGINT signal
+2025-07-11 14:17:11,241 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:17:11,241 - INFO - Polling stopped
+2025-07-11 14:17:32,583 - INFO - 🚀 Bot is starting...
+2025-07-11 14:17:32,585 - INFO - Start polling
+2025-07-11 14:17:32,609 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:17:33,110 - INFO - Update id=266425485 is handled. Duration 450 ms by bot id=7589720562
+2025-07-11 14:17:33,139 - INFO - Update id=266425484 is handled. Duration 480 ms by bot id=7589720562
+2025-07-11 14:17:35,423 - WARNING - Received SIGINT signal
+2025-07-11 14:17:35,423 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:17:35,423 - INFO - Polling stopped
+2025-07-11 14:18:44,077 - INFO - 🚀 Bot is starting...
+2025-07-11 14:18:44,077 - INFO - Start polling
+2025-07-11 14:18:44,098 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:18:45,832 - INFO - Update id=266425486 is handled. Duration 215 ms by bot id=7589720562
+2025-07-11 14:18:48,785 - WARNING - Received SIGINT signal
+2025-07-11 14:18:48,786 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:18:48,786 - INFO - Polling stopped
+2025-07-11 14:20:18,557 - INFO - 🚀 Bot is starting...
+2025-07-11 14:20:18,558 - INFO - Start polling
+2025-07-11 14:20:18,576 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:20:21,446 - INFO - Update id=266425487 is handled. Duration 131 ms by bot id=7589720562
+2025-07-11 14:20:23,761 - INFO - Update id=266425488 is not handled. Duration 53 ms by bot id=7589720562
+2025-07-11 14:20:23,761 - ERROR - Cause exception while process update id=266425488 by bot id=7589720562
+DuplicateKeyError: E11000 duplicate key error collection: getgems.support_tickets index: _id_ dup key: { _id: "1033" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: getgems.support_tickets index: _id_ dup key: { _id: "1033" }', 'keyPattern': {'_id': 1}, 'keyValue': {'_id': '1033'}}
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/support.py", line 51, in handle_support_message
+    support_collection.insert_one(user_data)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/collection.py", line 891, in insert_one
+    self._insert_one(
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/collection.py", line 831, in _insert_one
+    self._database.client._retryable_write(
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2061, in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1947, in _retry_with_session
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2862, in _write
+    return self._func(self._session, conn, self._retryable)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/synchronous/collection.py", line 829, in _insert_command
+    _check_write_command_response(result)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/helpers_shared.py", line 288, in _check_write_command_response
+    _raise_last_write_error(write_errors)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/pymongo/helpers_shared.py", line 258, in _raise_last_write_error
+    raise DuplicateKeyError(error.get("errmsg"), 11000, error)
+pymongo.errors.DuplicateKeyError: E11000 duplicate key error collection: getgems.support_tickets index: _id_ dup key: { _id: "1033" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: getgems.support_tickets index: _id_ dup key: { _id: "1033" }', 'keyPattern': {'_id': 1}, 'keyValue': {'_id': '1033'}}
+2025-07-11 14:20:46,069 - WARNING - Received SIGINT signal
+2025-07-11 14:20:46,070 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:20:46,071 - INFO - Polling stopped
+2025-07-11 14:23:42,133 - INFO - 🚀 Bot is starting...
+2025-07-11 14:23:42,134 - INFO - Start polling
+2025-07-11 14:23:42,153 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:24:18,981 - WARNING - Received SIGINT signal
+2025-07-11 14:24:18,982 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:24:18,982 - INFO - Polling stopped
+2025-07-11 14:24:22,586 - INFO - 🚀 Bot is starting...
+2025-07-11 14:24:22,587 - INFO - Start polling
+2025-07-11 14:24:22,614 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:24:22,882 - INFO - Update id=266425491 is handled. Duration 232 ms by bot id=7589720562
+2025-07-11 14:24:22,883 - INFO - Update id=266425489 is handled. Duration 233 ms by bot id=7589720562
+2025-07-11 14:24:22,890 - INFO - Update id=266425490 is handled. Duration 239 ms by bot id=7589720562
+2025-07-11 14:24:24,855 - INFO - Update id=266425492 is handled. Duration 47 ms by bot id=7589720562
+2025-07-11 14:24:26,999 - INFO - Update id=266425493 is handled. Duration 107 ms by bot id=7589720562
+2025-07-11 14:24:29,477 - INFO - Update id=266425494 is handled. Duration 182 ms by bot id=7589720562
+2025-07-11 14:24:40,222 - INFO - Update id=266425495 is handled. Duration 136 ms by bot id=7589720562
+2025-07-11 14:24:53,199 - INFO - Update id=266425497 is handled. Duration 85 ms by bot id=7589720562
+2025-07-11 14:25:03,473 - INFO - Update id=266425496 is not handled. Duration 18085 ms by bot id=7589720562
+2025-07-11 14:25:03,473 - ERROR - Cause exception while process update id=266425496 by bot id=7589720562
+TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.12/3.12.11/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/selector_events.py", line 988, in _read_ready__get_buffer
+    nbytes = self._sock.recv_into(buf)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: [Errno 60] Operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 177, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 730, in _request
+    await resp.start(conn)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client_reqrep.py", line 1059, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/streams.py", line 672, in read
+    await self._waiter
+aiohttp.client_exceptions.ClientOSError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 67, in clarify_ticket
+    await callback_query.message.answer(t["prompt_support_message"])
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 184, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}")
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:25:07,926 - WARNING - Received SIGINT signal
+2025-07-11 14:25:07,927 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:25:07,927 - INFO - Polling stopped
+2025-07-11 14:27:10,542 - INFO - 🚀 Bot is starting...
+2025-07-11 14:27:10,542 - INFO - Start polling
+2025-07-11 14:27:10,564 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:27:10,610 - INFO - Update id=266425498 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 14:27:10,921 - INFO - Update id=266425497 is not handled. Duration 312 ms by bot id=7589720562
+2025-07-11 14:27:10,921 - ERROR - Cause exception while process update id=266425497 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 80, in clarify_ticket
+    await callback_query.answer("Попросили уточнение у пользователя.")
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-11 14:27:18,213 - INFO - Update id=266425499 is handled. Duration 116 ms by bot id=7589720562
+2025-07-11 14:27:21,055 - INFO - Update id=266425500 is handled. Duration 406 ms by bot id=7589720562
+2025-07-11 14:27:25,650 - INFO - Update id=266425501 is handled. Duration 183 ms by bot id=7589720562
+2025-07-11 14:27:29,119 - INFO - Update id=266425502 is handled. Duration 177 ms by bot id=7589720562
+2025-07-11 14:27:51,391 - INFO - Update id=266425503 is handled. Duration 18351 ms by bot id=7589720562
+2025-07-11 14:28:13,180 - WARNING - Received SIGINT signal
+2025-07-11 14:28:13,181 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:28:13,181 - INFO - Polling stopped
+2025-07-11 14:28:29,128 - INFO - 🚀 Bot is starting...
+2025-07-11 14:28:29,129 - INFO - Start polling
+2025-07-11 14:28:29,162 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:28:32,019 - INFO - Update id=266425504 is handled. Duration 214 ms by bot id=7589720562
+2025-07-11 14:28:33,631 - INFO - Update id=266425505 is handled. Duration 188 ms by bot id=7589720562
+2025-07-11 14:28:37,249 - INFO - Update id=266425506 is handled. Duration 171 ms by bot id=7589720562
+2025-07-11 14:28:39,966 - INFO - Update id=266425507 is handled. Duration 119 ms by bot id=7589720562
+2025-07-11 14:28:41,788 - INFO - Update id=266425508 is handled. Duration 222 ms by bot id=7589720562
+2025-07-11 14:29:19,763 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:29:19,765 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 14:29:30,854 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 14:29:59,106 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:29:59,108 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 14:30:10,187 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 14:30:13,567 - WARNING - Received SIGINT signal
+2025-07-11 14:30:13,568 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:30:13,568 - INFO - Polling stopped
+2025-07-11 14:30:17,623 - INFO - 🚀 Bot is starting...
+2025-07-11 14:30:17,623 - INFO - Start polling
+2025-07-11 14:30:17,642 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:30:19,481 - INFO - Update id=266425509 is handled. Duration 189 ms by bot id=7589720562
+2025-07-11 14:30:21,409 - INFO - Update id=266425510 is not handled. Duration 169 ms by bot id=7589720562
+2025-07-11 14:30:21,409 - ERROR - Cause exception while process update id=266425510 by bot id=7589720562
+KeyError: 'ticket_received'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 151, in handle_support_message
+    await message.answer(t["ticket_received"])
+                         ~^^^^^^^^^^^^^^^^^^^
+KeyError: 'ticket_received'
+2025-07-11 14:31:03,888 - WARNING - Received SIGINT signal
+2025-07-11 14:31:03,889 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:31:03,889 - INFO - Polling stopped
+2025-07-11 14:46:22,780 - INFO - 🚀 Bot is starting...
+2025-07-11 14:46:22,781 - INFO - Start polling
+2025-07-11 14:46:22,802 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:46:25,717 - INFO - Update id=266425511 is handled. Duration 181 ms by bot id=7589720562
+2025-07-11 14:46:27,228 - INFO - Update id=266425512 is handled. Duration 183 ms by bot id=7589720562
+2025-07-11 14:47:10,186 - WARNING - Received SIGINT signal
+2025-07-11 14:47:10,189 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:47:10,189 - INFO - Polling stopped
+2025-07-11 14:47:13,702 - INFO - 🚀 Bot is starting...
+2025-07-11 14:47:13,703 - INFO - Start polling
+2025-07-11 14:47:13,722 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:47:13,849 - INFO - Update id=266425513 is not handled. Duration 91 ms by bot id=7589720562
+2025-07-11 14:47:13,952 - INFO - Update id=266425514 is handled. Duration 194 ms by bot id=7589720562
+2025-07-11 14:47:13,964 - INFO - Update id=266425515 is handled. Duration 206 ms by bot id=7589720562
+2025-07-11 14:47:16,226 - INFO - Update id=266425516 is handled. Duration 117 ms by bot id=7589720562
+2025-07-11 14:47:21,462 - WARNING - Received SIGINT signal
+2025-07-11 14:47:21,462 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:47:21,462 - INFO - Polling stopped
+2025-07-11 14:48:16,393 - INFO - 🚀 Bot is starting...
+2025-07-11 14:48:16,394 - INFO - Start polling
+2025-07-11 14:48:16,421 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:48:19,334 - INFO - Update id=266425517 is handled. Duration 237 ms by bot id=7589720562
+2025-07-11 14:48:20,939 - INFO - Update id=266425518 is handled. Duration 355 ms by bot id=7589720562
+2025-07-11 14:48:26,568 - INFO - Update id=266425519 is handled. Duration 127 ms by bot id=7589720562
+2025-07-11 14:48:30,449 - INFO - Update id=266425520 is handled. Duration 324 ms by bot id=7589720562
+2025-07-11 14:48:32,599 - INFO - Update id=266425521 is handled. Duration 208 ms by bot id=7589720562
+2025-07-11 14:48:43,319 - INFO - Update id=266425522 is handled. Duration 134 ms by bot id=7589720562
+2025-07-11 14:49:01,267 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:49:01,267 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 14:49:02,345 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 14:49:02,547 - INFO - Update id=266425524 is handled. Duration 198 ms by bot id=7589720562
+2025-07-11 14:49:02,564 - INFO - Update id=266425523 is not handled. Duration 216 ms by bot id=7589720562
+2025-07-11 14:49:02,564 - ERROR - Cause exception while process update id=266425523 by bot id=7589720562
+TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 80, in clarify_ticket
+    await callback_query.answer("Попросили уточнение у пользователя.")
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query is too old and response timeout expired or query ID is invalid
+2025-07-11 14:49:02,589 - INFO - Update id=266425525 is handled. Duration 238 ms by bot id=7589720562
+2025-07-11 14:49:05,823 - INFO - Update id=266425526 is handled. Duration 313 ms by bot id=7589720562
+2025-07-11 14:49:22,388 - WARNING - Received SIGINT signal
+2025-07-11 14:49:22,388 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:49:22,389 - INFO - Polling stopped
+2025-07-11 14:51:21,899 - INFO - 🚀 Bot is starting...
+2025-07-11 14:51:21,900 - INFO - Start polling
+2025-07-11 14:51:21,920 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:51:25,960 - INFO - Update id=266425527 is handled. Duration 187 ms by bot id=7589720562
+2025-07-11 14:51:27,408 - INFO - Update id=266425528 is handled. Duration 204 ms by bot id=7589720562
+2025-07-11 14:51:32,197 - INFO - Update id=266425529 is handled. Duration 312 ms by bot id=7589720562
+2025-07-11 14:51:47,131 - INFO - Update id=266425531 is handled. Duration 132 ms by bot id=7589720562
+2025-07-11 14:51:49,478 - INFO - Update id=266425532 is handled. Duration 411 ms by bot id=7589720562
+2025-07-11 14:51:56,740 - INFO - Update id=266425533 is handled. Duration 134 ms by bot id=7589720562
+2025-07-11 14:51:59,913 - INFO - Update id=266425530 is not handled. Duration 18109 ms by bot id=7589720562
+2025-07-11 14:51:59,913 - ERROR - Cause exception while process update id=266425530 by bot id=7589720562
+TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.12/3.12.11/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/selector_events.py", line 988, in _read_ready__get_buffer
+    nbytes = self._sock.recv_into(buf)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: [Errno 60] Operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 177, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 730, in _request
+    await resp.start(conn)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client_reqrep.py", line 1059, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/streams.py", line 672, in read
+    await self._waiter
+aiohttp.client_exceptions.ClientOSError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/admin_support.py", line 76, in clarify_ticket
+    await callback_query.bot.send_message(
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 2850, in send_message
+    return await self(call, request_timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 184, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}")
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:52:01,005 - INFO - Update id=266425534 is handled. Duration 70 ms by bot id=7589720562
+2025-07-11 14:52:03,064 - INFO - Update id=266425535 is handled. Duration 251 ms by bot id=7589720562
+2025-07-11 14:52:23,175 - WARNING - Received SIGINT signal
+2025-07-11 14:52:23,176 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:52:23,176 - INFO - Polling stopped
+2025-07-11 14:55:49,557 - INFO - 🚀 Bot is starting...
+2025-07-11 14:55:49,557 - INFO - Start polling
+2025-07-11 14:55:49,576 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:56:27,791 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 14:56:27,792 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 14:56:32,068 - WARNING - Received SIGINT signal
+2025-07-11 14:56:32,069 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 14:56:32,070 - INFO - Polling stopped
+2025-07-11 15:03:46,605 - INFO - 🚀 Bot is starting...
+2025-07-11 15:03:46,606 - INFO - Start polling
+2025-07-11 15:03:46,643 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 15:03:59,067 - INFO - Update id=266425536 is handled. Duration 325 ms by bot id=7589720562
+2025-07-11 15:04:02,634 - INFO - Update id=266425537 is handled. Duration 256 ms by bot id=7589720562
+2025-07-11 15:04:43,041 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 15:04:43,043 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 15:04:54,173 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 15:05:22,291 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 15:05:22,292 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 15:05:32,129 - WARNING - Received SIGINT signal
+2025-07-11 15:05:32,130 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 15:05:32,130 - INFO - Polling stopped
+2025-07-11 17:34:17,393 - INFO - 🚀 Bot is starting...
+2025-07-11 17:34:17,393 - INFO - Start polling
+2025-07-11 17:34:17,412 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:34:17,448 - INFO - Update id=266425539 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 17:34:17,568 - INFO - Update id=266425538 is handled. Duration 121 ms by bot id=7589720562
+2025-07-11 17:34:22,411 - INFO - Update id=266425540 is handled. Duration 284 ms by bot id=7589720562
+2025-07-11 17:35:10,379 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 17:35:10,380 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 17:35:21,046 - WARNING - Received SIGINT signal
+2025-07-11 17:35:21,048 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:35:21,049 - INFO - Polling stopped
+2025-07-11 17:35:24,493 - INFO - 🚀 Bot is starting...
+2025-07-11 17:35:24,494 - INFO - Start polling
+2025-07-11 17:35:24,515 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:35:31,085 - INFO - Update id=266425541 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 17:35:41,826 - INFO - Update id=266425542 is handled. Duration 241 ms by bot id=7589720562
+2025-07-11 17:35:47,021 - INFO - Update id=266425544 is handled. Duration 158 ms by bot id=7589720562
+2025-07-11 17:35:48,811 - INFO - Update id=266425545 is handled. Duration 51 ms by bot id=7589720562
+2025-07-11 17:35:58,336 - WARNING - Received SIGINT signal
+2025-07-11 17:35:58,336 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:35:58,336 - INFO - Polling stopped
+2025-07-11 17:35:58,589 - INFO - Update id=266425543 is not handled. Duration 13280 ms by bot id=7589720562
+2025-07-11 17:36:39,558 - INFO - 🚀 Bot is starting...
+2025-07-11 17:36:39,559 - INFO - Start polling
+2025-07-11 17:36:39,578 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:36:39,619 - INFO - Update id=266425546 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 17:36:44,468 - INFO - Update id=266425547 is handled. Duration 240 ms by bot id=7589720562
+2025-07-11 17:36:46,213 - INFO - Update id=266425548 is handled. Duration 259 ms by bot id=7589720562
+2025-07-11 17:36:52,287 - INFO - Update id=266425549 is handled. Duration 327 ms by bot id=7589720562
+2025-07-11 17:36:54,891 - INFO - Update id=266425550 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 17:36:57,513 - INFO - Update id=266425551 is handled. Duration 229 ms by bot id=7589720562
+2025-07-11 17:37:10,233 - WARNING - Received SIGINT signal
+2025-07-11 17:37:10,234 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 17:37:10,234 - INFO - Polling stopped
