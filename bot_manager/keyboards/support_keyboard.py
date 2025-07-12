@@ -9,7 +9,7 @@ clarify_kb = InlineKeyboardMarkup(inline_keyboard=[
 
 send_request_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="📨 Отправить")],
+        [KeyboardButton(text="📨 Подтвердить")],
         [KeyboardButton(text="🔙 Назад")]
     ],
     resize_keyboard=True,

@@ -65,3 +65,825 @@
 2025-07-11 18:15:39,553 - WARNING - Received SIGINT signal
 2025-07-11 18:15:39,553 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
 2025-07-11 18:15:39,553 - INFO - Polling stopped
+2025-07-11 18:36:04,787 - INFO - 🚀 Bot is starting...
+2025-07-11 18:36:04,788 - INFO - Start polling
+2025-07-11 18:36:04,809 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:36:04,971 - INFO - Update id=266425633 is handled. Duration 124 ms by bot id=7589720562
+2025-07-11 18:36:11,779 - WARNING - Received SIGINT signal
+2025-07-11 18:36:11,780 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:36:11,780 - INFO - Polling stopped
+2025-07-11 18:37:14,380 - INFO - 🚀 Bot is starting...
+2025-07-11 18:37:14,381 - INFO - Start polling
+2025-07-11 18:37:14,399 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:37:14,431 - INFO - Update id=266425634 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 18:37:20,712 - INFO - Update id=266425635 is handled. Duration 128 ms by bot id=7589720562
+2025-07-11 18:37:25,137 - INFO - Update id=266425636 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 18:37:32,860 - INFO - Update id=266425637 is not handled. Duration 8 ms by bot id=7589720562
+2025-07-11 18:37:32,861 - ERROR - Cause exception while process update id=266425637 by bot id=7589720562
+AttributeError: 'Bot' object has no attribute 'provider_token'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/payments.py", line 18, in payment_handler
+    provider_token=message.bot.provider_token,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'provider_token'
+2025-07-11 18:37:42,250 - WARNING - Received SIGINT signal
+2025-07-11 18:37:42,251 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:37:42,251 - INFO - Polling stopped
+2025-07-11 18:38:15,486 - INFO - 🚀 Bot is starting...
+2025-07-11 18:38:15,487 - INFO - Start polling
+2025-07-11 18:38:15,512 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:38:15,758 - INFO - Update id=266425637 is handled. Duration 207 ms by bot id=7589720562
+2025-07-11 18:38:27,418 - INFO - Update id=266425638 is handled. Duration 31 ms by bot id=7589720562
+2025-07-11 18:38:27,571 - INFO - Update id=266425639 is handled. Duration 87 ms by bot id=7589720562
+2025-07-11 18:38:37,636 - INFO - Update id=266425640 is handled. Duration 131 ms by bot id=7589720562
+2025-07-11 18:38:55,589 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:38:55,590 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:38:56,667 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 18:38:56,909 - INFO - Update id=266425642 is not handled. Duration 4 ms by bot id=7589720562
+2025-07-11 18:38:57,033 - INFO - Update id=266425641 is handled. Duration 364 ms by bot id=7589720562
+2025-07-11 18:39:35,177 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:39:35,179 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:39:46,350 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 18:40:14,692 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:40:14,692 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:40:22,425 - WARNING - Received SIGINT signal
+2025-07-11 18:40:22,426 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:40:22,426 - INFO - Polling stopped
+2025-07-11 18:44:05,788 - INFO - 🚀 Bot is starting...
+2025-07-11 18:44:05,789 - INFO - Start polling
+2025-07-11 18:44:05,807 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:44:14,356 - INFO - Update id=266425643 is handled. Duration 186 ms by bot id=7589720562
+2025-07-11 18:44:50,840 - WARNING - Received SIGINT signal
+2025-07-11 18:44:50,842 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:44:50,842 - INFO - Polling stopped
+2025-07-11 18:44:54,542 - INFO - 🚀 Bot is starting...
+2025-07-11 18:44:54,542 - INFO - Start polling
+2025-07-11 18:44:54,560 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:45:03,821 - INFO - Update id=266425644 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 18:45:07,679 - INFO - Update id=266425645 is handled. Duration 123 ms by bot id=7589720562
+2025-07-11 18:45:09,839 - INFO - Update id=266425646 is handled. Duration 32 ms by bot id=7589720562
+2025-07-11 18:45:09,986 - INFO - Update id=266425647 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 18:45:23,416 - INFO - Update id=266425648 is handled. Duration 126 ms by bot id=7589720562
+2025-07-11 18:45:41,368 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:45:41,368 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:45:42,442 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 18:45:42,501 - INFO - Update id=266425649 is not handled. Duration 56 ms by bot id=7589720562
+2025-07-11 18:45:42,584 - INFO - Update id=266425650 is handled. Duration 138 ms by bot id=7589720562
+2025-07-11 18:45:42,597 - INFO - Update id=266425651 is handled. Duration 150 ms by bot id=7589720562
+2025-07-11 18:45:54,832 - WARNING - Received SIGINT signal
+2025-07-11 18:45:54,833 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:45:54,833 - INFO - Polling stopped
+2025-07-11 18:47:08,133 - INFO - 🚀 Bot is starting...
+2025-07-11 18:47:08,133 - INFO - Start polling
+2025-07-11 18:47:08,153 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:47:15,929 - INFO - Update id=266425652 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 18:47:31,387 - INFO - Update id=266425653 is handled. Duration 131 ms by bot id=7589720562
+2025-07-11 18:47:49,337 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:47:49,338 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:47:50,410 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 18:47:50,498 - INFO - Update id=266425654 is handled. Duration 86 ms by bot id=7589720562
+2025-07-11 18:47:50,645 - INFO - Update id=266425655 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 18:47:50,952 - WARNING - Received SIGINT signal
+2025-07-11 18:47:50,952 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:47:50,952 - INFO - Polling stopped
+2025-07-11 18:49:04,933 - INFO - 🚀 Bot is starting...
+2025-07-11 18:49:04,934 - INFO - Start polling
+2025-07-11 18:49:04,954 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:49:05,163 - INFO - Update id=266425657 is handled. Duration 139 ms by bot id=7589720562
+2025-07-11 18:49:05,226 - INFO - Update id=266425658 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 18:49:05,273 - INFO - Update id=266425656 is handled. Duration 249 ms by bot id=7589720562
+2025-07-11 18:49:09,031 - INFO - Update id=266425659 is handled. Duration 92 ms by bot id=7589720562
+2025-07-11 18:49:47,083 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 18:49:47,087 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 18:49:58,172 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 18:51:18,444 - WARNING - Received SIGINT signal
+2025-07-11 18:51:18,450 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:51:18,450 - INFO - Polling stopped
+2025-07-11 18:58:17,480 - INFO - 🚀 Bot is starting...
+2025-07-11 18:58:17,481 - INFO - Start polling
+2025-07-11 18:58:17,506 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:58:23,175 - INFO - Update id=266425660 is handled. Duration 168 ms by bot id=7589720562
+2025-07-11 18:58:27,714 - WARNING - Received SIGINT signal
+2025-07-11 18:58:27,715 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:58:27,715 - INFO - Polling stopped
+2025-07-11 18:59:08,097 - INFO - 🚀 Bot is starting...
+2025-07-11 18:59:08,098 - INFO - Start polling
+2025-07-11 18:59:08,115 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:59:11,242 - INFO - Update id=266425661 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 18:59:20,562 - WARNING - Received SIGINT signal
+2025-07-11 18:59:20,564 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:59:20,564 - INFO - Polling stopped
+2025-07-11 18:59:24,440 - INFO - 🚀 Bot is starting...
+2025-07-11 18:59:24,440 - INFO - Start polling
+2025-07-11 18:59:24,467 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:59:25,539 - INFO - Update id=266425662 is not handled. Duration 1 ms by bot id=7589720562
+2025-07-11 18:59:55,098 - WARNING - Received SIGINT signal
+2025-07-11 18:59:55,100 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 18:59:55,100 - INFO - Polling stopped
+2025-07-11 19:00:44,201 - INFO - 🚀 Bot is starting...
+2025-07-11 19:00:44,202 - INFO - Start polling
+2025-07-11 19:00:44,223 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:00:44,462 - INFO - Update id=266425664 is handled. Duration 191 ms by bot id=7589720562
+2025-07-11 19:00:44,462 - INFO - Update id=266425663 is handled. Duration 192 ms by bot id=7589720562
+2025-07-11 19:00:50,194 - WARNING - Received SIGINT signal
+2025-07-11 19:00:50,195 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:00:50,195 - INFO - Polling stopped
+2025-07-11 19:01:10,933 - INFO - 🚀 Bot is starting...
+2025-07-11 19:01:10,934 - INFO - Start polling
+2025-07-11 19:01:10,954 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:01:14,609 - INFO - Update id=266425665 is handled. Duration 146 ms by bot id=7589720562
+2025-07-11 19:01:19,245 - INFO - Update id=266425666 is handled. Duration 81 ms by bot id=7589720562
+2025-07-11 19:01:20,633 - INFO - Update id=266425667 is handled. Duration 35 ms by bot id=7589720562
+2025-07-11 19:01:20,776 - INFO - Update id=266425668 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 19:01:24,303 - INFO - Update id=266425669 is handled. Duration 69 ms by bot id=7589720562
+2025-07-11 19:01:26,928 - INFO - Update id=266425670 is handled. Duration 75 ms by bot id=7589720562
+2025-07-11 19:01:44,849 - WARNING - Received SIGINT signal
+2025-07-11 19:01:44,851 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:01:44,851 - INFO - Polling stopped
+2025-07-11 19:04:36,364 - INFO - 🚀 Bot is starting...
+2025-07-11 19:04:36,366 - INFO - Start polling
+2025-07-11 19:04:36,393 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:04:40,236 - INFO - Update id=266425671 is handled. Duration 136 ms by bot id=7589720562
+2025-07-11 19:04:50,661 - INFO - Update id=266425673 is not handled. Duration 4 ms by bot id=7589720562
+2025-07-11 19:04:50,711 - INFO - Update id=266425672 is handled. Duration 198 ms by bot id=7589720562
+2025-07-11 19:04:55,319 - INFO - Update id=266425674 is handled. Duration 79 ms by bot id=7589720562
+2025-07-11 19:04:58,497 - INFO - Update id=266425675 is handled. Duration 79 ms by bot id=7589720562
+2025-07-11 19:05:11,392 - WARNING - Received SIGINT signal
+2025-07-11 19:05:11,395 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:05:11,395 - INFO - Polling stopped
+2025-07-11 19:17:04,220 - INFO - 🚀 Bot is starting...
+2025-07-11 19:17:04,220 - INFO - Start polling
+2025-07-11 19:17:04,243 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:17:04,415 - INFO - Update id=266425675 is handled. Duration 133 ms by bot id=7589720562
+2025-07-11 19:17:12,121 - INFO - Update id=266425676 is handled. Duration 37 ms by bot id=7589720562
+2025-07-11 19:17:12,260 - INFO - Update id=266425677 is handled. Duration 83 ms by bot id=7589720562
+2025-07-11 19:17:19,653 - INFO - Update id=266425678 is handled. Duration 61 ms by bot id=7589720562
+2025-07-11 19:17:29,155 - INFO - Update id=266425679 is handled. Duration 50 ms by bot id=7589720562
+2025-07-11 19:17:47,190 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:17:47,190 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:17:48,259 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:17:48,464 - INFO - Update id=266425680 is handled. Duration 203 ms by bot id=7589720562
+2025-07-11 19:17:48,499 - INFO - Update id=266425681 is handled. Duration 237 ms by bot id=7589720562
+2025-07-11 19:18:26,420 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:18:26,422 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:18:27,499 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:18:28,244 - INFO - Update id=266425683 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 19:18:28,616 - INFO - Update id=266425682 is handled. Duration 1116 ms by bot id=7589720562
+2025-07-11 19:18:42,619 - INFO - Update id=266425684 is handled. Duration 43 ms by bot id=7589720562
+2025-07-11 19:18:44,661 - INFO - Update id=266425685 is handled. Duration 45 ms by bot id=7589720562
+2025-07-11 19:18:45,943 - INFO - Update id=266425686 is handled. Duration 194 ms by bot id=7589720562
+2025-07-11 19:19:13,934 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:19:13,935 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:19:25,038 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:21:02,997 - WARNING - Received SIGINT signal
+2025-07-11 19:21:02,998 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:21:02,999 - INFO - Polling stopped
+2025-07-11 19:24:19,253 - INFO - 🚀 Bot is starting...
+2025-07-11 19:24:19,254 - INFO - Start polling
+2025-07-11 19:24:19,275 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:24:25,742 - INFO - Update id=266425687 is handled. Duration 134 ms by bot id=7589720562
+2025-07-11 19:24:28,269 - INFO - Update id=266425688 is handled. Duration 124 ms by bot id=7589720562
+2025-07-11 19:24:28,694 - INFO - Update id=266425689 is handled. Duration 142 ms by bot id=7589720562
+2025-07-11 19:24:46,603 - INFO - Update id=266425690 is handled. Duration 74 ms by bot id=7589720562
+2025-07-11 19:25:04,924 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:25:04,925 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:25:06,004 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:25:06,179 - INFO - Update id=266425691 is handled. Duration 174 ms by bot id=7589720562
+2025-07-11 19:25:06,233 - INFO - Update id=266425692 is handled. Duration 228 ms by bot id=7589720562
+2025-07-11 19:25:44,177 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:25:44,178 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:25:45,255 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:25:45,473 - INFO - Update id=266425694 is not handled. Duration 4 ms by bot id=7589720562
+2025-07-11 19:25:45,551 - INFO - Update id=266425693 is handled. Duration 294 ms by bot id=7589720562
+2025-07-11 19:26:01,803 - INFO - Update id=266425695 is handled. Duration 64 ms by bot id=7589720562
+2025-07-11 19:26:29,850 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:26:29,850 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:26:30,940 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:26:30,976 - INFO - Update id=266425696 is not handled. Duration 34 ms by bot id=7589720562
+2025-07-11 19:26:31,097 - INFO - Update id=266425697 is handled. Duration 154 ms by bot id=7589720562
+2025-07-11 19:27:19,307 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:27:19,309 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:27:30,409 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:29:45,316 - WARNING - Received SIGINT signal
+2025-07-11 19:29:45,318 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:29:45,318 - INFO - Polling stopped
+2025-07-11 19:40:05,671 - INFO - 🚀 Bot is starting...
+2025-07-11 19:40:05,672 - INFO - Start polling
+2025-07-11 19:40:05,697 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:40:15,089 - INFO - Update id=266425698 is handled. Duration 140 ms by bot id=7589720562
+2025-07-11 19:40:16,283 - INFO - Update id=266425699 is handled. Duration 79 ms by bot id=7589720562
+2025-07-11 19:40:20,496 - INFO - Update id=266425700 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 19:40:22,520 - INFO - Update id=266425701 is handled. Duration 68 ms by bot id=7589720562
+2025-07-11 19:40:25,559 - INFO - Update id=266425702 is handled. Duration 77 ms by bot id=7589720562
+2025-07-11 19:40:43,563 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:40:43,564 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:40:44,634 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:40:44,768 - INFO - Update id=266425703 is handled. Duration 132 ms by bot id=7589720562
+2025-07-11 19:40:48,240 - INFO - Update id=266425704 is handled. Duration 49 ms by bot id=7589720562
+2025-07-11 19:40:48,390 - INFO - Update id=266425705 is handled. Duration 88 ms by bot id=7589720562
+2025-07-11 19:40:50,533 - INFO - Update id=266425706 is not handled. Duration 26 ms by bot id=7589720562
+2025-07-11 19:40:50,533 - ERROR - Cause exception while process update id=266425706 by bot id=7589720562
+TypeError: ask_for_gift_id() got an unexpected keyword argument 'dispatcher'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/decorators/access.py", line 7, in wrapped
+    return await handler(message, *args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ask_for_gift_id() got an unexpected keyword argument 'dispatcher'
+2025-07-11 19:41:02,448 - WARNING - Received SIGINT signal
+2025-07-11 19:41:02,450 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:02,450 - INFO - Polling stopped
+2025-07-11 19:41:13,585 - INFO - 🚀 Bot is starting...
+2025-07-11 19:41:13,586 - INFO - Start polling
+2025-07-11 19:41:13,608 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:15,310 - INFO - Update id=266425707 is not handled. Duration 24 ms by bot id=7589720562
+2025-07-11 19:41:15,311 - ERROR - Cause exception while process update id=266425707 by bot id=7589720562
+TypeError: ask_for_gift_id() missing 1 required positional argument: 'state'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/decorators/access.py", line 8, in wrapped
+    return await handler(message, *args)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ask_for_gift_id() missing 1 required positional argument: 'state'
+2025-07-11 19:41:31,623 - WARNING - Received SIGINT signal
+2025-07-11 19:41:31,625 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:31,625 - INFO - Polling stopped
+2025-07-11 19:41:35,439 - INFO - 🚀 Bot is starting...
+2025-07-11 19:41:35,439 - INFO - Start polling
+2025-07-11 19:41:35,461 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:36,270 - INFO - Update id=266425708 is not handled. Duration 21 ms by bot id=7589720562
+2025-07-11 19:41:36,270 - ERROR - Cause exception while process update id=266425708 by bot id=7589720562
+TypeError: ask_for_gift_id() got an unexpected keyword argument 'dispatcher'
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/decorators/access.py", line 7, in wrapped
+    return await handler(message, *args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ask_for_gift_id() got an unexpected keyword argument 'dispatcher'
+2025-07-11 19:41:53,622 - WARNING - Received SIGINT signal
+2025-07-11 19:41:53,627 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:53,627 - INFO - Polling stopped
+2025-07-11 19:41:57,345 - INFO - 🚀 Bot is starting...
+2025-07-11 19:41:57,346 - INFO - Start polling
+2025-07-11 19:41:57,370 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:41:57,620 - INFO - Update id=266425709 is handled. Duration 192 ms by bot id=7589720562
+2025-07-11 19:42:00,415 - INFO - Update id=266425710 is handled. Duration 59 ms by bot id=7589720562
+2025-07-11 19:42:01,716 - INFO - Update id=266425711 is handled. Duration 112 ms by bot id=7589720562
+2025-07-11 19:42:04,775 - INFO - Update id=266425712 is handled. Duration 88 ms by bot id=7589720562
+2025-07-11 19:42:23,431 - INFO - Update id=266425714 is handled. Duration 312 ms by bot id=7589720562
+2025-07-11 19:42:34,333 - INFO - Update id=266425713 is not handled. Duration 18366 ms by bot id=7589720562
+2025-07-11 19:42:34,333 - ERROR - Cause exception while process update id=266425713 by bot id=7589720562
+TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.12/3.12.11/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/selector_events.py", line 988, in _read_ready__get_buffer
+    nbytes = self._sock.recv_into(buf)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: [Errno 60] Operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 177, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 730, in _request
+    await resp.start(conn)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client_reqrep.py", line 1059, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/streams.py", line 672, in read
+    await self._waiter
+aiohttp.client_exceptions.ClientOSError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/support.py", line 121, in handle_support_message
+    await message.answer(
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 184, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}")
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:42:49,879 - INFO - Update id=266425715 is handled. Duration 302 ms by bot id=7589720562
+2025-07-11 19:43:07,657 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:43:07,658 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:43:18,830 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 19:43:34,643 - INFO - Update id=266425717 is not handled. Duration 38 ms by bot id=7589720562
+2025-07-11 19:43:34,757 - INFO - Update id=266425716 is handled. Duration 419 ms by bot id=7589720562
+2025-07-11 19:43:41,860 - WARNING - Received SIGINT signal
+2025-07-11 19:43:41,860 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:43:41,861 - INFO - Polling stopped
+2025-07-11 19:50:05,783 - INFO - 🚀 Bot is starting...
+2025-07-11 19:50:05,784 - INFO - Start polling
+2025-07-11 19:50:05,803 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:50:19,315 - INFO - Update id=266425718 is handled. Duration 140 ms by bot id=7589720562
+2025-07-11 19:50:23,332 - INFO - Update id=266425719 is handled. Duration 49 ms by bot id=7589720562
+2025-07-11 19:50:31,917 - WARNING - Received SIGINT signal
+2025-07-11 19:50:31,917 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:50:31,918 - INFO - Polling stopped
+2025-07-11 19:50:50,973 - INFO - 🚀 Bot is starting...
+2025-07-11 19:50:50,974 - INFO - Start polling
+2025-07-11 19:50:50,994 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:50:57,590 - INFO - Update id=266425720 is handled. Duration 279 ms by bot id=7589720562
+2025-07-11 19:50:59,958 - INFO - Update id=266425721 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 19:51:04,018 - WARNING - Received SIGINT signal
+2025-07-11 19:51:04,019 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:51:04,019 - INFO - Polling stopped
+2025-07-11 19:53:22,548 - INFO - 🚀 Bot is starting...
+2025-07-11 19:53:22,548 - INFO - Start polling
+2025-07-11 19:53:22,569 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:53:26,807 - INFO - Update id=266425722 is handled. Duration 160 ms by bot id=7589720562
+2025-07-11 19:53:30,595 - INFO - Update id=266425723 is handled. Duration 71 ms by bot id=7589720562
+2025-07-11 19:53:30,775 - INFO - Update id=266425724 is handled. Duration 126 ms by bot id=7589720562
+2025-07-11 19:53:40,853 - INFO - Update id=266425725 is handled. Duration 133 ms by bot id=7589720562
+2025-07-11 19:53:54,930 - INFO - Update id=266425727 is handled. Duration 164 ms by bot id=7589720562
+2025-07-11 19:54:00,143 - INFO - Update id=266425726 is not handled. Duration 17984 ms by bot id=7589720562
+2025-07-11 19:54:00,144 - ERROR - Cause exception while process update id=266425726 by bot id=7589720562
+TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.12/3.12.11/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/selector_events.py", line 988, in _read_ready__get_buffer
+    nbytes = self._sock.recv_into(buf)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: [Errno 60] Operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 177, in make_request
+    async with session.post(
+               ^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 1425, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client.py", line 730, in _request
+    await resp.start(conn)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/client_reqrep.py", line 1059, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiohttp/streams.py", line 672, in read
+    await self._waiter
+aiohttp.client_exceptions.ClientOSError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/bot_manager/handlers/id_check.py", line 37, in go_back
+    await message.answer(t.texts["returned_to_menu"], reply_markup=main_menu)
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/bot.py", line 478, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dima/PycharmProjects/GiftValueBot/venv/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 184, in make_request
+    raise TelegramNetworkError(method=method, message=f"{type(e).__name__}: {e}")
+aiogram.exceptions.TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:54:02,512 - INFO - Update id=266425728 is handled. Duration 49 ms by bot id=7589720562
+2025-07-11 19:54:11,207 - INFO - Update id=266425729 is handled. Duration 58 ms by bot id=7589720562
+2025-07-11 19:54:12,800 - INFO - Update id=266425730 is handled. Duration 47 ms by bot id=7589720562
+2025-07-11 19:54:23,787 - INFO - Update id=266425732 is handled. Duration 301 ms by bot id=7589720562
+2025-07-11 19:54:43,976 - INFO - Update id=266425731 is handled. Duration 30380 ms by bot id=7589720562
+2025-07-11 19:54:45,866 - INFO - Update id=266425733 is handled. Duration 70 ms by bot id=7589720562
+2025-07-11 19:56:17,835 - WARNING - Received SIGINT signal
+2025-07-11 19:56:17,841 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:56:17,842 - INFO - Polling stopped
+2025-07-11 19:56:21,577 - INFO - 🚀 Bot is starting...
+2025-07-11 19:56:21,578 - INFO - Start polling
+2025-07-11 19:56:21,599 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 19:56:39,422 - INFO - Update id=266425734 is handled. Duration 225 ms by bot id=7589720562
+2025-07-11 19:57:04,174 - INFO - Update id=266425736 is handled. Duration 145 ms by bot id=7589720562
+2025-07-11 19:57:06,817 - INFO - Update id=266425735 is handled. Duration 18184 ms by bot id=7589720562
+2025-07-11 19:57:52,243 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 19:57:52,244 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 19:58:03,354 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 20:03:36,773 - WARNING - Received SIGINT signal
+2025-07-11 20:03:36,774 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:03:36,775 - INFO - Polling stopped
+2025-07-11 20:03:40,501 - INFO - 🚀 Bot is starting...
+2025-07-11 20:03:40,502 - INFO - Start polling
+2025-07-11 20:03:40,521 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:04:18,809 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 20:04:18,810 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 20:04:19,882 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 20:04:20,092 - INFO - Update id=266425738 is not handled. Duration 2 ms by bot id=7589720562
+2025-07-11 20:04:20,167 - INFO - Update id=266425737 is handled. Duration 284 ms by bot id=7589720562
+2025-07-11 20:04:35,313 - INFO - Update id=266425739 is handled. Duration 76 ms by bot id=7589720562
+2025-07-11 20:05:03,344 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 20:05:03,345 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 20:05:11,400 - WARNING - Received SIGINT signal
+2025-07-11 20:05:11,400 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:05:11,400 - INFO - Polling stopped
+2025-07-11 20:07:56,668 - INFO - 🚀 Bot is starting...
+2025-07-11 20:07:56,669 - INFO - Start polling
+2025-07-11 20:07:56,709 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:08:01,985 - WARNING - Received SIGINT signal
+2025-07-11 20:08:01,986 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:08:01,986 - INFO - Polling stopped
+2025-07-11 20:08:37,349 - INFO - 🚀 Bot is starting...
+2025-07-11 20:08:37,349 - INFO - Start polling
+2025-07-11 20:08:37,368 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:08:45,960 - INFO - Update id=266425740 is handled. Duration 213 ms by bot id=7589720562
+2025-07-11 20:08:48,305 - INFO - Update id=266425741 is handled. Duration 3 ms by bot id=7589720562
+2025-07-11 20:08:53,833 - INFO - Update id=266425742 is handled. Duration 1 ms by bot id=7589720562
+2025-07-11 20:09:03,737 - INFO - Update id=266425743 is handled. Duration 1 ms by bot id=7589720562
+2025-07-11 20:09:07,459 - INFO - Update id=266425744 is handled. Duration 0 ms by bot id=7589720562
+2025-07-11 20:09:25,537 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 20:09:25,539 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 20:09:25,816 - WARNING - Received SIGINT signal
+2025-07-11 20:09:25,817 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:09:25,817 - INFO - Polling stopped
+2025-07-11 20:09:38,419 - INFO - 🚀 Bot is starting...
+2025-07-11 20:09:38,419 - INFO - Start polling
+2025-07-11 20:09:38,440 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:09:38,503 - INFO - Update id=266425744 is handled. Duration 4 ms by bot id=7589720562
+2025-07-11 20:09:39,800 - INFO - Update id=266425745 is handled. Duration 1 ms by bot id=7589720562
+2025-07-11 20:10:28,205 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 20:10:28,206 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 20:10:33,827 - WARNING - Received SIGINT signal
+2025-07-11 20:10:33,829 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 20:10:33,829 - INFO - Polling stopped
+2025-07-11 21:16:37,515 - INFO - 🚀 Bot is starting...
+2025-07-11 21:16:37,516 - INFO - Start polling
+2025-07-11 21:16:37,534 - INFO - Run polling for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 21:17:15,828 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:17:15,829 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:17:27,033 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:17:52,550 - INFO - Update id=266425746 is handled. Duration 121 ms by bot id=7589720562
+2025-07-11 21:17:56,210 - INFO - Update id=266425747 is handled. Duration 53 ms by bot id=7589720562
+2025-07-11 21:18:13,282 - INFO - Update id=266425748 is handled. Duration 66 ms by bot id=7589720562
+2025-07-11 21:18:31,328 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:18:31,330 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:18:32,418 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:18:32,591 - INFO - Update id=266425749 is handled. Duration 170 ms by bot id=7589720562
+2025-07-11 21:18:37,789 - INFO - Update id=266425750 is handled. Duration 88 ms by bot id=7589720562
+2025-07-11 21:18:41,963 - INFO - Update id=266425751 is handled. Duration 40 ms by bot id=7589720562
+2025-07-11 21:18:42,163 - INFO - Update id=266425752 is handled. Duration 137 ms by bot id=7589720562
+2025-07-11 21:18:48,096 - INFO - Update id=266425753 is handled. Duration 63 ms by bot id=7589720562
+2025-07-11 21:18:50,017 - INFO - Update id=266425754 is handled. Duration 43 ms by bot id=7589720562
+2025-07-11 21:18:51,099 - INFO - Update id=266425755 is handled. Duration 99 ms by bot id=7589720562
+2025-07-11 21:18:52,847 - INFO - Update id=266425756 is handled. Duration 104 ms by bot id=7589720562
+2025-07-11 21:19:10,918 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:19:10,919 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:19:11,992 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:19:12,003 - INFO - Update id=266425757 is not handled. Duration 9 ms by bot id=7589720562
+2025-07-11 21:19:12,003 - INFO - Update id=266425758 is not handled. Duration 9 ms by bot id=7589720562
+2025-07-11 21:19:40,058 - INFO - Update id=266425759 is handled. Duration 212 ms by bot id=7589720562
+2025-07-11 21:19:47,538 - INFO - Update id=266425760 is handled. Duration 112 ms by bot id=7589720562
+2025-07-11 21:19:56,378 - INFO - Update id=266425761 is handled. Duration 44 ms by bot id=7589720562
+2025-07-11 21:19:57,469 - INFO - Update id=266425762 is handled. Duration 181 ms by bot id=7589720562
+2025-07-11 21:20:35,426 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:20:35,427 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:20:46,609 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:20:49,485 - INFO - Update id=266425763 is handled. Duration 173 ms by bot id=7589720562
+2025-07-11 21:20:57,639 - INFO - Update id=266425764 is handled. Duration 70 ms by bot id=7589720562
+2025-07-11 21:21:01,910 - INFO - Update id=266425765 is handled. Duration 41 ms by bot id=7589720562
+2025-07-11 21:21:03,353 - INFO - Update id=266425766 is handled. Duration 255 ms by bot id=7589720562
+2025-07-11 21:21:07,160 - INFO - Update id=266425767 is handled. Duration 68 ms by bot id=7589720562
+2025-07-11 21:21:35,205 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:21:35,206 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:21:36,287 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:21:36,475 - INFO - Update id=266425768 is handled. Duration 185 ms by bot id=7589720562
+2025-07-11 21:21:56,985 - INFO - Update id=266425769 is handled. Duration 43 ms by bot id=7589720562
+2025-07-11 21:22:15,021 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:22:15,023 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:22:26,104 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:22:45,920 - INFO - Update id=266425770 is handled. Duration 113 ms by bot id=7589720562
+2025-07-11 21:23:33,994 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:23:33,995 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:23:35,071 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:23:35,150 - INFO - Update id=266425771 is handled. Duration 77 ms by bot id=7589720562
+2025-07-11 21:23:49,270 - INFO - Update id=266425772 is handled. Duration 77 ms by bot id=7589720562
+2025-07-11 21:24:17,303 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:24:17,304 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:24:18,385 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:24:18,469 - INFO - Update id=266425773 is handled. Duration 82 ms by bot id=7589720562
+2025-07-11 21:24:34,848 - INFO - Update id=266425774 is handled. Duration 86 ms by bot id=7589720562
+2025-07-11 21:25:02,871 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:25:02,872 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:25:10,702 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:25:10,879 - INFO - Update id=266425776 is not handled. Duration 3 ms by bot id=7589720562
+2025-07-11 21:25:10,913 - INFO - Update id=266425775 is handled. Duration 208 ms by bot id=7589720562
+2025-07-11 21:25:59,093 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:25:59,095 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:26:10,174 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:28:17,292 - INFO - Update id=266425777 is handled. Duration 114 ms by bot id=7589720562
+2025-07-11 21:28:19,780 - INFO - Update id=266425778 is handled. Duration 32 ms by bot id=7589720562
+2025-07-11 21:28:19,941 - INFO - Update id=266425779 is handled. Duration 102 ms by bot id=7589720562
+2025-07-11 21:29:08,126 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:29:08,129 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:29:09,216 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:29:09,329 - INFO - Update id=266425780 is handled. Duration 110 ms by bot id=7589720562
+2025-07-11 21:29:57,858 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:29:57,859 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:30:09,003 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 21:47:22,022 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 21:47:22,026 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 21:47:33,105 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 22:04:43,728 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 22:04:43,732 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 22:04:54,813 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 22:22:05,425 - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 60] Operation timed out
+2025-07-11 22:22:05,429 - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7589720562)
+2025-07-11 22:22:16,508 - INFO - Connection established (tryings = 1, bot id = 7589720562)
+2025-07-11 22:31:26,794 - WARNING - Received SIGINT signal
+2025-07-11 22:31:26,801 - INFO - Polling stopped for bot @Giftvalue_bot id=7589720562 - 'GiftValueBot'
+2025-07-11 22:31:26,802 - INFO - Polling stopped
