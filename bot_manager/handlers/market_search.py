@@ -9,6 +9,8 @@ from bot_manager.keyboards.search_keyboard import get_collection_keyboard, get_n
 from bot_manager.texts.ru import texts as t
 from mongo import collections_collection
 
+from bot_manager.decorators.access import subscription_required
+
 
 # FSM State class for market search
 class MarketSearchState(StatesGroup):
@@ -66,6 +68,7 @@ async def handle_pagination(call: CallbackQuery, state: FSMContext):
 
 
 @router.message(F.text == t["btn_enter_manual"])
+@subscription_required
 async def handle_manual_input(message: Message, state: FSMContext):
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] for col in collections_cursor if "name" in col]

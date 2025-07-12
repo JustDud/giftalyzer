@@ -190,3 +190,7 @@ def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
         query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
 
     return list(nfts_collection.find(query))
+
+
+def get_all_subscriptions():
+    return list(subscriptions_collection.find())

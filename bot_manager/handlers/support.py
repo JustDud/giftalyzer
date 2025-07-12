@@ -9,19 +9,20 @@ from pymongo import ReturnDocument
 from bot_manager.keyboards.default import main_menu
 from bot_manager.keyboards.support_keyboard import send_request_keyboard
 
+
 import os
 
 SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
 
 router = Router()
-print("🔍 t['btn_help']:", repr(t["btn_help"]))
+
 
 @router.message(F.text.in_([t["btn_help"], "/support"]))
 async def support_entry(message: Message, state: FSMContext):
     print("💡 support_entry() triggered")
     await state.set_state(SupportState.waiting_for_description)
     await state.update_data(parent_ticket_id=None)
-    await message.answer("✍️ Напишите сообщение, затем нажмите «📨 Отправить».", reply_markup=send_request_keyboard)
+    await message.answer("✍️ Напишите сообщение, затем нажмите «📨 Подтвердить».", reply_markup=send_request_keyboard)
 
 
 @router.message(F.text == "🔙 Back", SupportState.waiting_for_description)
@@ -36,11 +37,11 @@ async def handle_support_message(message: Message, state: FSMContext):
         await message.answer("Вы вернулись в главное меню.", reply_markup=main_menu)
         return
 
-    if message.text == "📨 Отправить":
+    if message.text == "📨 Подтвердить":
         data = await state.get_data()
         user_text = data.get("pending_message")
         if not user_text:
-            await message.answer("❗ Пожалуйста, введите сообщение перед тем, как нажимать «📨 Отправить».")
+            await message.answer("❗ Пожалуйста, введите сообщение перед тем, как нажимать «📨 Подтвердить».")
             return
 
         # Generate ticket ID
@@ -109,8 +110,8 @@ async def handle_support_message(message: Message, state: FSMContext):
 
             await message.bot.send_message(SUPPORT_GROUP_ID, full_message)
         except Exception as e:
-            await message.answer(f"❌ Failed to send to group: {e}")
-
+            await message.answer("❗ Произошла ошибка при отправке сообщения. Попробуйте позже.")
+            
         await message.answer(f"{t['support_received']}\n🆔 Ticket ID: {ticket_id}", reply_markup=main_menu)
         await state.clear()
         return
@@ -118,7 +119,7 @@ async def handle_support_message(message: Message, state: FSMContext):
     # Save user message for future confirmation
     await state.update_data(pending_message=message.text)
     await message.answer(
-        "Нажмите «📨 Отправить», чтобы отправить ваш запрос.",
+        "Нажмите «📨 Подтвердить», чтобы отправить ваш запрос.",
         reply_markup=send_request_keyboard
     )
 
@@ -127,7 +128,7 @@ async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext):
     ticket_id = callback_query.data.replace("clarify_", "")
     await state.set_state(SupportState.waiting_for_description)
     await state.update_data(parent_ticket_id=ticket_id)
-    await callback_query.message.answer("✍️ Напишите сообщение, затем нажмите «📨 Отправить».", reply_markup=send_request_keyboard)
+    await callback_query.message.answer("✍️ Напишите сообщение, затем нажмите «📨 Подтвердить».", reply_markup=send_request_keyboard)
     await callback_query.answer()
 
 

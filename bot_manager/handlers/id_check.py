@@ -11,11 +11,14 @@ from analyser.page_parser import parse_telegram_gift_page
 from mongo import get_nfts_strict_match, get_nfts_loose_match
 from mongo import get_nft_by_id_or_name, normalize_nft_name, get_nfts_model_only
 
+from bot_manager.decorators.access import subscription_required
+
 router = Router()
 
 
 # Triggered when user presses the button
 @router.message(F.text == t.texts["btn_enter_id"])
+@subscription_required
 async def ask_for_gift_id(message: types.Message, state: FSMContext):
     await state.set_state(GiftStates.WaitingForGiftID)
     await message.answer(t.texts["id_input_prompt"], reply_markup=back_keyboard)
