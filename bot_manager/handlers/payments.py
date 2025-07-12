@@ -7,12 +7,25 @@ from mongo import subscriptions_collection
 from datetime import datetime, timedelta
 import os
 from bot_manager.texts.ru import texts as t
+from bot_manager.utils import is_admin
 
-admin_ids = os.getenv("ADMIN_IDS", "")
-admin_ids = [int(id.strip()) for id in admin_ids.split(",") if id.strip()]
+logs_group_id = os.getenv("LOGS_GROUP_ID")
 
 router = Router()
 
+async def get_subscription_info(user_id: int) -> str:
+    sub = subscriptions_collection.find_one({"user_id": user_id})
+    if not sub:
+        return "❌ Подписка не найдена для данного пользователя."
+    status = sub.get("subscribed")
+    start = sub.get("start_date")
+    transaction_id = sub.get("transaction_id", "—")
+    return (
+        f"👤 ID: {user_id}\n"
+        f"🟢 Статус: {status}\n"
+        f"⏱ С: {start}\n"
+        f"🔁 Транзакция: {transaction_id}"
+    )
 
 @router.message(F.text == t["btn_subscription"])
 async def payment_handler(message: Message):
@@ -46,13 +59,22 @@ async def successful_payment(message: Message):
         {"$set": {"transaction_id": charge_id}},
         upsert=True
     )
-    await message.answer(
+    confirmation_text = (
         f"✅ Подписка активирована на 30 дней. Спасибо за оплату!\n🔁 Transaction ID: \n{charge_id}"
     )
+    await message.answer(confirmation_text)
+    if logs_group_id:
+        try:
+            await message.bot.send_message(
+                chat_id=logs_group_id,
+                text=f"💸 Новый платёж!\n\n👤 ID: {message.from_user.id}\n🔁 Transaction ID:\n{charge_id}"
+            )
+        except Exception as e:
+            print(f"[LOG ERROR] Failed to send payment log: {e}")
 
 @router.message(F.text.startswith("/check_subs"))
 async def check_subscriptions(message: Message):
-    if message.from_user.id not in admin_ids:
+    if not await is_admin(message):
         await message.answer("❌ У вас нет прав для выполнения этой команды.")
         return
     try:
@@ -63,16 +85,8 @@ async def check_subscriptions(message: Message):
             except ValueError:
                 await message.answer("⚠️ Неверный формат ID пользователя.")
                 return
-            sub = subscriptions_collection.find_one({"user_id": user_id})
-            if not sub:
-                await message.answer("❌ Подписка не найдена для данного пользователя.")
-                return
-            status = sub.get("subscribed")
-            start = sub.get("start_date")
-            transaction_id = sub.get("transaction_id", "—")
-            await message.answer(
-                f"👤 ID: {user_id}\n🟢 Статус: {status}\n⏱ С: {start}\n🔁 Транзакция: {transaction_id}"
-            )
+            sub_info = await get_subscription_info(user_id)
+            await message.answer(sub_info)
         else:
             subs = get_all_subscriptions()
             if not subs:
@@ -98,22 +112,37 @@ async def check_subscriptions(message: Message):
 
 
 
-# Admin-only refund command: /refund <user_id> <charge_id>
 @router.message(F.text.startswith("/refund"))
-async def admin_refund_handler(message: Message):
-    if message.from_user.id not in admin_ids:
+async def admin_refund_handler(message: Message, *args):
+    user_id = None
+    charge_id = None
+
+    if not await is_admin(message):
         await message.answer("❌ У вас нет прав для выполнения этой команды.")
         return
 
-    parts = message.text.split()
-    if len(parts) != 3:
-        await message.answer("⚠️ Использование: /refund <user_id> <charge_id>")
-        return
+    # Extract arguments from FSM or command line
+    if len(args) == 2:
+        try:
+            user_id = int(args[0])
+            charge_id = args[1]
+        except ValueError:
+            await message.answer("⚠️ Неверный формат аргументов.")
+            return
+    else:
+        parts = message.text.split()
+        if len(parts) >= 3:
+            try:
+                user_id = int(parts[1])
+                charge_id = " ".join(parts[2:])
+            except Exception as e:
+                await message.answer(f"❌ Ошибка при обработке команды: {e}")
+                return
+        else:
+            await message.answer("⚠️ Использование: /refund <user_id> <charge_id>")
+            return
 
     try:
-        user_id = int(parts[1])
-        charge_id = parts[2]
-
         sub = subscriptions_collection.find_one({"user_id": user_id})
         if not sub or not sub.get("subscribed"):
             await message.answer("❌ У пользователя нет активной подписки.")
@@ -139,6 +168,18 @@ async def admin_refund_handler(message: Message):
         )
 
         await message.answer(f"✅ Подписка пользователя {user_id} отключена, возврат выполнен.")
+        if logs_group_id:
+            try:
+                await message.bot.send_message(
+                    chat_id=logs_group_id,
+                    text=(
+                        f"💸 Возврат выполнен\n\n"
+                        f"👤 ID: {user_id}\n"
+                        f"🔁 Transaction ID:\n{charge_id}"
+                    )
+                )
+            except Exception as log_err:
+                print(f"[LOG ERROR] Failed to send refund log: {log_err}")
     except Exception as e:
         await message.answer(f"❌ Ошибка при возврате: {e}")
 
