@@ -26,13 +26,21 @@ def is_subscription_valid(user_id: int) -> bool:
 def remove_expired_subscriptions():
     """Mark expired subscriptions as inactive."""
     threshold = datetime.utcnow() - timedelta(days=30)
-    subscriptions.update_many(
+    result = subscriptions.update_many(
         {"start_date": {"$lt": threshold}, "subscribed": True},
         {"$set": {"subscribed": False}}
     )
+    print(f"Marked {result.modified_count} subscriptions as inactive.")
 
 
 def run_daily_check():
     print(f"[{datetime.utcnow()}] Running daily subscription check...")
     remove_expired_subscriptions()
     print(f"[{datetime.utcnow()}] Check complete.")
+
+
+def get_subscription_stats():
+    """Return statistics about total and active subscriptions."""
+    total = subscriptions.count_documents({})
+    active = subscriptions.count_documents({"subscribed": True})
+    return total, active
