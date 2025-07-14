@@ -11,7 +11,7 @@ def main():
     if data_update_requested:
         data_scraper.scrape_and_update_db()
 
-    # test_estimate_price()
+    #test_estimate_price()
 
     # Export all NFT prices to CSV
     export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd)
@@ -20,7 +20,7 @@ def main():
 
 
 def test_estimate_price():
-    nft_id = "EQAXJEh1sqt4NnAiC177t5d9xxjdm974hazlSSwOY12kBq95"
+    nft_id = "EQAWChTROtqH_-qum38ToUSPl4AfiHmUBJTH8ZcSEoooyao5"
     collection_address = "EQA3-i1IUFjWyDhaIoCGdYUB4nt2IYaT3T-95CHPrSvV3AfX"
 
     estimated_price = estimate_ton_price(nft_id)
