@@ -1,18 +1,21 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot_manager.texts.ru import texts as t
 
-clarify_kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text=t["clarify"], callback_data="clarify_ticket")]
-])
+def get_clarify_kb(t, ticket_id):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t["clarify"], callback_data=f"clarify_{ticket_id}")]
+        ]
+    )
 
 
-send_request_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="📨 Подтвердить")],
-        [KeyboardButton(text="🔙 Назад")]
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=False,
-    selective=True
-)
+def get_send_request_keyboard(t):
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=t["btn_confirm"])],
+            [KeyboardButton(text=t["btn_back"])]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=False,
+        selective=True
+    )

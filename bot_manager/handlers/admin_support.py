@@ -5,14 +5,16 @@ from aiogram.filters import Command
 
 from aiogram import Router
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from bot_manager.texts import get_texts
 
 from bot_manager.states.support_state import SupportState
 from mongo import support_collection
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 import os
-from bot_manager.keyboards.default import main_menu
-from bot_manager.texts.ru import texts as t
+from bot_manager.keyboards.default import get_main_menu
+from bot_manager.keyboards.support_keyboard import get_send_request_keyboard, get_clarify_kb
+
 from bot_manager.utils import is_admin
 
 SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
@@ -35,7 +37,7 @@ def escape_md(text: str) -> str:
 
 # Handler: reply-to-message for support ticket replies
 @router.message(lambda msg: msg.reply_to_message is not None and msg.text)
-async def reply_to_support_ticket(message: Message):
+async def reply_to_support_ticket(message: Message, t: dict):
     original_msg = message.reply_to_message
     lines = original_msg.text.splitlines()
 
@@ -53,11 +55,7 @@ async def reply_to_support_ticket(message: Message):
 
     user_id = ticket["user_id"]
     try:
-        clarify_keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="📝 Уточнить", callback_data=f"clarify_{ticket_id}")]
-            ]
-        )
+        clarify_keyboard = get_clarify_kb(t, ticket_id)
         await message.bot.send_message(
             user_id,
             f"{t['support_reply']}:\n{message.text}",
@@ -77,14 +75,13 @@ from aiogram.filters import Command
 
 
 @router.callback_query(F.data.startswith("clarify_"))
-async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext):
-    from bot_manager.keyboards.support_keyboard import send_request_keyboard
+async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext, t: dict):
 
     ticket_id = callback_query.data.replace("clarify_", "")
     ticket = support_collection.find_one({"_id": ticket_id})
 
     if not ticket:
-        await callback_query.answer("Тикет не найден.", show_alert=True)
+        await callback_query.answer(t["ticket_not_found"], show_alert=True)
         return
 
     user_id = ticket["user_id"]
@@ -94,38 +91,39 @@ async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext):
 
     await callback_query.bot.send_message(
         user_id,
-        "✍️ Напишите сообщение, затем нажмите «📨 Отправить».",
-        reply_markup=send_request_keyboard
+        t["write_and_submit"],
+        reply_markup=get_send_request_keyboard(t)
     )
+    await callback_query.message.edit_reply_markup(reply_markup=None)
 
 
-async def close_all_tickets(message: Message):
+async def close_all_tickets(message: Message, t: dict):
     if not await is_admin(message):
-        await message.answer("❌ У вас нет доступа к этой команде.")
+        await message.answer(t["no_admin_access"])
         return
     result = support_collection.update_many({"status": "open"}, {"$set": {"status": "closed"}})
-    await message.answer(f"✅ Закрыто {result.modified_count} тикетов.")
+    await message.answer(t["tickets_closed"].format(count=result.modified_count))
 
 
-async def show_active_tickets(message: Message):
+async def show_active_tickets(message: Message, t: dict):
     if not await is_admin(message):
-        await message.answer("❌ У вас нет доступа к этой команде.")
+        await message.answer(t["no_admin_access"])
         return
     tickets = list(support_collection.find({"status": "open"}).sort("_id", -1))
 
     if not tickets:
-        await message.answer("📭 Активных тикетов нет.")
+        await message.answer(t["no_active_tickets"])
         return
 
     def escape_md(text: str) -> str:
         escape_chars = r"\_*[]()~`>#+-=|{}.! "
         return ''.join(f'\\{c}' if c in escape_chars else c for c in text)
 
-    for t in tickets:
-        ticket_id = t.get('ticket_id', t['_id'])
-        username = t.get('username', 'N/A')
-        user_id = t['user_id']
-        msg = escape_md(t.get("message", ""))
+    for ticket in tickets:
+        ticket_id = ticket.get('ticket_id', ticket['_id'])
+        username = ticket.get('username', 'N/A')
+        user_id = ticket['user_id']
+        msg = escape_md(ticket.get("message", ""))
         text = (
             f"📨 Ticket ID: `{ticket_id}`\n"
             f"👤 @{username} (ID: {user_id})\n"
@@ -135,13 +133,13 @@ async def show_active_tickets(message: Message):
 
 
 @router.callback_query(F.data == "admin_show_active_tickets")
-async def handle_show_active_tickets(callback: CallbackQuery):
-    await show_active_tickets(callback.message)
+async def handle_show_active_tickets(callback: CallbackQuery, t: dict):
+    await show_active_tickets(callback.message, t)
 
 
 @router.callback_query(F.data == "admin_close_all_tickets")
-async def handle_close_all_tickets(callback: CallbackQuery):
-    await close_all_tickets(callback.message)
+async def handle_close_all_tickets(callback: CallbackQuery, t: dict):
+    await close_all_tickets(callback.message, t)
 
 
 def register(dp):

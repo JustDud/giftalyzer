@@ -1,8 +1,8 @@
 texts = {
-    "start_command": "Запуск бота.",
-    "about_command": "Информация о боте и его функциях.",
-    "language_command": "Смена языка интерфейса бота.",
-    "support_command": "Связь со службой поддержки.",
+    "start_command": "Запуск бота",
+    "about_command": "Информация о боте и его функциях",
+    "language_command": "Смена языка интерфейса бота",
+    "support_command": "Связь со службой поддержки",
     "start": ("Привет! Я — GiftValueBot.\n"
             "Помогу быстро и точно определить цену Telegram-подарков в TON и $.\n\n"
             "Что я умею:\n"
@@ -29,6 +29,11 @@ texts = {
     "btn_ask_ai": "🤖 Задать вопрос AI",
     "btn_help": "🆘 Помощь",
     "btn_subscription": "🌟 Подписка",
+    "btn_check_subscription": "🔄 Проверить подписку",
+    "btn_refund": "💸 Рефанд",
+    "btn_active_tickets": "📬 Активные тикеты",
+    "btn_close_all_tickets": "✅ Закрыть все тикеты",
+    "btn_subscription_stats": "📊 Статистика подписок",
     "nft_not_found": "❌ Подарок не найден в базе данных. Попробуйте другой ID.",
     "returned_to_menu": "Вы вернулись в главное меню. Выберите действие 👇",
     "keyboard_restored": "Функционал разблокирован",
@@ -72,5 +77,46 @@ texts = {
     "reply_failed": "❌ Не удалось отправить ответ:",
     "prompt_reply_message": "✍️ Введите ваш ответ на обращение:",
     "support_reply": "💬 Ответ службы поддержки",
-    "clarify": "✏️ Уточнить"
+    "clarify": "✏️ Уточнить",
+
+    "write_and_submit": "✍️ Напишите сообщение, затем нажмите «📨 Отправить».",
+    "no_admin_access": "❌ У вас нет доступа к этой команде.",
+    "tickets_closed": "✅ Закрыто {count} тикетов.",
+    "no_active_tickets": "📭 Активных тикетов нет.",
+
+    "clarify_button": "📝 Уточнить",
+
+    "admin_panel_activated": "🛠 Админ-панель активирована.\nВыберите действие ниже:",
+    "enter_user_id_refund": "Введите <b>User ID</b> для возврата:",
+    "enter_user_id_sub_check": "🔍 Введите <b>User ID</b> для проверки подписки:",
+    "enter_transaction_id": "Теперь введите <b>Transaction ID</b>:",
+    "subscription_stats": (
+        "📊 <b>Subscription Stats</b>:\n"
+        "👥 Total: <b>{total}</b>\n"
+        "✅ Active: <b>{active}</b>"
+    ),
+
+    "gift_extraction_failed": "❌ Не удалось извлечь параметры подарка. Возможно, ссылка недействительна или структура страницы изменилась.",
+    "no_similar_gifts": "⚠️ Похожих подарков не найдено. Возможно, ваш подарок уникален или ещё не добавлен в базу. Попробуйте другое ID",
+    "exact_match_found": "✅ Найдены подарки с полной идентичностью (модель, символ, фон):",
+    "partial_match_found": "⚠️ Найдены похожие подарки без совпадения по символу:",
+    "model_only_match_found": "🔍 Найдены подарки только с совпадением по модели:",
+    "no_gift_found_final": "😔 К сожалению, не удалось найти ни одного похожего подарка.",
+
+    "btn_confirm": "📨 Подтвердить",
+
+    "subscription_activated": "✅ Подписка активирована! Транзакция: {charge_id}",
+    "btn_language_ru": "Русский",
+    "btn_language_en": "English",
+    "language_switched": "✅ Язык интерфейса переключён.",
+    "support_write_message": "✍️ Пожалуйста, опишите вашу проблему как можно подробнее:",
+    "no_active_subscription": "❌ У вас нет активной подписки. Приобретите её, чтобы использовать эту функцию.",
+    "active_subscription_until": "✅ У вас уже есть активная подписка до {date}",
+    "support_confirm_prompt": "📨 Нажмите «Подтвердить», чтобы отправить сообщение в поддержку, или введите новое.",
+    "support_thread_history": "🧵 Предыдущая переписка:",
+    "support_send_error": "❌ Не удалось отправить сообщение в поддержку. Попробуйте позже.",
+    "choose_language": "🌐 Выберите язык интерфейса:",
+    "subscription_refunded": "✅ Подписка пользователя с ID {user_id} успешно возвращена.",
+    "refund_error": "❌ Ошибка при возврате: {error}",
 }
+

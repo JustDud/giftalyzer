@@ -1,8 +1,10 @@
 from aiogram.types import Message
 from subscription.manager import is_subscription_valid
+from bot_manager.texts import get_texts
 
 def subscription_required(handler):
     async def wrapped(message: Message, *args, **kwargs):
+        t = get_texts(message.from_user.id)
         # Filter out unexpected kwargs (e.g. 'dispatcher' passed by aiogram)
         filtered_kwargs = {
             k: v for k, v in kwargs.items()
@@ -10,5 +12,5 @@ def subscription_required(handler):
         }
         if is_subscription_valid(message.from_user.id):
             return await handler(message, *args, **filtered_kwargs)
-        await message.answer("❌ У вас нет активной подписки. Приобретите её, чтобы использовать эту функцию.")
+        await message.answer(t["no_active_subscription"])
     return wrapped

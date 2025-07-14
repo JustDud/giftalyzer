@@ -9,7 +9,10 @@ from aiogram.client.session.aiohttp import AiohttpSession
 import logging
 
 from bot_manager.handlers import register_all_handlers
-from texts.ru import texts as t
+from middleware.i18n import I18nMiddleware
+
+from bot_manager.texts.ru import texts as ru
+from bot_manager.texts.en import texts as en
 
 BOT_TOKEN = os.getenv("BOT_API")
 
@@ -33,6 +36,8 @@ session = AiohttpSession(timeout=30)  # default is 10
 bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
+dp.update.middleware(I18nMiddleware())
+
 
 # @dp.message(Command("start"))
 # async def start_handler(message: Message):
@@ -47,15 +52,22 @@ async def main():
     await dp.start_polling(bot)
 
 
-async def set_commands():
-    commands = [
-        BotCommand(command='start', description=t["start_command"]),
-        BotCommand(command='about', description=t["about_command"]),
-        BotCommand(command='language', description=t["language_command"]),
-        BotCommand(command='support', description=t["support_command"])
-    ]
-    await bot.set_my_commands(commands)
 
+
+async def set_commands():
+    await bot.set_my_commands([
+        BotCommand(command='start', description=ru["start_command"]),
+        BotCommand(command='about', description=ru["about_command"]),
+        BotCommand(command='language', description=ru["language_command"]),
+        BotCommand(command='support', description=ru["support_command"]),
+    ], language_code="ru")
+
+    await bot.set_my_commands([
+        BotCommand(command='start', description=en["start_command"]),
+        BotCommand(command='about', description=en["about_command"]),
+        BotCommand(command='language', description=en["language_command"]),
+        BotCommand(command='support', description=en["support_command"]),
+    ], language_code="en")
 
 
 if __name__ == "__main__":

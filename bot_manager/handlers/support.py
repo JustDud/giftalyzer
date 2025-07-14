@@ -4,11 +4,9 @@ from aiogram.fsm.context import FSMContext
 
 from bot_manager.states.support_state import SupportState
 from mongo import support_collection
-from bot_manager.texts.ru import texts as t
 from pymongo import ReturnDocument
-from bot_manager.keyboards.default import main_menu
-from bot_manager.keyboards.support_keyboard import send_request_keyboard
-
+from bot_manager.keyboards.default import get_main_menu
+from bot_manager.keyboards.support_keyboard import get_send_request_keyboard
 
 import os
 
@@ -17,31 +15,30 @@ SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
 router = Router()
 
 
-@router.message(F.text.in_([t["btn_help"], "/support"]))
-async def support_entry(message: Message, state: FSMContext):
-    print("💡 support_entry() triggered")
+@router.message(lambda message, t: message.text in [t["btn_help"], "/support"])
+async def support_entry(message: Message, state: FSMContext, t: dict):
     await state.set_state(SupportState.waiting_for_description)
     await state.update_data(parent_ticket_id=None)
-    await message.answer("✍️ Напишите сообщение, затем нажмите «📨 Подтвердить».", reply_markup=send_request_keyboard)
+    await message.answer(t["support_write_message"], reply_markup=get_send_request_keyboard(t))
 
 
-@router.message(F.text == "🔙 Back", SupportState.waiting_for_description)
-async def handle_back_button(message: Message, state: FSMContext):
+@router.message(lambda message, t: message.text == t["btn_back"], SupportState.waiting_for_description)
+async def handle_back_button(message: Message, state: FSMContext, t: dict):
     await state.clear()
-    await message.answer("Вы вернулись в главное меню.", reply_markup=main_menu)
+    await message.answer(t["support_back_to_main"], reply_markup=get_main_menu(t))
 
 @router.message(SupportState.waiting_for_description)
-async def handle_support_message(message: Message, state: FSMContext):
-    if message.text == "🔙 Back":
+async def handle_support_message(message: Message, state: FSMContext, t: dict):
+    if message.text == t["btn_back"]:
         await state.clear()
-        await message.answer("Вы вернулись в главное меню.", reply_markup=main_menu)
+        await message.answer(t["support_back_to_main"], reply_markup=get_main_menu(t))
         return
 
-    if message.text == "📨 Подтвердить":
+    if message.text == t["btn_confirm"]:
         data = await state.get_data()
         user_text = data.get("pending_message")
         if not user_text:
-            await message.answer("❗ Пожалуйста, введите сообщение перед тем, как нажимать «📨 Подтвердить».")
+            await message.answer(t["support_confirm_error"])
             return
 
         # Generate ticket ID
@@ -101,7 +98,7 @@ async def handle_support_message(message: Message, state: FSMContext):
                         current_id = parent.get("parent_ticket_id")
                     else:
                         break
-                thread_text = "📚 История переписки:\n" + "\n".join(reversed(thread)) + "\n\n"
+                thread_text = t["support_thread_history"] + "\n" + "\n".join(reversed(thread)) + "\n\n"
 
             full_message = (
                 f"{thread_text}"
@@ -110,25 +107,26 @@ async def handle_support_message(message: Message, state: FSMContext):
 
             await message.bot.send_message(SUPPORT_GROUP_ID, full_message)
         except Exception as e:
-            await message.answer("❗ Произошла ошибка при отправке сообщения. Попробуйте позже.")
-            
-        await message.answer(f"{t['support_received']}\n🆔 Ticket ID: {ticket_id}", reply_markup=main_menu)
+            await message.answer(t["support_send_error"])
+
+        await message.answer(f"{t['support_received']}\n🆔 Ticket ID: {ticket_id}", reply_markup=get_main_menu(t))
         await state.clear()
         return
 
     # Save user message for future confirmation
     await state.update_data(pending_message=message.text)
     await message.answer(
-        "Нажмите «📨 Подтвердить», чтобы отправить ваш запрос.",
-        reply_markup=send_request_keyboard
+        t["support_confirm_prompt"],
+        reply_markup=get_send_request_keyboard(t)
     )
 
+
 @router.callback_query(F.data.startswith("clarify_"))
-async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext):
+async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext, t: dict):
     ticket_id = callback_query.data.replace("clarify_", "")
     await state.set_state(SupportState.waiting_for_description)
     await state.update_data(parent_ticket_id=ticket_id)
-    await callback_query.message.answer("✍️ Напишите сообщение, затем нажмите «📨 Подтвердить».", reply_markup=send_request_keyboard)
+    await callback_query.message.answer(t["support_write_message"], reply_markup=get_send_request_keyboard(t))
     await callback_query.answer()
 
 
