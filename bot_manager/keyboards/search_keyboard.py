@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot_manager.texts.ru import texts as t
 
 
 def get_nft_keyboard(
@@ -8,12 +7,16 @@ def get_nft_keyboard(
     per_page: int = 30,
     selected_models: list[str] = None,
     include_select_all: bool = False,
-    next_label: str = t["btn_next_page"],
-    prev_label: str = t["btn_prev_page"]
+    next_label: str = None,
+    prev_label: str = None,
+    t: dict = None
 ) -> InlineKeyboardMarkup:
     selected_models = selected_models or []
     start = page * per_page
     end = start + per_page
+
+    next_label = next_label or t["btn_next_page"]
+    prev_label = prev_label or t["btn_prev_page"]
 
     rows = [
         [
@@ -48,9 +51,12 @@ def get_nft_keyboard(
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
-def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int = 30, next_label: str = t["btn_next_page"], prev_label: str = t["btn_prev_page"]) -> InlineKeyboardMarkup:
+def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int = 30, next_label: str = None, prev_label: str = None, t: dict = None) -> InlineKeyboardMarkup:
     start = page * per_page
     end = start + per_page
+
+    next_label = next_label or t["btn_next_page"]
+    prev_label = prev_label or t["btn_prev_page"]
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
@@ -76,7 +82,8 @@ def get_collection_keyboard(collections: list[str], page: int = 0, per_page: int
 def get_backdrop_keyboard(
     backdrops: list[str],
     selected_backdrops: list[str] = None,
-    include_show_results_button: bool = False
+    include_show_results_button: bool = False,
+    t: dict = None
 ) -> InlineKeyboardMarkup:
     selected_backdrops = selected_backdrops or []
     rows = [

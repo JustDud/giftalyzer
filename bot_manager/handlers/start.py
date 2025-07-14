@@ -1,14 +1,13 @@
 from aiogram import types, Router
 from aiogram.filters import CommandStart
-from bot_manager.keyboards.default import main_menu
-from bot_manager.texts import ru as t
+from bot_manager.keyboards.default import get_main_menu
 
 router = Router()
 
 
 @router.message(CommandStart())
-async def start_handler(message: types.Message):
-    await message.answer(t.texts["start"], reply_markup=main_menu)
+async def start_handler(message: types.Message, t: dict):
+    await message.answer(t["start"], reply_markup=get_main_menu(t))
 
 
 def register(dp):

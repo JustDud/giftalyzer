@@ -6,11 +6,10 @@ from analyser.price_analyser import estimate_ton_price, convert_ton_to_usd
 from aiogram.exceptions import TelegramBadRequest
 import asyncio
 from bot_manager.handlers.market_search import MarketSearchState
-from bot_manager.texts.ru import texts as t
-
+from bot_manager.keyboards.default import get_main_menu
 router = Router()
 
-def get_pagination_keyboard(current_page: int, total_pages: int):
+def get_pagination_keyboard(current_page: int, total_pages: int, t: dict):
     buttons = []
     if current_page > 0:
         buttons.append(InlineKeyboardButton(text=t["btn_prev_page"], callback_data="page_prev"))
@@ -19,7 +18,7 @@ def get_pagination_keyboard(current_page: int, total_pages: int):
     return InlineKeyboardMarkup(inline_keyboard=[buttons]) if buttons else None
 
 @router.callback_query(F.data == "show_filtered_results")
-async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
+async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
     from aiogram.types import ReplyKeyboardRemove
     temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
@@ -90,9 +89,9 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
         await call.message.edit_text(t["no_results_found"])
         return
 
-    from bot_manager.keyboards.default import main_menu
+
     await temp.delete()
-    await call.message.answer(t["keyboard_restored"], reply_markup=main_menu)
+    await call.message.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
 
     await call.message.edit_text(interim_messages[2])
     await state.update_data(filtered_results=results, results_page=0)
@@ -102,13 +101,13 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext):
     text_blocks = [t["gift_result"].format(**r) for r in chunk]
     full_text = "\n\n-----------\n\n".join(text_blocks)
 
-    reply_markup = get_pagination_keyboard(page, total_pages)
+    reply_markup = get_pagination_keyboard(page, total_pages, t)
     await call.message.edit_text(t["processing_done"])
     await call.message.answer(full_text, reply_markup=reply_markup)
 
 
 @router.callback_query(F.data.in_(["page_prev", "page_next"]))
-async def paginate_filtered_results(call: CallbackQuery, state: FSMContext):
+async def paginate_filtered_results(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
     data = await state.get_data()
     results = data.get("filtered_results", [])
@@ -124,7 +123,7 @@ async def paginate_filtered_results(call: CallbackQuery, state: FSMContext):
     text_blocks = [t["gift_result"].format(**r) for r in chunk]
     full_text = "\n\n-----------\n\n".join(text_blocks)
 
-    reply_markup = get_pagination_keyboard(page, total_pages)
+    reply_markup = get_pagination_keyboard(page, total_pages, t)
     try:
         await call.message.edit_text(full_text, reply_markup=reply_markup)
     except TelegramBadRequest as e:
