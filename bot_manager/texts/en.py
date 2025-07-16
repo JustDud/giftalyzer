@@ -119,4 +119,53 @@ texts = {
     "choose_language": "🌐 Choose interface language:",
     "subscription_refunded": "✅ Subscription for user ID {user_id} has been successfully refunded.",
     "refund_error": "❌ Refund failed: {error}",
+    "giftalyserpro_full": (
+        "✨ <b>GIFTALYSER PRO — your smart assistant</b>\n\n"
+        "📅 <b>30-day subscription</b>\n"
+        "Access to advanced analytics and priority support.\n\n"
+        "🔹 <b>Price Analysis</b>\n"
+        "Accurate gift evaluation based on 30+ factors: rarity, sales history, collection popularity, and more.\n\n"
+        "🤖 <b>AI Forecast</b>\n"
+        "See whether the gift price is rising or may drop soon.\n\n"
+        "📊 <b>Similar Models</b>\n"
+        "Compare alternatives to choose the best price/quality option.\n\n"
+        "⚡ <b>Priority Support</b>\n"
+        "Your requests are processed first."
+    ),
+    "giftalyserpro_invoice_description": "Pay for subscription using the button below",
+
+    "btn_refund_policy": "🔄 Refund Policy",
+    "refund_policy_notice": "The refund policy is available by the button below.",
+    "refund_policy_text": (
+        "🔁 Refund Policy\n\n"
+        "Thank you for using our service. We strive to ensure transparency and fair conditions. Refunds are only possible in case of technical failures on the platform’s side that prevent the paid service from being provided.\n\n"
+        "✅ Refund Conditions\n"
+        "A refund will be issued if:\n"
+        "• The service failed to start or ended with an error due to our fault.\n"
+        "• The result was not provided due to a technical failure.\n"
+        "• Access to the service was not granted after confirmed payment.\n\n"
+        "📌 A refund request must be submitted within 24 hours of payment.\n\n"
+        "🧾 What You Need to Provide\n"
+        "• Transaction ID\n"
+        "• Screenshots confirming the error (preferably with date)\n"
+        "• A brief description of the issue\n\n"
+        "Each request is reviewed individually.\n\n"
+        "🕒 Review Time\n"
+        "A refund decision will be made within 21 calendar days from the date of submitting a correct request. The response will be sent via Telegram.\n\n"
+        "❌ A refund will not be issued if:\n"
+        "• The service was provided as described, but the result did not meet expectations\n"
+        "• The wrong service was purchased\n"
+        "• You changed your mind after payment\n"
+        "• The error occurred due to the user’s fault (unstable internet, device issues, etc.). Technical logs may be requested if necessary.\n\n"
+        "📬 How to Submit a Request\n"
+        "1. Go to the “Help” section on the platform or in the bot\n"
+        "2. Click “Support”\n"
+        "3. Specify “Refund Request” as the topic, add the order ID and description\n"
+        "4. Attach evidence (e.g., a screenshot with the error)\n"
+        "5. Send the request\n\n"
+        "⏱ We will respond within 48 hours."
+    ),
+    "support_confirm_error": "❌ No message to confirm. Please type your issue before sending.",
+    "refund_log": "🔁 Refund processed for user ID {user_id}, transaction ID: {charge_id}",
+    "new_payment_log": "✅ New subscription purchased! User ID: {user_id}, transaction: {charge_id}",
 }
