@@ -1,6 +1,6 @@
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
-from aiogram.types import Message, LabeledPrice, PreCheckoutQuery
+from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
 from subscription.manager import add_subscription
 from mongo import get_all_subscriptions
 from mongo import subscriptions_collection
@@ -18,11 +18,17 @@ async def get_subscription_info(user_id: int) -> str:
         return "❌ Подписка не найдена для данного пользователя."
     status = sub.get("subscribed")
     start = sub.get("start_date")
+    end_date = sub.get("end_date")
+    if end_date:
+        end_date = end_date.strftime('%d %B %Y')
+    elif start:
+        end_date = (start + timedelta(days=30)).strftime('%d %B %Y')
     transaction_id = sub.get("transaction_id", "—")
     return (
         f"👤 ID: {user_id}\n"
         f"🟢 Статус: {status}\n"
         f"⏱ С: {start}\n"
+        f"📅 До: {end_date if end_date else '—'}\n"
         f"🔁 Транзакция: {transaction_id}"
     )
 
@@ -37,12 +43,23 @@ async def payment_handler(message: Message, t: dict):
         await message.answer(t["active_subscription_until"].format(date=end_date.strftime('%d %B %y')))
         return
 
+    await message.answer(t["giftalyserpro_full"], parse_mode="HTML")
+
+    refund_policy_kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=t["btn_refund_policy"], callback_data="refund_policy")]
+    ])
+
     await message.answer_invoice(
-        title="Plus Plan",
-        description="Payment for a Plus Plan",
+        title="GIFTALYSER PRO",
+        description=t["giftalyserpro_invoice_description"],
         payload="month_subscription",
         currency="XTR",
         prices=[LabeledPrice(label="XTR", amount=1)],
+    )
+
+    await message.answer(
+        t["refund_policy_notice"],
+        reply_markup=refund_policy_kb
     )
 
 @router.pre_checkout_query()
@@ -55,11 +72,16 @@ async def successful_payment(message: Message, t: dict):
     charge_id = message.successful_payment.telegram_payment_charge_id
     subscriptions_collection.update_one(
         {"user_id": message.from_user.id},
-        {"$set": {"transaction_id": charge_id}},
+        {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": datetime.utcnow()}},
+         "$set": {"subscribed": True, "start_date": datetime.utcnow()}},
         upsert=True
     )
     confirmation_text = t["subscription_activated"].format(charge_id=charge_id)
     await message.answer(confirmation_text)
+    try:
+        await message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
     if logs_group_id:
         try:
             await message.bot.send_message(
@@ -144,13 +166,14 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             await message.answer(t["no_active_subscription"])
             return
 
-        start_date = sub.get("start_date")
-        if start_date and (datetime.utcnow() - start_date) > timedelta(days=30):
-            await message.answer(t["subscription_expired_no_refund"])
+        transactions = sub.get("transactions", [])
+        matched_tx = next((tx for tx in transactions if tx["id"] == charge_id and not tx.get("refunded")), None)
+        if not matched_tx:
+            await message.answer(t["transaction_id_mismatch"])
             return
 
-        if charge_id != sub.get("transaction_id"):
-            await message.answer(t["transaction_id_mismatch"])
+        if (datetime.utcnow() - matched_tx["date"]) > timedelta(days=14):
+            await message.answer(t["subscription_expired_no_refund"])
             return
 
         await message.bot.refund_star_payment(
@@ -159,8 +182,8 @@ async def admin_refund_handler(message: Message, *args, t: dict):
         )
 
         subscriptions_collection.update_one(
-            {"user_id": user_id},
-            {"$set": {"subscribed": False}}
+            {"user_id": user_id, "transactions.id": charge_id},
+            {"$set": {"transactions.$.refunded": True, "subscribed": False}}
         )
 
         await message.answer(t["subscription_refunded"].format(user_id=user_id))
@@ -182,3 +205,9 @@ def register(dp):
 @router.message(lambda msg, t: msg.text == t["btn_subscription"])
 async def handle_subscription_button(message: Message, t: dict):
     await payment_handler(message, t)
+
+@router.callback_query(F.data == "refund_policy")
+async def show_refund_policy(callback_query: CallbackQuery, t: dict):
+    await callback_query.message.edit_reply_markup(reply_markup=None)
+    await callback_query.message.answer(t["refund_policy_text"])
+    await callback_query.answer()

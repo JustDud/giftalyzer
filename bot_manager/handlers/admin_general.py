@@ -1,4 +1,5 @@
 from typing import Awaitable
+import os
 
 from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
@@ -12,6 +13,8 @@ from bot_manager.utils import is_admin
 from bot_manager.handlers.admin_support import close_all_tickets, show_active_tickets
 from subscription.manager import get_subscription_stats
 
+
+logs_group_id = os.getenv("LOGS_GROUP_ID")
 
 router = Router()
 
@@ -125,3 +128,119 @@ async def handle_subscription_stats(callback: CallbackQuery, t: dict):
 
 def register(dp):
     dp.include_router(router)
+
+
+# --- New admin commands: /force_refund and /force_subscribe ---
+from mongo import subscriptions_collection
+from datetime import datetime, timedelta
+
+@router.message(Command("force_refund"))
+async def admin_force_refund(message: Message, t: dict):
+    if not await is_admin(message):
+        await message.answer(t["no_admin_access"])
+        return
+
+    parts = message.text.split()
+    if len(parts) < 3:
+        await message.answer("Usage: /force_refund <user_id> <charge_id>")
+        return
+
+    try:
+        user_id = int(parts[1])
+        charge_id = parts[2]
+    except ValueError:
+        await message.answer("Invalid arguments.")
+        return
+
+    try:
+        await message.bot.refund_star_payment(
+            user_id=user_id,
+            telegram_payment_charge_id=charge_id
+        )
+        subscriptions_collection.update_one(
+            {"user_id": user_id, "transactions.id": charge_id},
+            {"$set": {"transactions.$.refunded": True}}
+        )
+        await message.answer(f"✅ Forced refund processed for user {user_id}, charge {charge_id}")
+        if logs_group_id:
+            try:
+                await message.bot.send_message(
+                    chat_id=logs_group_id,
+                    text=f"🔁 Forced refund by admin: user {user_id}, charge {charge_id}"
+                )
+            except Exception as e:
+                print(f"[LOG ERROR] Failed to send forced refund log: {e}")
+    except Exception as e:
+        await message.answer(f"❌ Error while forcing refund: {e}")
+
+
+@router.message(Command("force_subscribe"))
+async def admin_force_subscribe(message: Message, t: dict):
+    if not await is_admin(message):
+        await message.answer(t["no_admin_access"])
+        return
+
+    parts = message.text.split()
+    if len(parts) < 3:
+        await message.answer("Usage: /force_subscribe <user_id> <days>")
+        return
+
+    try:
+        user_id = int(parts[1])
+        days = int(parts[2])
+    except ValueError:
+        await message.answer("Invalid arguments.")
+        return
+
+    end_date = datetime.utcnow() + timedelta(days=days)
+    subscriptions_collection.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "subscribed": True,
+                "start_date": datetime.utcnow(),
+                "end_date": end_date
+            }
+        },
+        upsert=True
+    )
+    await message.answer(f"✅ Forced subscription activated for {user_id} for {days} days.")
+    if logs_group_id:
+        try:
+            await message.bot.send_message(
+                chat_id=logs_group_id,
+                text=f"✅ Forced subscription by admin: user {user_id}, {days} days"
+            )
+        except Exception as e:
+            print(f"[LOG ERROR] Failed to send forced subscription log: {e}")
+
+@router.message(Command("force_cancel"))
+async def admin_force_cancel(message: Message, t: dict):
+    if not await is_admin(message):
+        await message.answer(t["no_admin_access"])
+        return
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        await message.answer("Usage: /force_cancel <user_id>")
+        return
+
+    try:
+        user_id = int(parts[1])
+    except ValueError:
+        await message.answer("Invalid user_id.")
+        return
+
+    subscriptions_collection.update_one(
+        {"user_id": user_id},
+        {"$set": {"subscribed": False}},
+    )
+    await message.answer(f"✅ Subscription for user {user_id} has been forcibly cancelled.")
+    if logs_group_id:
+        try:
+            await message.bot.send_message(
+                chat_id=logs_group_id,
+                text=f"⛔ Forced subscription cancellation by admin: user {user_id}"
+            )
+        except Exception as e:
+            print(f"[LOG ERROR] Failed to send forced cancellation log: {e}")
