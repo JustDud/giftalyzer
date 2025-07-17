@@ -1,15 +1,3 @@
-def normalize_nft_name(name: str) -> str:
-    if not name:
-        return ""
-    name = name.strip()
-    import re
-    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
-    if match:
-        prefix = match.group(1).replace(" ", "")
-        number = match.group(2)
-        return f"{prefix}-{number}"
-    return name.replace(" ", "")
-
 import re
 from pymongo import MongoClient, UpdateOne
 from dotenv import load_dotenv
@@ -17,6 +5,7 @@ import os
 from typing import List, Dict, Any
 from pymongo.collection import Collection
 import csv
+from datetime import datetime
 
 
 load_dotenv()
@@ -29,12 +18,29 @@ nfts_collection = db.nfts
 collections_collection = db.collections
 subscriptions_collection = db.subscriptions
 support_collection = db.support_tickets
+promo_codes_collection = db.promo_codes
+promo_usage_collection = db.promo_usage
 
 # Indexes to ensure uniqueness and efficient lookups
 nfts_collection.create_index("nft_id", unique=True)
 nfts_collection.create_index("collection_address")
 collections_collection.create_index("address", unique=True)
 subscriptions_collection.create_index("user_id", unique=True)
+promo_codes_collection.create_index("code", unique=True)
+promo_usage_collection.create_index("promo_code")
+
+
+def normalize_nft_name(name: str) -> str:
+    if not name:
+        return ""
+    name = name.strip()
+    import re
+    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
+    if match:
+        prefix = match.group(1).replace(" ", "")
+        number = match.group(2)
+        return f"{prefix}-{number}"
+    return name.replace(" ", "")
 
 
 def upsert_and_notify_new_collections(collections_collection, collection_summaries):
@@ -131,17 +137,6 @@ def get_nft_by_id_or_name(gift_id: str):
         if nft:
             return nft
     return nfts_collection.find_one({"collection_address": gift_id})
-
-def normalize_collection_name(name: str) -> str:
-    if not name:
-        return ""
-    name = name.strip()
-    match = re.match(r"^(.*?)[\s#]+(\d+)$", name)
-    if match:
-        prefix = match.group(1).replace(" ", "")
-        number = match.group(2)
-        return f"{prefix}-{number}"
-    return name.replace(" ", "")
 
 
 def get_nfts_by_params(model: str, symbol: str | None, backdrop: str) -> list[dict]:

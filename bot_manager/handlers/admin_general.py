@@ -2,16 +2,18 @@ from typing import Awaitable
 import os
 
 from aiogram import Router, F
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from bot_manager.keyboards.admin_keyboard import get_admin_keyboard
+from bot_manager.keyboards.admin_keyboard import get_admin_keyboard, get_promocodes_keyboard
 from bot_manager.handlers.payments import admin_refund_handler as perform_refund
 from bot_manager.handlers.payments import get_subscription_info
 from bot_manager.utils import is_admin
 from bot_manager.handlers.admin_support import close_all_tickets, show_active_tickets
 from subscription.manager import get_subscription_stats
+from mongo import subscriptions_collection
+from datetime import datetime, timedelta
 
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
@@ -25,6 +27,21 @@ class RefundFSM(StatesGroup):
 # New FSM for checking subscriptions
 class CheckSubsFSM(StatesGroup):
     waiting_for_user_id = State()
+
+class PromoStatsFSM(StatesGroup):
+    waiting_for_promo_code = State()
+
+class PromoAddFSM(StatesGroup):
+    waiting_for_code = State()
+    waiting_for_owner_id = State()
+    waiting_for_discount = State()
+    waiting_for_profit = State()
+    waiting_for_single_use = State()
+
+class PromoDeleteFSM(StatesGroup):
+    waiting_for_code = State()
+
+from promocodes import get_promo_stats, create_promo, disable_promo, list_all_promos  # ensure you have this import
 
 @router.message(Command("admin_panel", "adm"))
 async def admin_panel(message: Message, t: dict):
@@ -125,14 +142,181 @@ async def handle_subscription_stats(callback: CallbackQuery, t: dict):
         parse_mode="HTML"
     )
 
+@router.callback_query(F.data == "admin_manage_promocodes")
+async def admin_manage_promocodes(callback: CallbackQuery, t: dict):
+    await callback.answer()
+    await callback.message.edit_reply_markup(reply_markup=get_promocodes_keyboard(t))
 
-def register(dp):
-    dp.include_router(router)
+@router.callback_query(F.data == "admin_back_main")
+async def admin_back_main(callback: CallbackQuery, t: dict):
+    await callback.answer()
+    await callback.message.edit_reply_markup(reply_markup=get_admin_keyboard(t))
 
+@router.callback_query(F.data == "admin_promocode_stats")
+async def admin_promocode_stats(callback: CallbackQuery, state: FSMContext, t: dict):
+    await state.set_state(PromoStatsFSM.waiting_for_promo_code)
+    await state.update_data(starter_id=callback.from_user.id)
+    await callback.message.answer(t["enter_promocode_for_stats"], parse_mode="HTML")
 
-# --- New admin commands: /force_refund and /force_subscribe ---
-from mongo import subscriptions_collection
-from datetime import datetime, timedelta
+@router.callback_query(F.data == "admin_list_promocodes")
+async def admin_list_promocodes(callback: CallbackQuery, t: dict):
+    try:
+        promos = list_all_promos()
+        if not promos:
+            await callback.message.answer(t["no_promocodes_found"])
+            return
+
+        text = t["promocodes_list_header"] + "\n"
+        for p in promos:
+            text += (
+                f"🔹 <b>{p['code']}</b> | "
+                f"{t['owner']} {p['owner_id']} | "
+                f"{t['discount']} {p['discount_percent']}% | "
+                f"{t['profit']} {p.get('total_profit', 0):.2f} | "
+                f"{'✅' if p.get('is_active') else '❌'}\n"
+            )
+
+        await callback.message.answer(text, parse_mode="HTML")
+    except Exception as e:
+        print(f"[ERROR] Failed to list promo codes: {e}")
+        await callback.message.answer("❌ Ошибка при выводе списка промокодов.")
+
+@router.message(PromoStatsFSM.waiting_for_promo_code)
+async def process_promo_stats(message: Message, state: FSMContext, t: dict):
+    data = await state.get_data()
+    if message.from_user.id != data.get("starter_id"):
+        return
+
+    code = message.text.strip().upper()
+    stats = get_promo_stats(code)
+    await state.clear()
+
+    print(f"[DEBUG] Promo stats for {code}: {stats}")  # Log the stats for debugging
+
+    if not stats:
+        await message.answer(t["promocode_not_found"].format(code=code))
+        return
+
+    try:
+        await message.answer(
+            t["promocode_stats"].format(
+                code=code,
+                usage=stats.get("usage_count", 0),
+                total_profit=stats.get("total_profit", 0.0),
+                active="✅" if stats.get("is_active", False) else "❌"
+            ),
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        print(f"[ERROR] Failed to send promo stats for {code}: {e}")
+        await message.answer("❌ Произошла ошибка при отображении статистики промокода.")
+
+@router.callback_query(F.data == "admin_add_promocode")
+async def admin_add_promocode(callback: CallbackQuery, state: FSMContext, t: dict):
+    await state.set_state(PromoAddFSM.waiting_for_code)
+    await state.update_data(starter_id=callback.from_user.id)
+    await callback.message.answer(t["enter_promocode_code"], parse_mode="HTML")
+
+@router.message(PromoAddFSM.waiting_for_code)
+async def process_add_code(message: Message, state: FSMContext, t: dict):
+    try:
+        if message.from_user.id != (await state.get_data()).get("starter_id"):
+            return
+        await state.update_data(code=message.text.strip().upper())
+        await state.set_state(PromoAddFSM.waiting_for_owner_id)
+        await message.answer(t["enter_promocode_owner"], parse_mode="HTML")
+    except Exception as e:
+        print(f"[ERROR] Failed at add code step: {e}")
+        await message.answer("❌ Ошибка при обработке кода промокода.")
+
+@router.message(PromoAddFSM.waiting_for_owner_id)
+async def process_add_owner(message: Message, state: FSMContext, t: dict):
+    try:
+        if message.from_user.id != (await state.get_data()).get("starter_id"):
+            return
+        await state.update_data(owner_id=int(message.text.strip()))
+        await state.set_state(PromoAddFSM.waiting_for_discount)
+        await message.answer(t["enter_promocode_discount"], parse_mode="HTML")
+    except Exception as e:
+        print(f"[ERROR] Failed at add owner step: {e}")
+        await message.answer("❌ Ошибка при обработке ID владельца промокода.")
+
+@router.message(PromoAddFSM.waiting_for_discount)
+async def process_add_discount(message: Message, state: FSMContext, t: dict):
+    if message.from_user.id != (await state.get_data()).get("starter_id"):
+        return
+    try:
+        discount = float(message.text.strip())
+        if not 0 <= discount <= 100:
+            raise ValueError
+    except ValueError:
+        await message.answer("❌ Введите число от 0 до 100 для процента скидки.")
+        return
+    await state.update_data(discount=discount)
+    await state.set_state(PromoAddFSM.waiting_for_profit)
+    await message.answer(t["enter_promocode_profit"], parse_mode="HTML")
+
+@router.message(PromoAddFSM.waiting_for_profit)
+async def process_add_profit(message: Message, state: FSMContext, t: dict):
+    if message.from_user.id != (await state.get_data()).get("starter_id"):
+        return
+    try:
+        profit = float(message.text.strip())
+        if not 0 <= profit <= 100:
+            raise ValueError
+    except ValueError:
+        await message.answer("❌ Введите число от 0 до 100 для процента прибыли владельцу.")
+        return
+    await state.update_data(profit=profit)
+    await state.set_state(PromoAddFSM.waiting_for_single_use)
+    await message.answer(t["enter_promocode_single_use"], parse_mode="HTML")
+
+@router.message(PromoAddFSM.waiting_for_single_use)
+async def process_add_single_use(message: Message, state: FSMContext, t: dict):
+    data = await state.get_data()
+    if message.from_user.id != data.get("starter_id"):
+        return
+    try:
+        single_use_flag = int(message.text.strip())
+        if single_use_flag not in (0, 1):
+            raise ValueError
+    except ValueError:
+        await message.answer("❌ Введите 1 для одноразового или 0 для многоразового.")
+        return
+
+    promo = create_promo(
+        data["code"],
+        data["owner_id"],
+        data["discount"],
+        data["profit"],
+        single_use_flag == 1
+    )
+    await state.clear()
+    await message.answer(t["promocode_created"].format(code=promo["code"]), parse_mode="HTML")
+
+@router.callback_query(F.data == "admin_delete_promocode")
+async def admin_delete_promocode(callback: CallbackQuery, state: FSMContext, t: dict):
+    await state.set_state(PromoDeleteFSM.waiting_for_code)
+    await state.update_data(starter_id=callback.from_user.id)
+    await callback.message.answer(t["enter_promocode_for_delete"], parse_mode="HTML")
+
+@router.message(PromoDeleteFSM.waiting_for_code)
+async def process_delete_promo(message: Message, state: FSMContext, t: dict):
+    try:
+        data = await state.get_data()
+        if message.from_user.id != data.get("starter_id"):
+            return
+        code = message.text.strip().upper()
+        ok = disable_promo(code)
+        await state.clear()
+        if ok:
+            await message.answer(t["promocode_disabled"].format(code=code))
+        else:
+            await message.answer(t["promocode_not_found"].format(code=code))
+    except Exception as e:
+        print(f"[ERROR] Failed to delete promo code: {e}")
+        await message.answer("❌ Ошибка при удалении промокода.")
+
 
 @router.message(Command("force_refund"))
 async def admin_force_refund(message: Message, t: dict):
@@ -244,3 +428,7 @@ async def admin_force_cancel(message: Message, t: dict):
             )
         except Exception as e:
             print(f"[LOG ERROR] Failed to send forced cancellation log: {e}")
+
+
+def register(dp):
+    dp.include_router(router)
