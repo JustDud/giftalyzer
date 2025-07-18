@@ -2,32 +2,49 @@ from datetime import datetime, timedelta
 from mongo import subscriptions_collection as subscriptions
 
 
-def add_subscription(user_id: int):
-    """Add or update a subscription with current timestamp."""
+def add_subscription(user_id: int, days: int = 30):
+    """Extend subscription if already active, otherwise start new."""
     now = datetime.utcnow()
+    record = subscriptions.find_one({"user_id": user_id})
+
+    if record and record.get("subscribed") and record.get("end_date") and record["end_date"] > now:
+        # Extend from the current end_date if active
+        end_date = record["end_date"] + timedelta(days=days)
+        start_date = record.get("start_date", now)
+    else:
+        # Start new subscription
+        start_date = now
+        end_date = now + timedelta(days=days)
+
     subscriptions.update_one(
         {"user_id": user_id},
-        {"$set": {"user_id": user_id, "subscribed": True, "start_date": now}},
+        {
+            "$set": {
+                "user_id": user_id,
+                "subscribed": True,
+                "start_date": start_date,
+                "end_date": end_date
+            }
+        },
         upsert=True
     )
 
 
 def is_subscription_valid(user_id: int) -> bool:
-    """Check if the user's subscription is still valid."""
+    """Check if the user's subscription is still valid based on end date."""
     record = subscriptions.find_one({"user_id": user_id, "subscribed": True})
     if not record:
         return False
-    start_date = record.get("start_date")
-    if not start_date:
+    end_date = record.get("end_date")
+    if not end_date:
         return False
-    return (datetime.utcnow() - start_date) <= timedelta(days=30)
+    return datetime.utcnow() <= end_date
 
 
 def remove_expired_subscriptions():
-    """Mark expired subscriptions as inactive."""
-    threshold = datetime.utcnow() - timedelta(days=30)
+    """Mark expired subscriptions as inactive based on end date."""
     result = subscriptions.update_many(
-        {"start_date": {"$lt": threshold}, "subscribed": True},
+        {"end_date": {"$lt": datetime.utcnow()}, "subscribed": True},
         {"$set": {"subscribed": False}}
     )
     print(f"Marked {result.modified_count} subscriptions as inactive.")

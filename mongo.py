@@ -189,3 +189,26 @@ def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
 
 def get_all_subscriptions():
     return list(subscriptions_collection.find())
+
+
+class SyncSubscriptionsCollection:
+    def __init__(self, collection):
+        self._collection = collection
+
+    def update_one(self, *args, **kwargs):
+        return self._collection.update_one(*args, **kwargs)
+
+    def find_one(self, *args, **kwargs):
+        return self._collection.find_one(*args, **kwargs)
+
+    def insert_one(self, *args, **kwargs):
+        return self._collection.insert_one(*args, **kwargs)
+
+    def delete_one(self, *args, **kwargs):
+        return self._collection.delete_one(*args, **kwargs)
+
+    def delete_many(self, *args, **kwargs):
+        return self._collection.delete_many(*args, **kwargs)
+
+
+sync_subscriptions_collection = SyncSubscriptionsCollection(subscriptions_collection)
