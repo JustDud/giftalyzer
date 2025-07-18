@@ -193,4 +193,10 @@ texts = {
     "profit": "Доход:",
     "btn_back_admin": "🔙 Назад",
 
+    "ask_promo_code": "У вас есть промокод? Отправьте его сейчас или нажмите пропустить:",
+    "btn_skip_promo": "⏭ Пропустить",
+    "promo_applied": "✅ Промокод применён! Цена со скидкой: {discounted_price} XTR",
+    "promo_try_again_or_skip": "Попробуйте ввести другой промокод или нажмите пропустить.",
+    "my_promocodes_header": "📋 Ваши промокоды:",
+    "no_my_promocodes": "❌ У вас нет созданных промокодов."
 }

@@ -194,4 +194,10 @@ texts = {
 
     "btn_back_admin": "🔙 Back",
 
+    "ask_promo_code": "Do you have a promo code? Send it now or skip:",
+    "btn_skip_promo": "⏭ Skip",
+    "promo_applied": "✅ Promo applied! Discounted price: {discounted_price} XTR",
+    "promo_try_again_or_skip": "Try entering another promo code or press skip.",
+    "my_promocodes_header": "📋 Your promo codes:",
+    "no_my_promocodes": "❌ You don't have any created promo codes."
 }

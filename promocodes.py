@@ -53,8 +53,8 @@ def disable_promo(code: str) -> bool:
     return result.modified_count > 0
 
 
-def apply_promo(user_id: int, code: str, price: float, purchase_id: Optional[str] = None) -> Dict[str, Any]:
-    """Apply promo code, calculate discount, update stats, and save usage."""
+def apply_promo(user_id: int, code: str, price: float) -> Dict[str, Any]:
+    """Check promo code and calculate discounted price without updating stats."""
     promo = get_promo_by_code(code)
     if not promo or not promo.get("is_active"):
         return {"error": "Promo code is inactive or does not exist"}
@@ -65,34 +65,52 @@ def apply_promo(user_id: int, code: str, price: float, purchase_id: Optional[str
             return {"error": "You have already used this promo code"}
 
     discount = price * (promo["discount_percent"] / 100)
-    owner_profit = price * (promo["owner_profit_percent"] / 100)
-
-    # Save usage history
-    promo_usage_collection.insert_one({
-        "promo_code": promo["code"],
-        "user_id": user_id,
-        "purchase_id": purchase_id,
-        "profit_to_owner": owner_profit,
-        "discount_applied": promo["discount_percent"],
-        "created_at": datetime.utcnow()
-    })
-
-    # Update promo stats
-    promo_codes_collection.update_one(
-        {"code": promo["code"]},
-        {
-            "$inc": {
-                "usage_count": 1,
-                "total_profit": owner_profit
-            }
-        }
-    )
+    final_price = price - discount
 
     return {
-        "final_price": price - discount,
+        "final_price": final_price,
         "discount": discount,
-        "owner_profit": owner_profit
+        "promo_code": promo["code"],
+        "owner_profit_percent": promo["owner_profit_percent"]
     }
+
+
+def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
+    """Finalize promo code usage after successful payment."""
+    promo = get_promo_by_code(promo_code)
+    if not promo or not promo.get("is_active"):
+        print(f"[ERROR] Promo not found or inactive during finalization: {promo_code}")
+        return False
+
+    owner_profit = round(paid_price * (promo["owner_profit_percent"] / 100), 2)
+    print(f"[INFO] Finalizing promo usage: code={promo_code}, paid_price={paid_price}, profit={owner_profit}")
+
+    try:
+        promo_usage_collection.insert_one({
+            "promo_code": promo_code,
+            "user_id": user_id,
+            "profit_to_owner": owner_profit,
+            "discount_applied": promo["discount_percent"],
+            "created_at": datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"[ERROR] Failed to insert promo usage record: {e}")
+
+    try:
+        update_result = promo_codes_collection.update_one(
+            {"code": promo_code.upper()},
+            {
+                "$inc": {
+                    "usage_count": 1,
+                    "total_profit": owner_profit
+                }
+            }
+        )
+        print(f"[INFO] Promo update result: matched={update_result.matched_count}, modified={update_result.modified_count}")
+        return update_result.modified_count > 0
+    except Exception as e:
+        print(f"[ERROR] Failed to update promo stats: {e}")
+        return False
 
 
 def get_promo_stats(code: str) -> Optional[Dict[str, Any]]:
