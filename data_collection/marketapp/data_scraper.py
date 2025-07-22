@@ -1,5 +1,4 @@
 import time
-
 from data_collection.marketapp.collections_scraper import scrape_collections
 from data_collection.marketapp.nft_scraper import scrape_nfts
 from mongo import nfts_collection, collections_collection, upsert_many

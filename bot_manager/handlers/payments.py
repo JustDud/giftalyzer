@@ -1,23 +1,22 @@
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+import os
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
 from subscription.manager import add_subscription
-from mongo import subscriptions_collection
-from mongo import get_all_subscriptions
+from mongo import subscriptions_collection, get_all_subscriptions
 from datetime import datetime, timedelta
-import os
 from bot_manager.utils import is_admin
-from aiogram.fsm.state import State, StatesGroup
+from bot_manager.states.admin_states import PromoApplyFSM
 from aiogram.fsm.context import FSMContext
-from promocodes import apply_promo
-from promocodes import list_all_promos
-from promocodes import finalize_promo_usage
+from bot_manager.promocodes import apply_promo, list_all_promos, finalize_promo_usage
+
 
 BASE_PRICE_XTR = 10  # Base subscription price in XTR
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 
 router = Router()
+
 
 def has_active_subscription(user_id: int):
     sub = subscriptions_collection.find_one({"user_id": user_id})
@@ -30,8 +29,6 @@ def has_active_subscription(user_id: int):
         return True, end_date
     return False, None
 
-class PromoApplyFSM(StatesGroup):
-    waiting_for_promo_code = State()
 
 async def get_subscription_info(user_id: int) -> str:
     sub = subscriptions_collection.find_one({"user_id": user_id})
@@ -54,6 +51,7 @@ async def get_subscription_info(user_id: int) -> str:
         f"🔁 Транзакция: {transaction_id}"
     )
 
+
 @router.message(lambda msg, t: msg.text == t["btn_subscription"])
 async def handle_subscription_button(message: Message, state: FSMContext, t: dict):
     active, end_date = has_active_subscription(message.from_user.id)
@@ -63,6 +61,7 @@ async def handle_subscription_button(message: Message, state: FSMContext, t: dic
         return
     await start_promo_flow(message, t, state)
 
+
 async def start_promo_flow(message: Message, t: dict, state: FSMContext):
     # Ask user if they want to use a promo code
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -71,6 +70,7 @@ async def start_promo_flow(message: Message, t: dict, state: FSMContext):
     sent_msg = await message.answer(t["ask_promo_code"], reply_markup=kb)
     await state.update_data(promo_prompt_msg_id=sent_msg.message_id)
     await state.set_state(PromoApplyFSM.waiting_for_promo_code)
+
 
 @router.message(PromoApplyFSM.waiting_for_promo_code)
 async def process_promo_code(message: Message, state: FSMContext, t: dict):
@@ -113,6 +113,7 @@ async def process_promo_code(message: Message, state: FSMContext, t: dict):
     )
 
     await start_payment_cycle(message, discounted_price, t)
+
 
 @router.callback_query(F.data == "skip_promo")
 async def skip_promo(callback: CallbackQuery, state: FSMContext, t: dict):
@@ -201,6 +202,7 @@ async def successful_payment(message: Message, t: dict):
             {"user_id": message.from_user.id},
             {"$unset": {"last_used_promo": ""}}
         )
+
 
 @router.message(F.text.startswith("/check_subs"))
 async def check_subscriptions(message: Message, t: dict):
@@ -309,6 +311,7 @@ async def admin_refund_handler(message: Message, *args, t: dict):
     except Exception as e:
         await message.answer(t["refund_error"].format(error=str(e)))
 
+
 @router.message(F.text.startswith("/my_promocodes"))
 async def my_promocodes_handler(message: Message, t: dict):
     try:
@@ -340,11 +343,12 @@ async def my_promocodes_handler(message: Message, t: dict):
         await message.answer("❌ Ошибка при отображении ваших промокодов.")
 
 
-def register(dp):
-    dp.include_router(router)
-
 @router.callback_query(F.data == "refund_policy")
 async def show_refund_policy(callback_query: CallbackQuery, t: dict):
     await callback_query.message.edit_reply_markup(reply_markup=None)
     await callback_query.message.answer(t["refund_policy_text"])
     await callback_query.answer()
+
+
+def register(dp):
+    dp.include_router(router)

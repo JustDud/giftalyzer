@@ -4,7 +4,7 @@ texts = {
     "language_command": "Change the interface language",
     "support_command": "Contact support",
     "start": (
-        "Hi! I'm GiftValueBot.\n"
+        "Hi! I'm Giftalyser.\n"
         "I'll help you quickly and accurately determine the value of Telegram gifts in TON and USD.\n\n"
         "What I can do:\n"
         "• Show current market prices\n"
@@ -55,8 +55,8 @@ texts = {
     "select_model_and_backdrop": "Select at least one model and one backdrop.",
     "select_one_backdrop": "Select at least one backdrop.",
     "prompt_select_collection": "Select a collection:",
-    "prompt_select_model": "Select a model from collection “{collection_name}”",
-    "prompt_select_backdrop": "Select a backdrop from collection “{collection_name}”",
+    "prompt_select_model": "Select a model from collection {collection_name}",
+    "prompt_select_backdrop": "Select a backdrop from collection {collection_name}",
     "btn_next_page": "➡️ Next page",
     "btn_prev_page": "⬅️ Previous page",
     "please_wait": "⏳ Please wait... Don’t close this window.",
@@ -106,7 +106,7 @@ texts = {
 
     "btn_confirm": "📨 Confirm",
 
-    "subscription_activated": "✅ Subscription activated! Transaction: {charge_id}",
+    "subscription_activated": "✅ Congratulations! Subscription has been activated!\n Transaction ID:\n{charge_id}",
     "btn_language_ru": "Russian",
     "btn_language_en": "English",
     "language_switched": "✅ Language has been switched.",
@@ -178,16 +178,17 @@ texts = {
     "enter_promocode_for_stats": "Enter the promo code to view its statistics:",
     "promocode_not_found": "❌ Promo code {code} not found",
     "promocode_stats": "📊 Promo Code <b>{code}</b>\nUsage count: {usage}\nTotal profit: {total_profit}\nActive: {active}",
-    "enter_promocode_code": "Enter promo code (or leave empty to auto-generate):",
+    "enter_promocode_code": "Enter promo code name:",
     "enter_promocode_owner": "Enter the promo code owner's ID:",
     "enter_promocode_discount": "Enter the discount percentage:",
     "enter_promocode_profit": "Enter the owner's profit percentage:",
-    "enter_promocode_single_use": "Enter 1 for single-use or 0 for multiple-use:",
+    "enter_promocode_single_use": "Enter 0 for multiple-use or 1 for single-use:",
     "promocode_created": "✅ Promo code <b>{code}</b> successfully created",
     "enter_promocode_for_delete": "Enter the promo code to disable:",
     "promocode_disabled": "✅ Promo code {code} disabled",
     "no_promocodes_found": "❌ No promo codes found",
     "promocodes_list_header": "📋 List of all promo codes:",
+    "operation_error": "Error. Please try again",
     "owner": "Owner:",
     "discount": "Discount:",
     "profit": "Profit:",
@@ -196,7 +197,7 @@ texts = {
 
     "ask_promo_code": "Do you have a promo code? Send it now or skip:",
     "btn_skip_promo": "⏭ Skip",
-    "promo_applied": "✅ Promo applied! Discounted price: {discounted_price} XTR",
+    "promo_applied": "✅ Promo applied! Discounted price: {discounted_price}⭐",
     "promo_try_again_or_skip": "Try entering another promo code or press skip.",
     "my_promocodes_header": "📋 Your promo codes:",
     "no_my_promocodes": "❌ You don't have any created promo codes."

@@ -1,24 +1,14 @@
-from bson import ObjectId
-
-# Handler for /active_tickets command: show all open tickets to admin
-from aiogram.filters import Command
-
+import os
 from aiogram import Router
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from bot_manager.texts import get_texts
-
+from aiogram.types import Message, CallbackQuery
 from bot_manager.states.support_state import SupportState
 from mongo import support_collection
 from aiogram import F
 from aiogram.fsm.context import FSMContext
-import os
-from bot_manager.keyboards.default import get_main_menu
 from bot_manager.keyboards.support_keyboard import get_send_request_keyboard, get_clarify_kb
-
 from bot_manager.utils import is_admin
 
 SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
-
 
 router = Router()
 
@@ -67,13 +57,6 @@ async def reply_to_support_ticket(message: Message, t: dict):
         await message.answer(f"{t['reply_failed']} {e}")
 
 
-
-from bson import ObjectId
-
-# Handler for /active_tickets command: show all open tickets to admin
-from aiogram.filters import Command
-
-
 @router.callback_query(F.data.startswith("clarify_"))
 async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext, t: dict):
 
@@ -114,10 +97,6 @@ async def show_active_tickets(message: Message, t: dict):
     if not tickets:
         await message.answer(t["no_active_tickets"])
         return
-
-    def escape_md(text: str) -> str:
-        escape_chars = r"\_*[]()~`>#+-=|{}.! "
-        return ''.join(f'\\{c}' if c in escape_chars else c for c in text)
 
     for ticket in tickets:
         ticket_id = ticket.get('ticket_id', ticket['_id'])

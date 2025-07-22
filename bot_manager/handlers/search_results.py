@@ -7,7 +7,9 @@ from aiogram.exceptions import TelegramBadRequest
 import asyncio
 from bot_manager.handlers.market_search import MarketSearchState
 from bot_manager.keyboards.default import get_main_menu
+
 router = Router()
+
 
 def get_pagination_keyboard(current_page: int, total_pages: int, t: dict):
     buttons = []
@@ -16,6 +18,7 @@ def get_pagination_keyboard(current_page: int, total_pages: int, t: dict):
     if current_page < total_pages - 1:
         buttons.append(InlineKeyboardButton(text=t["btn_next_page"], callback_data="page_next"))
     return InlineKeyboardMarkup(inline_keyboard=[buttons]) if buttons else None
+
 
 @router.callback_query(F.data == "show_filtered_results")
 async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
@@ -89,7 +92,6 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
         await call.message.edit_text(t["no_results_found"])
         return
 
-
     await temp.delete()
     await call.message.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
 
@@ -130,7 +132,6 @@ async def paginate_filtered_results(call: CallbackQuery, state: FSMContext, t: d
         if "message is not modified" not in str(e):
             raise
     await state.update_data(results_page=page)
-
 
 
 def register(dp):

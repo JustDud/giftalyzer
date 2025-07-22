@@ -2,6 +2,7 @@ from aiogram.types import Message
 from subscription.manager import is_subscription_valid
 from bot_manager.texts import get_texts
 
+
 def subscription_required(handler):
     async def wrapped(message: Message, *args, **kwargs):
         t = get_texts(message.from_user.id)
