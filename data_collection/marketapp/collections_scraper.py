@@ -1,8 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import os
-import json
 import re
+
 
 def normalize_collection_name(name: str) -> str:
     if not name:
@@ -14,6 +13,7 @@ def normalize_collection_name(name: str) -> str:
         number = match.group(2)
         return f"{prefix}-{number}"
     return name.replace(" ", "")
+
 
 def parse_ton_value(val):
     if val is None:
@@ -28,6 +28,7 @@ def parse_ton_value(val):
     if val.endswith("M"):
         return str(int(float(val[:-1]) * 1_000_000))
     return val
+
 
 def scrape_collections():
     base_url = "https://marketapp.ws"
@@ -61,7 +62,8 @@ def scrape_collections():
             continue
 
         tds = row.find_all("td")[1:]
-        def get_td_text(i):
+
+        def get_td_text(i, tds):
             return tds[i].get_text(strip=True).split("~")[0] if len(tds) > i else None
 
         floor = get_td_text(1)
@@ -85,9 +87,5 @@ def scrape_collections():
             "owners": owners,
             "supply": supply
         })
-
-    # output_path = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections_summary.json")
-    # with open(output_path, "w") as f:
-    #     json.dump(collections, f, indent=2)
 
     return collections

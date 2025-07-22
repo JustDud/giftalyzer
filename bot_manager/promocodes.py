@@ -1,10 +1,8 @@
 from datetime import datetime
-from pymongo.collection import Collection
 from typing import Optional, Dict, Any
-
 from mongo import promo_codes_collection, promo_usage_collection
-
-import random, string
+import random
+import string
 
 
 def validate_promo_data(discount_percent: float, owner_profit_percent: float):

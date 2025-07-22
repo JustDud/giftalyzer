@@ -1,9 +1,8 @@
-
-
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.types import TelegramObject
 from typing import Callable, Awaitable, Dict, Any
 from bot_manager.texts import get_texts
+
 
 class I18nMiddleware(BaseMiddleware):
     async def __call__(

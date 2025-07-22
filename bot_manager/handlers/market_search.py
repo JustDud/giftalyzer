@@ -1,23 +1,11 @@
 from aiogram import Router, F
-from aiogram.filters import StateFilter
 from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.exceptions import TelegramBadRequest
-
+from bot_manager.states.marketsearch_states import MarketSearchState
 from bot_manager.keyboards.search_keyboard import get_collection_keyboard, get_nft_keyboard, get_backdrop_keyboard
 from mongo import collections_collection
-
 from bot_manager.decorators.access import subscription_required
-
-# FSM State class for market search
-class MarketSearchState(StatesGroup):
-    selecting_collection = State()
-    selecting_gift = State()
-    selecting_backdrop = State()
-    confirming_selection = State()
-    loading_results = State()
-
 
 router = Router()
 
@@ -92,7 +80,7 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
     nfts = sorted(list({doc["model"] for doc in nft_cursor if "model" in doc}))
-    await state.update_data(cached_nfts=nfts)  # 💾 Кешируем модели
+    await state.update_data(cached_nfts=nfts)  # Кешируем модели
 
     keyboard = get_nft_keyboard(nfts, selected_models=[], include_select_all=True, t=t)
 
@@ -132,7 +120,6 @@ async def handle_nft_pagination(call: CallbackQuery, state: FSMContext, t: dict)
             raise
 
 
-# Toggle model selection in NFT list
 @router.callback_query(
     MarketSearchState.selecting_gift,
     lambda call, t: call.data.startswith("toggle_model:")
@@ -159,7 +146,6 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext, t: dict
             raise
 
 
-# Select all models in NFT list
 @router.callback_query(MarketSearchState.selecting_gift, F.data == "select_all_models")
 async def select_all_models(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()

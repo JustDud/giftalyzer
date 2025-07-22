@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot_manager.states.support_state import SupportState
@@ -26,6 +26,7 @@ async def support_entry(message: Message, state: FSMContext, t: dict):
 async def handle_back_button(message: Message, state: FSMContext, t: dict):
     await state.clear()
     await message.answer(t["support_back_to_main"], reply_markup=get_main_menu(t))
+
 
 @router.message(SupportState.waiting_for_description)
 async def handle_support_message(message: Message, state: FSMContext, t: dict):

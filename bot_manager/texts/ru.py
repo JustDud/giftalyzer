@@ -3,7 +3,7 @@ texts = {
     "about_command": "Информация о боте и его функциях",
     "language_command": "Смена языка интерфейса бота",
     "support_command": "Связь со службой поддержки",
-    "start": ("Привет! Я — GiftValueBot.\n"
+    "start": ("Привет! Я — Giftalyser.\n"
             "Помогу быстро и точно определить цену Telegram-подарков в TON и $.\n\n"
             "Что я умею:\n"
             "• Показываю актуальные рыночные цены на подарки\n"
@@ -105,7 +105,7 @@ texts = {
 
     "btn_confirm": "📨 Подтвердить",
 
-    "subscription_activated": "✅ Подписка активирована! Транзакция: {charge_id}",
+    "subscription_activated": "✅ Поздравляем! Ваша подписка активирована!\n ID Транзакции:\n{charge_id}",
     "btn_language_ru": "Русский",
     "btn_language_en": "English",
     "language_switched": "✅ Язык интерфейса переключён.",
@@ -178,16 +178,17 @@ texts = {
     "enter_promocode_for_stats": "Введите промокод для отображения статистики:",
     "promocode_not_found": "❌ Промокод {code} не найден",
     "promocode_stats": "📊 Промокод <b>{code}</b>\nИспользований: {usage}\nОбщий доход: {total_profit}\nАктивен: {active}",
-    "enter_promocode_code": "Введите код промокода (или оставьте пустым для автогенерации):",
+    "enter_promocode_code": "Введите название промокода:",
     "enter_promocode_owner": "Введите ID владельца промокода:",
-    "enter_promocode_discount": "Введите процент скидки:",
+    "enter_promocode_discount": "Введите процент скидки для покупателей:",
     "enter_promocode_profit": "Введите процент прибыли владельцу:",
-    "enter_promocode_single_use": "Введите 1 для одноразового или 0 для многоразового:",
+    "enter_promocode_single_use": "Введите 0 для многоразового и 1 для одноразового:",
     "promocode_created": "✅ Промокод <b>{code}</b> успешно создан",
     "enter_promocode_for_delete": "Введите код промокода для удаления:",
     "promocode_disabled": "✅ Промокод {code} отключён",
     "no_promocodes_found": "❌ Промокоды не найдены",
     "promocodes_list_header": "📋 Список всех промокодов:",
+    "operation_error": "❌ Произошла ошибка, пожалуйста, попробуйте еще раз",
     "owner": "Владелец:",
     "discount": "Скидка:",
     "profit": "Доход:",
@@ -195,7 +196,7 @@ texts = {
 
     "ask_promo_code": "У вас есть промокод? Отправьте его сейчас или нажмите пропустить:",
     "btn_skip_promo": "⏭ Пропустить",
-    "promo_applied": "✅ Промокод применён! Цена со скидкой: {discounted_price} XTR",
+    "promo_applied": "✅ Промокод применён! Цена со скидкой: {discounted_price}⭐ ",
     "promo_try_again_or_skip": "Попробуйте ввести другой промокод или нажмите пропустить.",
     "my_promocodes_header": "📋 Ваши промокоды:",
     "no_my_promocodes": "❌ У вас нет созданных промокодов."

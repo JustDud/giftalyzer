@@ -16,7 +16,6 @@ async def language_handler(message: Message, t: dict):
     await message.answer(t["choose_language"], reply_markup=keyboard)
 
 
-# Handle callback for English language selection
 @router.callback_query(lambda c: c.data == "lang_en")
 async def set_english(callback: CallbackQuery, t: dict):
     set_language(callback.from_user.id, "en")
@@ -24,7 +23,6 @@ async def set_english(callback: CallbackQuery, t: dict):
     await callback.message.edit_text(t["language_switched"])
 
 
-# Handle callback for Russian language selection
 @router.callback_query(lambda c: c.data == "lang_ru")
 async def set_russian(callback: CallbackQuery, t: dict):
     set_language(callback.from_user.id, "ru")

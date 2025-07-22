@@ -235,36 +235,4 @@ def scrape_nfts(address):
                 })
         page += 1
 
-    elapsed = round(time.time() - start_time, 2)
-    # print(f"✅ Total NFTs scraped: {nft_count}")
-    # print(f"⏱️ Time taken: {elapsed} seconds")
-
-    # output_folder = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections")
-    # os.makedirs(output_folder, exist_ok=True)
-    #
-    # output_file = os.path.join(output_folder, f"{address}.json")
-    # with open(output_file, "w") as f:
-    #     json.dump(all_rows, f, indent=2)
     return all_rows
-
-
-if __name__ == "__main__":
-    print("🔄 Scraping collections summary from MarketApp...")
-    scrape_collections()
-
-    collection_file_path = os.path.join(os.path.dirname(__file__), "..", "scraped_output", "collections_summary.json")
-    collection_file_path = os.path.abspath(collection_file_path)
-
-    if not os.path.exists(collection_file_path):
-        raise FileNotFoundError("❌ Collection summary file not found after scraping.")
-
-    with open(collection_file_path, "r") as f:
-        collections = json.load(f)
-
-    total_collections = len(collections)
-
-    for idx, collection in enumerate(collections, 1):
-        name = collection.get("name", "Unnamed")
-        address = collection.get("address")
-        print(f"\n📦 Scraping collection ({idx}/{total_collections}): {name} ({address})")
-        scrape_nfts(address)
