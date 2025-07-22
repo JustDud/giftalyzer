@@ -1,33 +1,33 @@
 import re
-from pymongo import MongoClient, UpdateOne
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from dotenv import load_dotenv
 import os
 from typing import List, Dict, Any
-from pymongo.collection import Collection
 import csv
 from datetime import datetime
 
-
 load_dotenv()
 
-client = MongoClient(os.getenv("MONGO_URI"))
+client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
 db = client.getgems
 
-gifts_collection = db.gifts
-nfts_collection = db.nfts
-collections_collection = db.collections
-subscriptions_collection = db.subscriptions
-support_collection = db.support_tickets
-promo_codes_collection = db.promo_codes
-promo_usage_collection = db.promo_usage
+gifts_collection: AsyncIOMotorCollection = db.gifts
+nfts_collection: AsyncIOMotorCollection = db.nfts
+collections_collection: AsyncIOMotorCollection = db.collections
+subscriptions_collection: AsyncIOMotorCollection = db.subscriptions
+support_collection: AsyncIOMotorCollection = db.support_tickets
+promo_codes_collection: AsyncIOMotorCollection = db.promo_codes
+promo_usage_collection: AsyncIOMotorCollection = db.promo_usage
 
 # Indexes to ensure uniqueness and efficient lookups
-nfts_collection.create_index("nft_id", unique=True)
-nfts_collection.create_index("collection_address")
-collections_collection.create_index("address", unique=True)
-subscriptions_collection.create_index("user_id", unique=True)
-promo_codes_collection.create_index("code", unique=True)
-promo_usage_collection.create_index("promo_code")
+async def init_indexes():
+    await nfts_collection.create_index("nft_id", unique=True)
+    await nfts_collection.create_index("collection_address")
+    await collections_collection.create_index("address", unique=True)
+    await subscriptions_collection.create_index("user_id", unique=True)
+    await promo_codes_collection.create_index("code", unique=True)
+    await promo_usage_collection.create_index("promo_code")
 
 
 def normalize_nft_name(name: str) -> str:
@@ -43,50 +43,58 @@ def normalize_nft_name(name: str) -> str:
     return name.replace(" ", "")
 
 
-def upsert_and_notify_new_collections(collections_collection, collection_summaries):
-    existing_addresses = {
-        doc["address"] for doc in collections_collection.find({}, {"address": 1})
+async def upsert_and_notify_new_collections(
+    collection: AsyncIOMotorCollection,
+    collection_summaries: List[Dict],
+    key: str = "address"
+):
+    existing_keys = {
+        doc[key]
+        async for doc in collection.find({}, {key: 1})
     }
-    new_collections = [col for col in collection_summaries if col["address"] not in existing_addresses]
 
-    upsert_many(collections_collection, collection_summaries, key="address")
+    new_items = [
+        col for col in collection_summaries if col[key] not in existing_keys
+    ]
 
-    for new_col in new_collections:
-        print(f"📢 New collection published: {new_col['name']} ({new_col['address']})")
-        # Optionally send a message via Telegram bot, Discord webhook, email, etc.
+    await upsert_many(collection, collection_summaries, key=key)
 
-    return new_collections
+    for new in new_items:
+        print(f"📢 New item published: {new.get('name', '')} ({new.get(key)})")
+
+    return new_items
 
 
-def upsert_many(collection: Collection, documents: List[Dict[str, Any]], key: str = "_id") -> None:
-    """
-    Efficiently upserts many documents based on a unique key.
-    """
+async def upsert_many(collection: AsyncIOMotorCollection, documents: List[Dict[str, Any]], key: str = "_id"):
     operations = []
     for doc in documents:
         if key in doc:
-            operations.append(UpdateOne({key: doc[key]}, {"$set": doc}, upsert=True))
+            operations.append(
+                {
+                    "filter": {key: doc[key]},
+                    "update": {"$set": doc},
+                    "upsert": True
+                }
+            )
     if operations:
-        result = collection.bulk_write(operations)
-        print(f"Upserted {result.upserted_count} inserted / {result.modified_count} updated documents.")
+        requests = [
+            collection.update_one(op["filter"], op["update"], upsert=op["upsert"])
+            for op in operations
+        ]
+        await asyncio.gather(*requests)
+        print(f"Upserted {len(operations)} documents.")
 
 
-def remove_missing(collection: Collection, valid_ids: List[Any], match: Dict[str, Any] = None, key: str = "nft_id") -> None:
-    """
-    Removes documents from the collection where the key is not in valid_ids and match conditions are met.
-    """
+async def remove_missing(collection: AsyncIOMotorCollection, valid_ids: List[Any], match: Dict[str, Any] = None, key: str = "nft_id"):
     if match is None:
         match = {}
     match[key] = {"$nin": valid_ids}
-    result = collection.delete_many(match)
+    result = await collection.delete_many(match)
     print(f"Removed {result.deleted_count} documents not in the scraped list.")
 
 
-def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_path="nft_price_output.csv"):
-    """
-    Export all NFTs from the DB with their estimated price to a CSV.
-    """
-    nfts = list(nfts_collection.find())
+async def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_path="nft_price_output.csv"):
+    nfts = [n async for n in nfts_collection.find()]
 
     with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
@@ -98,7 +106,7 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
         for nft in nfts:
             nft_id = nft.get("nft_id")
             collection_address = nft.get("collection_address")
-            collection_doc = collections_collection.find_one({"address": collection_address})
+            collection_doc = await collections_collection.find_one({"address": collection_address})
             collection_name = collection_doc["name"] if collection_doc else ""
 
             try:
@@ -124,22 +132,18 @@ def export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd, output_
             ])
 
 
-def get_nft_by_id_or_name(gift_id: str):
-    """
-    Retrieve NFT document by its ID, normalized name, or collection address.
-    """
-    nft = nfts_collection.find_one({"nft_id": gift_id})
+async def get_nft_by_id_or_name(gift_id: str):
+    nft = await nfts_collection.find_one({"nft_id": gift_id})
     if nft:
         return nft
-    # If it's a normalized name
     if "-" in gift_id and not gift_id.startswith("EQ"):
-        nft = nfts_collection.find_one({"name": gift_id})
+        nft = await nfts_collection.find_one({"name": gift_id})
         if nft:
             return nft
-    return nfts_collection.find_one({"collection_address": gift_id})
+    return await nfts_collection.find_one({"collection_address": gift_id})
 
 
-def get_nfts_by_params(model: str, symbol: str | None, backdrop: str) -> list[dict]:
+async def get_nfts_by_params(model: str, symbol: str | None, backdrop: str) -> list[dict]:
     query = {
         "model": model,
         "backdrop": backdrop,
@@ -148,10 +152,14 @@ def get_nfts_by_params(model: str, symbol: str | None, backdrop: str) -> list[di
     if symbol:
         query["symbol"] = symbol
 
-    return list(nfts_collection.find(query))
+    return [n async for n in nfts_collection.find(query)]
 
 
-def get_nfts_strict_match(model: str, symbol: str, backdrop: str, collection_name: str = None) -> list[dict]:
+async def get_all_subscriptions():
+    return [doc async for doc in subscriptions_collection.find()]
+
+
+async def get_nfts_strict_match(model: str, symbol: str, backdrop: str, collection_name: str = None) -> list[dict]:
     query = {
         "model": model,
         "symbol": symbol,
@@ -161,10 +169,10 @@ def get_nfts_strict_match(model: str, symbol: str, backdrop: str, collection_nam
     if collection_name:
         query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
 
-    return list(nfts_collection.find(query))
+    return [n async for n in nfts_collection.find(query)]
 
 
-def get_nfts_loose_match(model: str, backdrop: str, collection_name: str = None) -> list[dict]:
+async def get_nfts_loose_match(model: str, backdrop: str, collection_name: str = None) -> list[dict]:
     query = {
         "model": model,
         "backdrop": backdrop,
@@ -173,10 +181,10 @@ def get_nfts_loose_match(model: str, backdrop: str, collection_name: str = None)
     if collection_name:
         query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
 
-    return list(nfts_collection.find(query))
+    return [n async for n in nfts_collection.find(query)]
 
 
-def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
+async def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
     query = {
         "model": model,
         "price": {"$ne": None}
@@ -184,31 +192,5 @@ def get_nfts_model_only(model: str, collection_name: str = None) -> list[dict]:
     if collection_name:
         query["name"] = {"$regex": f"^{collection_name}", "$options": "i"}
 
-    return list(nfts_collection.find(query))
+    return [n async for n in nfts_collection.find(query)]
 
-
-def get_all_subscriptions():
-    return list(subscriptions_collection.find())
-
-
-class SyncSubscriptionsCollection:
-    def __init__(self, collection):
-        self._collection = collection
-
-    def update_one(self, *args, **kwargs):
-        return self._collection.update_one(*args, **kwargs)
-
-    def find_one(self, *args, **kwargs):
-        return self._collection.find_one(*args, **kwargs)
-
-    def insert_one(self, *args, **kwargs):
-        return self._collection.insert_one(*args, **kwargs)
-
-    def delete_one(self, *args, **kwargs):
-        return self._collection.delete_one(*args, **kwargs)
-
-    def delete_many(self, *args, **kwargs):
-        return self._collection.delete_many(*args, **kwargs)
-
-
-sync_subscriptions_collection = SyncSubscriptionsCollection(subscriptions_collection)

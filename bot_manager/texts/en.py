@@ -200,5 +200,8 @@ texts = {
     "promo_applied": "✅ Promo applied! Discounted price: {discounted_price}⭐",
     "promo_try_again_or_skip": "Try entering another promo code or press skip.",
     "my_promocodes_header": "📋 Your promo codes:",
-    "no_my_promocodes": "❌ You don't have any created promo codes."
+    "no_my_promocodes": "❌ You don't have any created promo codes.",
+
+    "db_update_started": "DB update has started",
+    "db_update_finished": "DB update has finished",
 }
