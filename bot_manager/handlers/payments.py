@@ -289,10 +289,18 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             await message.answer(t["subscription_expired_no_refund"])
             return
 
-        await message.bot.refund_star_payment(
-            user_id=user_id,
-            telegram_payment_charge_id=charge_id
-        )
+        print(f"[DEBUG] Trying refund: user_id={user_id}, charge_id={charge_id}")
+        try:
+            await message.bot.refund_star_payment(
+                user_id=user_id,
+                telegram_payment_charge_id=charge_id
+            )
+        except Exception as e:
+            if "INVALID_CHARGE_ID" in str(e):
+                await message.answer("❌ Автоматический возврат недоступен для этого платежа. Проверьте тип платежа или свяжитесь с поддержкой.")
+                return
+            await message.answer(t["refund_error"].format(error=str(e)))
+            return
 
         await subscriptions_collection.update_one(
             {"user_id": user_id, "transactions.id": charge_id},
@@ -316,7 +324,8 @@ async def admin_refund_handler(message: Message, *args, t: dict):
 async def my_promocodes_handler(message: Message, t: dict):
     try:
         user_id = message.from_user.id
-        promos = [p for p in list_all_promos() if p.get("owner_id") == user_id]
+        promos_all = await list_all_promos()
+        promos = [p for p in promos_all if p.get("owner_id") == user_id]
 
         if not promos:
             await message.answer("❌ У вас нет созданных промокодов.")

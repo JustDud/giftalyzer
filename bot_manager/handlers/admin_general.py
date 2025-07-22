@@ -121,7 +121,7 @@ async def handle_close_all_tickets(callback: CallbackQuery):
 @router.callback_query(F.data == "admin_subscription_stats")
 async def handle_subscription_stats(callback: CallbackQuery, t: dict):
     await callback.answer()
-    total, active = get_subscription_stats()
+    total, active = await get_subscription_stats()
     await callback.message.answer(
         t["subscription_stats"].format(total=total, active=active),
         parse_mode="HTML"
@@ -150,7 +150,7 @@ async def admin_promocode_stats(callback: CallbackQuery, state: FSMContext, t: d
 @router.callback_query(F.data == "admin_list_promocodes")
 async def admin_list_promocodes(callback: CallbackQuery, t: dict):
     try:
-        promos = list_all_promos()
+        promos = await list_all_promos()
         if not promos:
             await callback.message.answer(t["no_promocodes_found"])
             return
@@ -178,7 +178,7 @@ async def process_promo_stats(message: Message, state: FSMContext, t: dict):
         return
 
     code = message.text.strip().upper()
-    stats = get_promo_stats(code)
+    stats = await get_promo_stats(code)
     await state.clear()
 
     print(f"[DEBUG] Promo stats for {code}: {stats}")  # Log the stats for debugging

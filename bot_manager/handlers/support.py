@@ -43,21 +43,21 @@ async def handle_support_message(message: Message, state: FSMContext, t: dict):
             return
 
         # Generate ticket ID
-        existing_max = support_collection.find_one(
+        existing_max = await support_collection.find_one(
             {"_id": {"$regex": r"^\d+$"}},
             sort=[("_id", -1)]
         )
         if existing_max:
             current_max = int(existing_max["_id"])
-            counter_doc = support_collection.find_one({"_id": "ticket_counter"}) or {"seq": 0}
+            counter_doc = await support_collection.find_one({"_id": "ticket_counter"}) or {"seq": 0}
             current_seq = counter_doc.get("seq", 0)
             if current_seq < (current_max - 1000 + 1):
-                support_collection.update_one(
+                await support_collection.update_one(
                     {"_id": "ticket_counter"},
                     {"$set": {"seq": current_max - 1000 + 1}},
                     upsert=True
                 )
-        counter = support_collection.find_one_and_update(
+        counter = await support_collection.find_one_and_update(
             {"_id": "ticket_counter"},
             {"$inc": {"seq": 1}},
             upsert=True,
@@ -79,7 +79,7 @@ async def handle_support_message(message: Message, state: FSMContext, t: dict):
         if parent_ticket_id:
             user_data["parent_ticket_id"] = parent_ticket_id
 
-        support_collection.insert_one(user_data)
+        await support_collection.insert_one(user_data)
 
         try:
             user_line = (
@@ -93,7 +93,7 @@ async def handle_support_message(message: Message, state: FSMContext, t: dict):
                 thread = []
                 current_id = parent_ticket_id
                 while current_id:
-                    parent = support_collection.find_one({"_id": current_id})
+                    parent = await support_collection.find_one({"_id": current_id})
                     if parent:
                         thread.append(f"[{parent['_id']}] {parent['message']}")
                         current_id = parent.get("parent_ticket_id")

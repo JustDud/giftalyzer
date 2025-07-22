@@ -3,6 +3,7 @@ from typing import Optional, Dict, Any
 from mongo import promo_codes_collection, promo_usage_collection
 import random
 import string
+import asyncio
 
 
 def validate_promo_data(discount_percent: float, owner_profit_percent: float):
@@ -16,7 +17,7 @@ def generate_promo_code(length: int = 8) -> str:
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 
-def create_promo(code: str, owner_id: int, discount_percent: float,
+async def create_promo(code: str, owner_id: int, discount_percent: float,
                  owner_profit_percent: float, is_single_use: bool = False) -> Dict[str, Any]:
     """Create a new promo code in MongoDB."""
     validate_promo_data(discount_percent, owner_profit_percent)
@@ -33,32 +34,32 @@ def create_promo(code: str, owner_id: int, discount_percent: float,
         "total_profit": 0.0,
         "created_at": datetime.utcnow()
     }
-    promo_codes_collection.insert_one(promo)
+    await promo_codes_collection.insert_one(promo)
     return promo
 
 
-def get_promo_by_code(code: str) -> Optional[Dict[str, Any]]:
+async def get_promo_by_code(code: str) -> Optional[Dict[str, Any]]:
     """Retrieve promo code by its code."""
-    return promo_codes_collection.find_one({"code": code.upper()})
+    return await promo_codes_collection.find_one({"code": code.upper()})
 
 
-def disable_promo(code: str) -> bool:
+async def disable_promo(code: str) -> bool:
     """Disable a promo code."""
-    result = promo_codes_collection.update_one(
+    result = await promo_codes_collection.update_one(
         {"code": code.upper()},
         {"$set": {"is_active": False}}
     )
     return result.modified_count > 0
 
 
-def apply_promo(user_id: int, code: str, price: float) -> Dict[str, Any]:
+async def apply_promo(user_id: int, code: str, price: float) -> Dict[str, Any]:
     """Check promo code and calculate discounted price without updating stats."""
-    promo = get_promo_by_code(code)
+    promo = await get_promo_by_code(code)
     if not promo or not promo.get("is_active"):
         return {"error": "Promo code is inactive or does not exist"}
 
     if promo.get("is_single_use"):
-        already_used = promo_usage_collection.find_one({"promo_code": promo["code"], "user_id": user_id})
+        already_used = await promo_usage_collection.find_one({"promo_code": promo["code"], "user_id": user_id})
         if already_used:
             return {"error": "You have already used this promo code"}
 
@@ -73,9 +74,9 @@ def apply_promo(user_id: int, code: str, price: float) -> Dict[str, Any]:
     }
 
 
-def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
+async def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
     """Finalize promo code usage after successful payment."""
-    promo = get_promo_by_code(promo_code)
+    promo = await get_promo_by_code(promo_code)
     if not promo or not promo.get("is_active"):
         print(f"[ERROR] Promo not found or inactive during finalization: {promo_code}")
         return False
@@ -84,7 +85,7 @@ def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
     print(f"[INFO] Finalizing promo usage: code={promo_code}, paid_price={paid_price}, profit={owner_profit}")
 
     try:
-        promo_usage_collection.insert_one({
+        await promo_usage_collection.insert_one({
             "promo_code": promo_code,
             "user_id": user_id,
             "profit_to_owner": owner_profit,
@@ -95,7 +96,7 @@ def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
         print(f"[ERROR] Failed to insert promo usage record: {e}")
 
     try:
-        update_result = promo_codes_collection.update_one(
+        update_result = await promo_codes_collection.update_one(
             {"code": promo_code.upper()},
             {
                 "$inc": {
@@ -111,9 +112,9 @@ def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float):
         return False
 
 
-def get_promo_stats(code: str) -> Optional[Dict[str, Any]]:
+async def get_promo_stats(code: str) -> Optional[Dict[str, Any]]:
     """Return statistics of promo code usage."""
-    promo = get_promo_by_code(code)
+    promo = await get_promo_by_code(code)
     if not promo:
         return None
     return {
@@ -123,16 +124,14 @@ def get_promo_stats(code: str) -> Optional[Dict[str, Any]]:
     }
 
 
-def list_all_promos(active_only: bool = False) -> list[Dict[str, Any]]:
+async def list_all_promos(active_only: bool = False) -> list[Dict[str, Any]]:
     """List all promo codes, optionally filtering only active ones."""
     query = {"is_active": True} if active_only else {}
-    return list(promo_codes_collection.find(query, {"_id": 0}))
+    cursor = promo_codes_collection.find(query, {"_id": 0})
+    return [doc async for doc in cursor]
 
 
-def get_top_promos(limit: int = 10) -> list[Dict[str, Any]]:
+async def get_top_promos(limit: int = 10) -> list[Dict[str, Any]]:
     """Get top promo codes by total profit."""
-    return list(
-        promo_codes_collection.find({"usage_count": {"$gt": 0}})
-        .sort("total_profit", -1)
-        .limit(limit)
-    )
+    cursor = promo_codes_collection.find({"usage_count": {"$gt": 0}}).sort("total_profit", -1).limit(limit)
+    return [doc async for doc in cursor]

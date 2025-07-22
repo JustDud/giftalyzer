@@ -11,7 +11,7 @@ def subscription_required(handler):
             k: v for k, v in kwargs.items()
             if k in handler.__code__.co_varnames
         }
-        if is_subscription_valid(message.from_user.id):
+        if await is_subscription_valid(message.from_user.id):
             return await handler(message, *args, **filtered_kwargs)
         await message.answer(t["no_active_subscription"])
     return wrapped

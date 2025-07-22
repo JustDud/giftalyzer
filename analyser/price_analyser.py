@@ -3,12 +3,15 @@ from mongo import collections_collection, nfts_collection
 import os
 import requests
 import math
+import asyncio
 
 # csv_path = os.path.join(os.path.dirname(__file__), 'Backdrop_Price_Multipliers.csv')
 # df = pd.read_csv(csv_path)
 
 
-def convert_ton_to_usd(ton):
+async def convert_ton_to_usd(ton):
+    if asyncio.iscoroutine(ton):
+        ton = await ton
     url = "https://api.binance.com/api/v3/ticker/price?symbol=TONUSDT"
     try:
         response = requests.get(url, timeout=5)
@@ -20,8 +23,8 @@ def convert_ton_to_usd(ton):
         return round(ton * 2.0, 2)
 
 
-def get_data(nft_id):
-    nft = nfts_collection.find_one({"nft_id": nft_id})
+async def get_data(nft_id):
+    nft = await nfts_collection.find_one({"nft_id": nft_id})
     if not nft:
         raise ValueError("NFT not found in the database.")
 
@@ -29,7 +32,7 @@ def get_data(nft_id):
     if not collection_address:
         raise ValueError("Collection address not found in NFT data.")
 
-    collection = collections_collection.find_one({"address": collection_address})
+    collection = await collections_collection.find_one({"address": collection_address})
     if not collection:
         raise ValueError("Collection not found in the database.")
 
@@ -63,17 +66,8 @@ def get_data(nft_id):
     }
 
 
-def estimate_ton_price(nft_id):
-    """
-    Оценивает цену NFT в TON на основе упрощённой формулы.
-
-    Параметры:
-    - nft_id: Идентификатор NFT
-
-    Возвращает:
-    - Оценочная цена (TON), округлённая до 2 знаков
-    """
-    data = get_data(nft_id)
+async def estimate_ton_price(nft_id):
+    data = await get_data(nft_id)
 
     floor = data["floor"]
     top_order = data["top_order"]
@@ -86,7 +80,6 @@ def estimate_ton_price(nft_id):
     supply = data["supply"]
     max_rarity = data["max_rarity"]
 
-    # Расчет оценочной цены
     estimated_price = calculate_nft_price_final_optimized(
         price=price,
         backdrop=backdrop,
