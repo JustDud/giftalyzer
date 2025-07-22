@@ -5,7 +5,7 @@ from bot_manager.texts import get_texts
 
 def subscription_required(handler):
     async def wrapped(message: Message, *args, **kwargs):
-        t = get_texts(message.from_user.id)
+        t = await get_texts(message.from_user.id)
         # Filter out unexpected kwargs (e.g. 'dispatcher' passed by aiogram)
         filtered_kwargs = {
             k: v for k, v in kwargs.items()

@@ -14,7 +14,7 @@ def main():
     #test_estimate_price()
 
     # Export all NFT prices to CSV
-    export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd)
+    # export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd)
 
 
 

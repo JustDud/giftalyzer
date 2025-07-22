@@ -53,7 +53,7 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
     if "-" in normalized_id and not normalized_id.startswith("EQ"):
         normalized_id = normalize_nft_name(normalized_id)
 
-    data = get_nft_by_id_or_name(normalized_id)
+    data = await get_nft_by_id_or_name(normalized_id)
     if data is None:
         parsed_data = await parse_telegram_gift_page(normalized_id)
         print(f"[DEBUG] Parsed data from Telegram page: {parsed_data}")
@@ -65,14 +65,14 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
             await state.set_state(GiftStates.WaitingForGiftID)
             return
 
-        strict = get_nfts_strict_match(
+        strict = await get_nfts_strict_match(
             model=parsed_data["model"],
             symbol=parsed_data["symbol"],
             backdrop=parsed_data["backdrop"],
             collection_name=collection_name
         )
 
-        loose = get_nfts_loose_match(
+        loose = await get_nfts_loose_match(
             model=parsed_data["model"],
             backdrop=parsed_data["backdrop"],
             collection_name=collection_name
@@ -81,7 +81,7 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
         strict_ids = {gift["nft_id"] for gift in strict}
         loose_filtered = [gift for gift in loose if gift["nft_id"] not in strict_ids]
 
-        model_only = get_nfts_model_only(
+        model_only = await get_nfts_model_only(
             model=parsed_data["model"],
             collection_name=collection_name
         )

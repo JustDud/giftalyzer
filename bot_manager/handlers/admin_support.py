@@ -12,12 +12,21 @@ SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
 
 router = Router()
 
-last_ticket = support_collection.find_one(
-    {"_id": {"$regex": r"^\d+$"}},
-    sort=[("_id", -1)]
-)
-last_id = int(last_ticket["_id"]) if last_ticket else 1000
-ticket_id = str(last_id + 1)
+
+# These will be initialized asynchronously
+last_ticket = None
+last_id = 1000
+ticket_id = None
+
+
+async def init_last_ticket():
+    global last_ticket, last_id, ticket_id
+    last_ticket = await support_collection.find_one(
+        {"_id": {"$regex": r"^\d+$"}},
+        sort=[("_id", -1)]
+    )
+    last_id = int(last_ticket["_id"]) if last_ticket else 1000
+    ticket_id = str(last_id + 1)
 
 
 def escape_md(text: str) -> str:

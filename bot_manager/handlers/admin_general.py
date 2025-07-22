@@ -13,6 +13,7 @@ from mongo import subscriptions_collection
 from datetime import datetime, timedelta
 from bot_manager.states.admin_states import RefundFSM,CheckSubsFSM,PromoStatsFSM,PromoAddFSM,PromoDeleteFSM
 from bot_manager.promocodes import get_promo_stats, create_promo, disable_promo, list_all_promos
+from data_collection.marketapp import data_scraper
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 
@@ -31,6 +32,17 @@ async def admin_panel(message: Message, t: dict):
         return
 
     await message.answer(t["admin_panel_activated"], reply_markup=get_admin_keyboard(t))
+
+
+@router.message(Command("update_db"))
+async def update_db(message: Message, t: dict):
+    if not await is_admin(message):
+        await message.answer(t["no_admin_access"])
+        return
+
+    await message.answer(t["db_update_started"])
+    await data_scraper.scrape_and_update_db()
+    await message.answer(t["db_update_finished"])
 
 
 @router.callback_query(F.data == "admin_refund")
@@ -327,7 +339,7 @@ async def admin_force_refund(message: Message, t: dict):
             user_id=user_id,
             telegram_payment_charge_id=charge_id
         )
-        subscriptions_collection.update_one(
+        await subscriptions_collection.update_one(
             {"user_id": user_id, "transactions.id": charge_id},
             {"$set": {"transactions.$.refunded": True}}
         )
@@ -363,7 +375,7 @@ async def admin_force_subscribe(message: Message, t: dict):
         return
 
     end_date = datetime.utcnow() + timedelta(days=days)
-    subscriptions_collection.update_one(
+    await subscriptions_collection.update_one(
         {"user_id": user_id},
         {
             "$set": {
@@ -402,7 +414,7 @@ async def admin_force_cancel(message: Message, t: dict):
         await message.answer("Invalid user_id.")
         return
 
-    subscriptions_collection.update_one(
+    await subscriptions_collection.update_one(
         {"user_id": user_id},
         {"$set": {"subscribed": False}},
     )

@@ -52,5 +52,6 @@ async def parse_telegram_gift_page(gift_name: str) -> dict | None:
     except Exception:
         return None
 
-def find_similar_in_db(model: str, symbol: str, backdrop: str) -> list[dict]:
-    return get_nfts_by_params(model, symbol, backdrop)
+
+async def find_similar_in_db(model: str, symbol: str, backdrop: str) -> list[dict]:
+    return await get_nfts_by_params(model, symbol, backdrop)
