@@ -38,7 +38,7 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
     await call.message.edit_text(interim_messages[0])
     collection_name = data.get("selected_collection")
 
-    collection = collections_collection.find_one({"name": collection_name})
+    collection = await collections_collection.find_one({"name": collection_name})
     if not collection:
         await call.message.answer(t["collection_not_found"])
         return
@@ -52,10 +52,10 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
     })
 
     results = []
-    for nft in nft_cursor:
+    async for nft in nft_cursor:
         try:
             nft_id = nft.get("nft_id")
-            ton_price = estimate_ton_price(nft_id) if nft_id else 0.0
+            ton_price = await estimate_ton_price(nft_id) if nft_id else 0.0
         except Exception as e:
             print(f"[ERROR] Estimating price failed for NFT: {nft.get('name')}, reason: {e}")
             ton_price = 0.0
@@ -65,16 +65,19 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
         except Exception:
             market_price = 0.0
 
+        usd_estimated = await convert_ton_to_usd(ton_price)
+        usd_market = await convert_ton_to_usd(market_price)
+
         result = {
             "name": nft.get("name", "Unknown"),
             "model": nft.get("model", ""),
             "symbol": nft.get("symbol", ""),
             "backdrop": nft.get("backdrop", ""),
             "ton": ton_price,
-            "usd_estimated": convert_ton_to_usd(ton_price),
+            "usd_estimated": usd_estimated,
             "market": nft.get("market", "N/A"),
             "market_price": market_price,
-            "usd_market": convert_ton_to_usd(market_price),
+            "usd_market": usd_market,
         }
         results.append(result)
 
