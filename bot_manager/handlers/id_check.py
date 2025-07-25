@@ -122,7 +122,7 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
             await message.answer(t["no_gift_found_final"])
         return
 
-    price = estimate_ton_price(data["nft_id"])
+    price = await estimate_ton_price(data["nft_id"])
     await send_gift_result(message, {
         "name": data["name"],
         "model": data["model"],
@@ -136,11 +136,11 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
 
 
 async def send_gift_result(message: types.Message, gift: dict, t: dict):
-    estimated_price = estimate_ton_price(gift["nft_id"]) if "nft_id" in gift else float(gift["price"])
+    estimated_price = await estimate_ton_price(gift["nft_id"]) if "nft_id" in gift else float(gift["price"])
     market_price = float(gift["price"])
 
-    usd_estimated = convert_ton_to_usd(estimated_price)
-    usd_market = convert_ton_to_usd(market_price) if market_price is not None else "—"
+    usd_estimated = await convert_ton_to_usd(estimated_price)
+    usd_market = await convert_ton_to_usd(market_price) if market_price is not None else "—"
 
     result = {
         "name": gift["name"],
