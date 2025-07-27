@@ -1,4 +1,4 @@
-import requests
+import httpx
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -6,7 +6,7 @@ load_dotenv()
 api_key = os.environ.get("API_KEY_OPENROUTER")
 
 
-def generate_response(system_prompt, user_message, model="openai/gpt-4"):
+async def generate_response(system_prompt, user_message, model="openai/gpt-4"):
     print("Sending request to OpenRouter")
     url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -24,10 +24,10 @@ def generate_response(system_prompt, user_message, model="openai/gpt-4"):
         "temperature": 0.0
     }
 
-    # print("=== PAYLOAD ===")
-    # print(json.dumps(payload, indent=2))
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=payload, timeout=60.0)
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"]
 
-    response = requests.post(url, headers=headers, json=payload)
-    response.raise_for_status()
-
-    return response.json()["choices"][0]["message"]["content"]
+    print(f"[DEBUG] AI Response: {content}")
+    return content

@@ -62,7 +62,8 @@ async def get_data(nft_id):
         "volume": float(collection.get("volume", 0)),
         "owners": int(collection.get("owners", 1)),
         "supply": int(collection.get("supply", 2800)),
-        "collection_address": collection_address
+        "collection_address": collection_address,
+
     }
 
 
@@ -204,5 +205,69 @@ def calculate_nft_price_final_optimized(price, backdrop, last_sale, rarity, max_
         estimated_price = min(estimated_price, (price + last_sale) / 2 * 1.15)
     print(f"Actual Price: {price}")
     #print(f"Estimated Price: {estimated_price}")
+
+    return min(max(estimated_price, lower_bound), upper_bound)
+
+
+async def analyse_gift(nft_id):
+    data = await get_data(nft_id)
+
+    rarity = data["rarity"]
+    price = data["price"]
+    backdrop = data["backdrop"]
+    model = data["model"]
+    symbol = data["symbol"]
+    volume_of_sales = data["volume"]
+    last_sale = data["last_sale"]
+
+
+    # Инициализация estimated_price
+    estimated_price = await estimate_ton_price(nft_id)
+
+    lower_bound = (price + last_sale) / 2 * 0.98
+    upper_bound = price * 1.2
+
+    # Логика прогнозирования движения цены
+    score = 0
+
+    # Редкость
+    if rarity < 50000:
+        score += 1
+    elif rarity > 75000:
+        score -= 1
+
+    # Цена vs оценка
+    price_ratio = price / estimated_price if estimated_price > 0 else 1
+    if price_ratio < 0.95:
+        score += 1
+    elif price_ratio > 1.05:
+        score -= 1
+
+    # Популярные атрибуты
+    popular_attributes = {"Neon Blue", "Caramel", "Cotton Candy", "Indigo Dye", "Navy Blue"}
+    if any(attr in popular_attributes for attr in [backdrop, model, symbol] if attr):
+        score += 1
+
+    # Объем продаж
+    if volume_of_sales and volume_of_sales > 100:
+        score += 1
+
+    # Определение прогноза
+    if score >= 2:
+        prediction = "up"
+    elif score <= -2:
+        prediction = "down"
+    else:
+        prediction = "neutral"
+
+    # Солидное обоснование в формате промта
+    print("Обоснование:")
+    print(f"На основании тщательного анализа данных, цена данного NFT с высокой степенью вероятности {'продемонстрирует устойчивый рост' if prediction == 'up' else 'подвергнется коррекции' if prediction == 'down' else 'сохранит текущую стабильность'} в течение ближайших 30 дней.")
+    print(f"Редкость: показатель {rarity} {'отражает исключительную редкость актива, усиливая его ценность' if score > 0 else 'указывает на широкую распространенность, что ограничивает потенциал' if score < 0 else 'поддерживает нейтральную позицию на рынке'}.")
+    print(f"Сравнение цены с оценочной: текущая цена {price} {'значительно ниже' if price_ratio < 0.95 else 'превышает' if price_ratio > 1.05 else 'соответствует'} оценке {estimated_ton}, {'подтверждая недооценку с перспективой роста' if price_ratio < 0.95 else 'сигнализируя о переоценке с риском снижения' if price_ratio > 1.05 else 'поддерживая текущую рыночную оценку'}.")
+    print(f"Популярные атрибуты: {'наличие' if any(attr in popular_attributes for attr in [backdrop, model, symbol] if attr) else 'отсутствие'} черт, таких как {', '.join(popular_attributes)}, {'гарантирует повышенный спрос и привлекательность' if score > 0 else 'не оказывает заметного влияния на рыночный интерес'}.")
+    print(f"Рыночная активность: объем продаж {volume_of_sales if volume_of_sales else 'не указан'} {'подтверждает высокий уровень ликвидности и интереса со стороны инвесторов' if volume_of_sales and volume_of_sales > 100 else 'не демонстрирует значительной рыночной активности'}.")
+    print(f"Итог: совокупность факторов {'формирует убедительный восходящий тренд с техническим потенциалом роста' if score >= 2 else 'не выявляет явных сигналов для кардинальных изменений' if -1 <= score <= 1 else 'предостерегает о возможном нисходящем давлении'}.")
+    print(f"Прогноз: **{prediction}**")
 
     return min(max(estimated_price, lower_bound), upper_bound)

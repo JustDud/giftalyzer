@@ -203,4 +203,14 @@ texts = {
 
     "db_update_started": "Обновление базы началось",
     "db_update_finished": "Обновление базы закончилось",
+
+    "ai_analyse_gift": "🔎 Проанализируй подарок",
+    "ai_undervalued": "📈 Покажи недооцененные",
+    "ai_only_up": "⬆ Только с прогнозом 'up'",
+    "ai_prompt_select_model": "Выберите модель для анализа: {collection_name}",
+    "ai_prompt_select_backdrop": "Выберите до 3 фонов для анализа коллекции {collection_name}:",
+    "ai_btn_show_results": "Показать результаты AI-анализа",
+    "ai_prompt_select_collection": "Выберите коллекцию:",
+    "ai_collection_not_found": "Коллекция не найдена в AI-режиме.",
+    "ai_select_backdrop": "Выберите фон",
 }
