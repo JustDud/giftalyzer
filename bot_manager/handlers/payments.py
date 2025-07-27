@@ -18,8 +18,8 @@ logs_group_id = os.getenv("LOGS_GROUP_ID")
 router = Router()
 
 
-def has_active_subscription(user_id: int):
-    sub = subscriptions_collection.find_one({"user_id": user_id})
+async def has_active_subscription(user_id: int):
+    sub = await subscriptions_collection.find_one({"user_id": user_id})
     if not sub:
         return False, None
     if sub.get("subscribed") is True or sub.get("subscribed") == "True":
@@ -31,7 +31,7 @@ def has_active_subscription(user_id: int):
 
 
 async def get_subscription_info(user_id: int) -> str:
-    sub = subscriptions_collection.find_one({"user_id": user_id})
+    sub = await subscriptions_collection.find_one({"user_id": user_id})
     if not sub:
         return "❌ Подписка не найдена для данного пользователя."
     status = sub.get("subscribed")
@@ -54,7 +54,7 @@ async def get_subscription_info(user_id: int) -> str:
 
 @router.message(lambda msg, t: msg.text == t["btn_subscription"])
 async def handle_subscription_button(message: Message, state: FSMContext, t: dict):
-    active, end_date = has_active_subscription(message.from_user.id)
+    active, end_date = await has_active_subscription(message.from_user.id)
     if active:
         formatted_date = end_date.strftime('%d %B %Y') if end_date else "—"
         await message.answer(t["active_subscription_until"].format(date=formatted_date))
@@ -103,7 +103,7 @@ async def process_promo_code(message: Message, state: FSMContext, t: dict):
         print(f"[ERROR] Failed to send promo_applied message: {e}")
         await message.answer("❌ Ошибка сети. Попробуйте ещё раз.")
 
-    subscriptions_collection.update_one(
+    await subscriptions_collection.update_one(
         {"user_id": user_id},
         {"$set": {"last_used_promo": {
             "promo_code": result["promo_code"],
@@ -131,7 +131,7 @@ async def skip_promo(callback: CallbackQuery, state: FSMContext, t: dict):
     await start_payment_cycle(callback.message, BASE_PRICE_XTR, t)  # base price
 
 async def start_payment_cycle(message: Message, price: float, t: dict):
-    active, end_date = has_active_subscription(message.from_user.id)
+    active, end_date = await has_active_subscription(message.from_user.id)
     if active:
         formatted_date = end_date.strftime('%d %B %Y') if end_date else "—"
         await message.answer(t["active_subscription_until"].format(date=formatted_date))
@@ -173,7 +173,7 @@ async def pre_checkout_handler(pre_checkout: PreCheckoutQuery):
 async def successful_payment(message: Message, t: dict):
     add_subscription(message.from_user.id)
     charge_id = message.successful_payment.telegram_payment_charge_id
-    subscriptions_collection.update_one(
+    await subscriptions_collection.update_one(
         {"user_id": message.from_user.id},
         {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": datetime.utcnow()}},
          "$set": {"subscribed": True, "start_date": datetime.utcnow()}},
@@ -191,14 +191,14 @@ async def successful_payment(message: Message, t: dict):
         except Exception as e:
             print(f"[LOG ERROR] Failed to send payment log: {e}")
 
-    promo_data = subscriptions_collection.find_one({"user_id": message.from_user.id})
+    promo_data = await subscriptions_collection.find_one({"user_id": message.from_user.id})
     if promo_data and promo_data.get("last_used_promo"):
         finalize_promo_usage(
             message.from_user.id,
             promo_data["last_used_promo"]["promo_code"],
             promo_data["last_used_promo"]["final_price"]
         )
-        subscriptions_collection.update_one(
+        await subscriptions_collection.update_one(
             {"user_id": message.from_user.id},
             {"$unset": {"last_used_promo": ""}}
         )
@@ -220,7 +220,7 @@ async def check_subscriptions(message: Message, t: dict):
             sub_info = await get_subscription_info(user_id)
             await message.answer(sub_info)
         else:
-            subs = get_all_subscriptions()
+            subs = await get_all_subscriptions()
             if not subs:
                 await message.answer(t["no_subscriptions_found"])
                 return
@@ -274,7 +274,7 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             return
 
     try:
-        sub = subscriptions_collection.find_one({"user_id": user_id})
+        sub = await subscriptions_collection.find_one({"user_id": user_id})
         if not sub or not sub.get("subscribed"):
             await message.answer(t["no_active_subscription"])
             return
@@ -289,12 +289,20 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             await message.answer(t["subscription_expired_no_refund"])
             return
 
-        await message.bot.refund_star_payment(
-            user_id=user_id,
-            telegram_payment_charge_id=charge_id
-        )
+        print(f"[DEBUG] Trying refund: user_id={user_id}, charge_id={charge_id}")
+        try:
+            await message.bot.refund_star_payment(
+                user_id=user_id,
+                telegram_payment_charge_id=charge_id
+            )
+        except Exception as e:
+            if "INVALID_CHARGE_ID" in str(e):
+                await message.answer("❌ Автоматический возврат недоступен для этого платежа. Проверьте тип платежа или свяжитесь с поддержкой.")
+                return
+            await message.answer(t["refund_error"].format(error=str(e)))
+            return
 
-        subscriptions_collection.update_one(
+        await subscriptions_collection.update_one(
             {"user_id": user_id, "transactions.id": charge_id},
             {"$set": {"transactions.$.refunded": True, "subscribed": False}}
         )
@@ -316,7 +324,8 @@ async def admin_refund_handler(message: Message, *args, t: dict):
 async def my_promocodes_handler(message: Message, t: dict):
     try:
         user_id = message.from_user.id
-        promos = [p for p in list_all_promos() if p.get("owner_id") == user_id]
+        promos_all = await list_all_promos()
+        promos = [p for p in promos_all if p.get("owner_id") == user_id]
 
         if not promos:
             await message.answer("❌ У вас нет созданных промокодов.")

@@ -13,5 +13,5 @@ class I18nMiddleware(BaseMiddleware):
     ) -> Any:
         user = data.get("event_from_user")
         if user:
-            data["t"] = get_texts(user.id)
+            data["t"] = await get_texts(user.id)
         return await handler(event, data)

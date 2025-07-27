@@ -42,6 +42,9 @@ def scrape_collections():
 
     collections = []
     rows = soup.select("tr.tm-row-selectable")
+    print("DEBUG: status:", res.status_code)
+    print("DEBUG: preview:", res.text[:500])
+    print("DEBUG: found rows:", len(rows))
 
     for row in rows:
         name_cell = row.select_one(".tm-value")

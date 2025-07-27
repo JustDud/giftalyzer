@@ -199,5 +199,8 @@ texts = {
     "promo_applied": "✅ Промокод применён! Цена со скидкой: {discounted_price}⭐ ",
     "promo_try_again_or_skip": "Попробуйте ввести другой промокод или нажмите пропустить.",
     "my_promocodes_header": "📋 Ваши промокоды:",
-    "no_my_promocodes": "❌ У вас нет созданных промокодов."
+    "no_my_promocodes": "❌ У вас нет созданных промокодов.",
+
+    "db_update_started": "Обновление базы началось",
+    "db_update_finished": "Обновление базы закончилось",
 }

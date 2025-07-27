@@ -12,12 +12,21 @@ SUPPORT_GROUP_ID = os.getenv("SUPPORT_GROUP_ID")
 
 router = Router()
 
-last_ticket = support_collection.find_one(
-    {"_id": {"$regex": r"^\d+$"}},
-    sort=[("_id", -1)]
-)
-last_id = int(last_ticket["_id"]) if last_ticket else 1000
-ticket_id = str(last_id + 1)
+
+# These will be initialized asynchronously
+last_ticket = None
+last_id = 1000
+ticket_id = None
+
+
+async def init_last_ticket():
+    global last_ticket, last_id, ticket_id
+    last_ticket = await support_collection.find_one(
+        {"_id": {"$regex": r"^\d+$"}},
+        sort=[("_id", -1)]
+    )
+    last_id = int(last_ticket["_id"]) if last_ticket else 1000
+    ticket_id = str(last_id + 1)
 
 
 def escape_md(text: str) -> str:
@@ -38,7 +47,7 @@ async def reply_to_support_ticket(message: Message, t: dict):
 
     ticket_id = ticket_line.replace("📨 Ticket ID:", "").strip(" `")
 
-    ticket = support_collection.find_one({"_id": ticket_id})
+    ticket = await support_collection.find_one({"_id": ticket_id})
     if not ticket:
         await message.answer(t["ticket_not_found"])
         return
@@ -51,7 +60,10 @@ async def reply_to_support_ticket(message: Message, t: dict):
             f"{t['support_reply']}:\n{message.text}",
             reply_markup=clarify_keyboard
         )
-        support_collection.update_one({"_id": ticket_id}, {"$set": {"status": "closed", "admin_response": message.text}})
+        await support_collection.update_one(
+            {"_id": ticket_id},
+            {"$set": {"status": "closed", "admin_response": message.text}}
+        )
         await message.answer(t["reply_sent"])
     except Exception as e:
         await message.answer(f"{t['reply_failed']} {e}")
@@ -61,7 +73,7 @@ async def reply_to_support_ticket(message: Message, t: dict):
 async def clarify_ticket(callback_query: CallbackQuery, state: FSMContext, t: dict):
 
     ticket_id = callback_query.data.replace("clarify_", "")
-    ticket = support_collection.find_one({"_id": ticket_id})
+    ticket = await support_collection.find_one({"_id": ticket_id})
 
     if not ticket:
         await callback_query.answer(t["ticket_not_found"], show_alert=True)
@@ -84,7 +96,7 @@ async def close_all_tickets(message: Message, t: dict):
     if not await is_admin(message):
         await message.answer(t["no_admin_access"])
         return
-    result = support_collection.update_many({"status": "open"}, {"$set": {"status": "closed"}})
+    result = await support_collection.update_many({"status": "open"}, {"$set": {"status": "closed"}})
     await message.answer(t["tickets_closed"].format(count=result.modified_count))
 
 
@@ -92,7 +104,8 @@ async def show_active_tickets(message: Message, t: dict):
     if not await is_admin(message):
         await message.answer(t["no_admin_access"])
         return
-    tickets = list(support_collection.find({"status": "open"}).sort("_id", -1))
+    tickets_cursor = support_collection.find({"status": "open"}).sort("_id", -1)
+    tickets = [ticket async for ticket in tickets_cursor]
 
     if not tickets:
         await message.answer(t["no_active_tickets"])
