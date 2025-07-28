@@ -25,10 +25,8 @@ async def ai_help_start(message: Message, state: FSMContext, t):
 @router.callback_query(F.data == "ai_analyze_gift")
 async def handle_ai_analyze_gift(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
-    # Сохраняем тип запроса
     await state.update_data(user_question="🔍 Проанализируй NFT")
 
-    # Загружаем коллекции
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] async for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections, t=t)
@@ -180,9 +178,9 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext, t: dict
         await state.set_state(AIRequestState.selecting_gift)
         return
 
-    keyboard = get_ai_backdrop_keyboard(backdrops, t=t, selection_limit=3)
+    keyboard = get_ai_backdrop_keyboard(backdrops, t=t, selection_limit=1)
     await state.update_data(cached_backdrops=backdrops, selected_backdrops=[])
-    await state.update_data(backdrop_selection_limit=3)
+    await state.update_data(backdrop_selection_limit=1)
     await call.message.edit_text(t["ai_prompt_select_backdrop"].format(collection_name=collection_name))
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
@@ -338,10 +336,24 @@ async def validate_and_proceed_to_ai(call: CallbackQuery, state: FSMContext, t: 
             logging.exception("Failed to send backdrop selection warning: %s", e)
         return
 
+    await call.answer()
+    from aiogram.types import ReplyKeyboardRemove
+    temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
+    # Remove inline keyboard safely before editing text
+    current_reply_markup = call.message.reply_markup
+    if current_reply_markup is not None:
+        try:
+            await call.message.edit_reply_markup(reply_markup=None)
+        except TelegramBadRequest as e:
+            if "message is not modified" not in str(e):
+                raise
+    try:
+        await call.message.edit_text("⌛ Генерация анализа, пожалуйста подождите...", reply_markup=None)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            raise
     await state.set_state(AIRequestState.loading_results)
-    await analyse_ai_request(call, state, t)
-
-
+    await analyse_ai_request(call, state, t, temp)
 
 
 def register(dp):

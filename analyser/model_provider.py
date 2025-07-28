@@ -6,7 +6,7 @@ load_dotenv()
 api_key = os.environ.get("API_KEY_OPENROUTER")
 
 
-async def generate_response(system_prompt, user_message, model="openai/gpt-4"):
+async def generate_response(system_prompt, user_message, model="anthropic/claude-sonnet-4"):
     print("Sending request to OpenRouter")
     url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -30,4 +30,5 @@ async def generate_response(system_prompt, user_message, model="openai/gpt-4"):
         content = response.json()["choices"][0]["message"]["content"]
 
     print(f"[DEBUG] AI Response: {content}")
+
     return content
