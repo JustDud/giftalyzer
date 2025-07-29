@@ -1,11 +1,8 @@
 import time
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
 import html
 import re
-from data_collection.marketapp.collections_scraper import scrape_collections
 
 
 # Helper to normalize NFT names to format "MadPumpkin-1218"
