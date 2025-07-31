@@ -4,14 +4,27 @@ import os
 import random
 import json
 import csv
+# -- 3rd party
 from playwright.async_api import async_playwright
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.196 Mobile Safari/537.36"
+]
 # from utils import fragment_slug
 # from config import API_URL_TONNEL, COLLECTION_NAMES
+from dotenv import load_dotenv
+load_dotenv()
 
-API_URL_TONNEL   = "https://gifts3.tonnel.network/api/pageGifts"
+USER_AUTH = os.environ.get("USER_AUTH")
+API_URL_TONNEL = os.environ.get("API_URL_TONNEL")
+TONNEL_PRICE_MULTIPLIER = 1.06
+
+TONNEL_RATE = 1.5
+
 
 COLLECTION_NAMES = [
-    "Pet Snake", "Plush Pepe", "Precious Peach", "Record Player", "Restless Jar",
+    "Astral Shard", "Pet Snake", "Plush Pepe", "Precious Peach", "Record Player", "Restless Jar",
     "Sakura Flower", "Santa Hat", "Scared Cat", "Sharp Tongue", "Signet Ring",
     "Skull Flower", "Sleigh Bell", "Snake Box", "Snow Globe", "Snow Mittens",
     "Spiced Wine", "Spy Agaric", "Star Notepad", "Swiss Watch", "Tama Gadget",
@@ -27,9 +40,11 @@ COLLECTION_NAMES = [
     "Bow Tie", "Bunny Muffin", "Candy Cane", "Cookie Heart", "Crystal Ball",
     "Cupid Charm", "Desk Calendar", "Diamond Ring", "Durov's Cap", "Easter Egg",
     "Perfume Bottle", "Flying Broom", "Snoop Dogg", "Swag Bag", "Snoop Cigar",
-    "Westside Sign", "Low Rider", "Astral Shard", "B-Day Candle", "Berry Box", "Big Year"
+    "Westside Sign", "Low Rider", "B-Day Candle", "Berry Box", "Big Year"
 ]
 
+_tonnel_lock = asyncio.Lock()
+_tonnel_last = 0
 
 def manual_slugify(name):
     return name.lower().replace("’", "").replace("'", "").replace("’", "").replace("’", "").replace(" ", "-")
@@ -52,15 +67,13 @@ async def get_valid_token():
 # from fragment import fetch_fragment_floors
 # from getgems import fetch_getgems_floors, GETGEMS_MAP
 
-_tonnel_lock = asyncio.Lock()
-_tonnel_last = 0
-TONNEL_RATE = 1.5
+
 
 
 async def fetch_floor(page, gift_name: str):
     payload = {
         "page": 1,
-        "limit": 5,
+        "limit": 30,
         "sort": "{\"price\":1,\"gift_id\":-1}",
         "filter": f"""{{
             "gift_name": "{gift_name}",
@@ -79,39 +92,61 @@ async def fetch_floor(page, gift_name: str):
     try:
         global _tonnel_last
         async with _tonnel_lock:
-            wait_time = random.uniform(1.2, 2.0)
-            wait = wait_time - (time.perf_counter() - _tonnel_last)
+            wait = TONNEL_RATE - (time.perf_counter() - _tonnel_last)
+            print(f"Wait Delay: {wait}")
             if wait > 0:
                 await asyncio.sleep(wait)
             _tonnel_last = time.perf_counter()
 
-        payload["user_auth"] = "user=%7B%22id%22%3A474039722%2C%22first_name%22%3A%22DD%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22dimadud%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FBGU567L3Vze7kpeoVSkeUDvHBh-0ZooveO2c_CXyk-Q.svg%22%7D&chat_instance=2616407032313614176&chat_type=sender&auth_date=1753806184&signature=t_GYtEnqYhEEjv5ls7JJiCRVHCeY1SV7y_6EjaPYHQrgf8e7kNnjqdxMtKVnGGlsaPwxJQArBbtnUqZrTU_YDw&hash=35b1c2cc67e5396e9ff3d070a034e5921dfb15b79b0bbefb2b5e8a1a0942edb1"
+        payload["user_auth"] = USER_AUTH
         all_valid_items = []
         page_num = 1
 
         while True:
             payload["page"] = page_num
-            response = await page.evaluate(
-                """async ({url, payload}) => {
-                    const res = await fetch(url, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!res.ok) throw new Error("HTTP " + res.status);
-                    return await res.json();
-                }""",
-                {"url": API_URL_TONNEL, "payload": payload},
-            )
+            delay = random.uniform(1.2, 1.4)
+            print(f"⏳ Вариативная задержка перед запросом: {delay:.2f} сек")
+            await asyncio.sleep(delay)
+            print(f"📄 {gift_name} — страница {page_num}")
+            retries = 3
+            for attempt in range(retries):
+                # --- Patch: set random User-Agent
+                headers = {"Content-Type": "application/json"}
+                headers["User-Agent"] = random.choice(USER_AGENTS)
+                try:
+                    data = await page.evaluate(
+                        """async ({url, payload, headers}) => {
+                            const res = await fetch(url, {
+                                method: "POST",
+                                headers,
+                                body: JSON.stringify(payload)
+                            });
+                            if (!res.ok) throw new Error("HTTP " + res.status);
+                            return await res.json();
+                        }""",
+                        {"url": API_URL_TONNEL, "payload": payload, "headers": headers},
+                    )
+                    break  # success, exit retry loop
+                except Exception as e:
+                    print(f"⚠️ Попытка {attempt+1} не удалась: {e}")
+                    # Patch: wait 20s before last attempt
+                    if attempt == retries - 2:
+                        print("⏳ Последняя попытка, ждём 25 секунд перед повтором...")
+                        await asyncio.sleep(25)
+                    if attempt < retries - 1:
+                        await asyncio.sleep(15)
+                    else:
+                        raise  # re-raise the final exception after retries exhausted
             # Patch: extract "items" from dict response if present
+            response = data
             if isinstance(response, dict):
                 response = response.get("items", [])
-            print("🔎 RAW response:", response)
+            #print("🔎 RAW response:", response)
 
             # New: handle empty or invalid responses gracefully
             if response is None or not isinstance(response, list) or len(response) == 0:
                 print(f"❌ {gift_name} (tonnel): нет данных")
-                return gift_name, "", None, "", "", "", ""
+                return gift_name, []
 
             valid_items = [
                 item for item in response
@@ -123,27 +158,40 @@ async def fetch_floor(page, gift_name: str):
                 break
             page_num += 1
 
-        # Check for empty all_valid_items before accessing [0]
+        # Check for empty all_valid_items before accessing
         if not all_valid_items:
             print(f"❌ {gift_name} (tonnel): нет валидных лотов")
-            return gift_name, "", None, "", "", "", ""
+            return gift_name, []
 
-        item = all_valid_items[0]
-        price = float(item["price"]) * 1.10
-        gift_num = item.get("gift_num", "")
-        real_id = item.get("gift_id", "")
-        name_gift = item.get("name", "")
-        model = item.get("model", "")
-        #gift_slug = fragment_slug(gift_name)
-        #image_url = f"https://nft.fragment.com/gift/{gift_slug}-{gift_num}.large.jpg"
-        market_url = f"https://marketplace.tonnel.network/?giftDrawerId={real_id}"
+        # Extract required fields for each valid item
+        extracted_items = []
+        for item in all_valid_items:
+            gift_id = item.get("gift_id", "")
+            gift_num = item.get("gift_num", "")
+            name_gift = item.get("name", "")
+            model = item.get("model", "")
+            symbol = item.get("symbol", "")
+            backdrop = item.get("backdrop", "")
+            price = float(item.get("price", 0)) * TONNEL_PRICE_MULTIPLIER if item.get("price") is not None else None
+            status = item.get("status", "")
+            extracted_items.append((
+                gift_name,
+                gift_id,
+                gift_num,
+                name_gift,
+                model,
+                symbol,
+                backdrop,
+                price,
+                status
+            ))
 
-        print(f"✅ {gift_name} (tonnel): {name_gift} {model} {price:.2f} TON")
-        return gift_name, gift_num, price, market_url, name_gift, model, #image_url
+        print(f"✅ {gift_name} (tonnel): extracted {len(extracted_items)} items")
+        return gift_name, extracted_items
 
     except Exception as e:
         print(f"❌ {gift_name} (tonnel): ошибка — {e}")
-        return gift_name, "", None, "", "", "", ""
+        return gift_name, []
 
 
 async def main():
@@ -153,7 +201,7 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=["--no-sandbox"])
         context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
         )
 
         # fragment_floors = await fetch_fragment_floors(COLLECTION_NAMES)
@@ -166,31 +214,32 @@ async def main():
             print("❌ Не удалось получить MRKT токен")
             return
 
-        if not os.path.exists("tonnel_results.csv"):
-            with open("tonnel_results.csv", mode="w", newline="", encoding="utf-8") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(["Collection Slug", "Gift Name", "Gift Num", "Price (TON)", "Market URL", "Name Gift", "Model"])
+        # Always overwrite the CSV file and write the correct header at the start
+        with open("tonnel_results.csv", mode="w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["Collection Slug", "Gift ID", "Gift Num", "Gift Name", "Model", "Symbol", "Backdrop", "Price (TON)", "Status"])
 
         for idx, name in enumerate(COLLECTION_NAMES, 1):
+            collection_start = time.time()
             name_mrkt = name.replace("'", "’")
             t_task = fetch_floor(page, name)
-            tonnel_data = await t_task
+            gift_name, items = await t_task
 
-            # Save each collection result appended into a single CSV file
+            print(f"📦 Проверка перед записью: {gift_name}, items count: {len(items)}")
+            # Append each valid item as a separate row (append mode not needed since we wrote header above, but keep append below for clarity)
             with open("tonnel_results.csv", mode="a", newline="", encoding="utf-8") as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow([name] + list(tonnel_data))
-            print(f"✅ Appended: {name}")
-            await asyncio.sleep(0.2)
+                if items:
+                    for item in items:
+                        writer.writerow(item)
+                    print(f"✅ Записано: {gift_name} — {len(items)} items")
+                else:
+                    print(f"⚠️ Пропущено: {gift_name}, некорректные или пустые данные")
+            await asyncio.sleep(random.uniform(0.9, 1.4))
+            print(f"⏱ Time for {gift_name}: {time.time() - collection_start:.1f} sec")
 
         await browser.close()
-        # The following block is removed/commented: save all results to a single CSV file
-        # with open("tonnel_results.csv", mode="w", newline="", encoding="utf-8") as csvfile:
-        #     writer = csv.writer(csvfile)
-        #     writer.writerow(["Collection Slug", "Gift Name", "Gift Num", "Price (TON)", "Market URL", "Name Gift", "Model"])
-        #     for name, data in results:
-        #         writer.writerow([name] + list(data))
-        # print("✅ Results saved to tonnel_results.csv")
+
         print(f"⏱ Total time: {time.time() - start:.1f} sec")
 
 if __name__ == "__main__":

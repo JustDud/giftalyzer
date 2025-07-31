@@ -16,3 +16,5 @@ venv/
 .DS_Store
 nft_price_output.csv
 nft_price_output.csv
+data_collection/tonnel/data_test.csv
+data_collection/tonnel/tonnel_results.csv
