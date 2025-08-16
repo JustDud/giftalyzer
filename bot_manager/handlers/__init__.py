@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 from . import (start, id_check, market_search, search_results, admin_support, support, payments,
-               admin_general, language, ai_requests)
+               admin_general, language, ai_requests, ai_requests_results)
 
 
 def register_all_handlers(dp: Dispatcher):
@@ -14,4 +14,5 @@ def register_all_handlers(dp: Dispatcher):
     admin_general.register(dp)
     language.register(dp)
     ai_requests.register(dp)
+    ai_requests_results.register(dp)
 

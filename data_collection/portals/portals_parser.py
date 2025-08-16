@@ -1,4 +1,4 @@
-from urllib.parse import quote_plus
+from urllib.parse import unquote, quote_plus
 import os
 from dotenv import load_dotenv
 import aiohttp
@@ -8,6 +8,11 @@ from pyrogram import Client
 from pyrogram.raw.functions.messages import RequestAppWebView
 from pyrogram.raw.types import InputBotAppShortName, InputUser
 from pyrogram.raw.functions.users import GetUsers
+import random
+import csv
+import datetime
+import pandas as pd
+from .pagination_config import get_pagination_config, get_api_config, get_error_config, calculate_delay, should_retry_request, get_error_message
 
 load_dotenv()
 
@@ -18,139 +23,251 @@ API_HASH = os.environ.get("API_HASH")
 PHONE_NUMBER = os.environ.get("TELEGRAM_PHONE")
 TWO_FA_PASSWORD = os.environ.get("TELEGRAM_PASSWORD")
 
-gift_name = "Pepe"
-collections_ids = {
-    "Plush Pepe": "8d21b568-63bb-437a-9093-8684c5b63485",
-    "Loot Bag": "db7f4abd-96d9-4968-ba81-7f1a07bc2e9c",
-    "Bow Tie": "216c52eb-447a-4775-921d-a59f9b67082c",
-    "Heroic Helmet": "013a775d-4d7d-457b-9d3d-30a6429ea79f",
-    "Durov's Cap": "fc46d19d-5f25-44c5-8924-5976c2fb790e",
-    "Nail Bracelet": "40311c45-48a8-4863-8abb-7156ae62767b",
-    "Swiss Watch": "f0125f02-2b17-4882-95b4-8715a88678a5",
-    "Bonded Ring": "07484deb-1790-4a21-9d2f-ece02acdcb84",
-    "Precious Peach": "40131849-420d-4775-b616-6d359c17c22f",
-    "Gem Signet": "020c2380-709d-4d09-bbad-814852b32551",
-    "Vintage Cigar": "48204369-2f95-4909-8018-1660b37c2b9d",
-    "Light Sword": "0ebbc5d6-f59f-49f5-9a48-7a1fc1625093",
-    "Toy Bear": "060d4cef-3a21-47e6-98fc-cd338ae0b5e0",
-    "Neko Helmet": "f3e9621f-a32f-49d9-b602-71ecf2515ded",
-    "Lol Pop": "98850266-bb6c-43a6-9559-accedf420a02",
-    "Ion Gem": "47f0cf89-4fc9-4aa2-99b2-7f3cf9a6c16a",
-    "Astral Shard": "207d7011-8359-429c-b86b-df191b3659dd",
-    "Sharp Tongue": "308fc63d-1ebc-4e31-865e-c756018e4dff",
-    "Diamond Ring": "45aa08dd-94e0-492f-bf04-1952aa024951",
-    "Restless Jar": "9537661e-290b-49f3-adaf-d96e8f590288",
-    "Signet Ring": "a1a5ec7e-53b9-45b9-91e5-cad37a15fe5e",
-    "Scared Cat": "a4a90909-9a06-4b78-9d75-4de42280334a",
-    "Easter Egg": "88a37665-6d13-4619-afa9-47de8464adb4",
-    "Genie Lamp": "7693b50e-b9ad-4eed-8791-a7b4bf3ea726",
-    "Electric Skull": "43b4502a-ca8c-49e8-ba5d-03cdf66d8f48",
-    "Perfume Bottle": "e1b2c024-a443-4637-b451-02904a6bc3f6",
-    "Voodoo Doll": "ba7390cc-72d4-45ce-96e4-d243e22a6500",
-    "Kissed Frog": "2c68a297-604a-4710-a32e-d3eac17e15ae",
-    "Hanging Star": "1d7b6d74-5eef-45ee-b25b-632a96b9505a",
-    "Magic Potion": "a17b488a-3942-4eae-89f9-bba2ce342c6b",
-    "Tama Gadget": "beed4df4-cce3-4b21-aefe-0cc5e5196834",
-    "Top Hat": "860ae248-5a63-4ea9-ae6d-defd3c0952b9",
-    "Desk Calendar": "ae8f48a9-e090-44f2-9c61-5928702ab171",
-    "Sleigh Bell": "8519c4e9-ef09-48fd-af9c-9e7412809e7c",
-    "Flying Broom": "73de1866-6b90-45b4-a543-fb5ea9ca1415",
-    "Trapped Heart": "bef99328-29f3-454a-abef-4d2f34b3bf3f",
-    "Love Potion": "7369ac28-ddaf-4100-9a75-a4225b64e1b0",
-    "Eternal Rose": "fa27c78c-6eb9-4653-a619-19544b8255b1",
-    "Mad Pumpkin": "1f281b21-1955-4691-923c-8f58ce00a456",
-    "Eternal Candle": "257ad54a-134c-437c-ab1e-febc4c798243",
-    "Sakura Flower": "1c1616f5-2f39-47dc-9f27-e77fa1b6a569",
-    "Snow Globe": "ffdfcb47-b9c9-4a5c-a59f-d6d236b583cf",
-    "Mini Oscar": "ea3f1a6f-80c8-4abf-8c56-cd41a0e1c89a",
-    "Record Player": "99cb46d0-c724-4e27-8497-ac381e10d97c",
-    "Love Candle": "128c7b37-36db-4b21-a21b-7d858c8dbc1a",
-    "Evil Eye": "f639a421-45df-4848-ac69-a089746828c4",
-    "Witch Hat": "a7253309-ed0e-4d5d-972c-2bc9c0194bea",
-    "Crystal Ball": "ac575eb3-2929-48d6-96d0-1db8f12243de",
-    "Bunny Muffin": "586cd461-0194-49af-86b0-cbc3b55a2a65",
-    "Spy Agaric": "a39d2458-5df0-42ff-98d5-08af484001d6",
-    "Skull Flower": "61a23d97-cf11-4c91-8435-476ba84c81eb",
-    "Homemade Cake": "f7a194d4-d53a-419a-b357-3c794f6cd98b",
-    "Holiday Drink": "6bf906a0-e5b1-4c7f-b741-a70c3f7ed77b",
-    "Jelly Bunny": "1a139fcf-5850-48c3-aee6-924134ad17d8",
-    "Party Sparkler": "53110539-1d3e-4334-9692-a665e0527f69",
-    "Big Year": "8b58d6ea-a8e0-47ef-bdd1-3ade5d5ea0cb",
-    "Ginger Cookie": "b85209cd-4e16-4d1a-985c-d784619fe2d0",
-    "Pet Snake": "563ed415-a63b-49e8-870d-745602fb3de3",
-    "Jack-in-the-Box": "996e7628-28bf-4874-b3ec-2e5f7c1cb684",
-    "Snow Mittens": "0009551d-bdd4-40ee-a276-b6e01fa4d327",
-    "B-Day Candle": "12efb9cd-179f-44c6-af65-a63480691c18",
-    "Berry Box": "b8747d58-90ed-49cf-8e29-b9e2c8b3e7a6",
-    "Xmas Stocking": "acebace7-be16-4a4b-9b02-c274bed4c856",
-    "Jingle Bells": "1501b9b9-83e0-4d05-a3af-d0e2021c6d5e",
-    "Candy Cane": "8b001ea2-5a73-4a61-a3a2-6f01d557fee7",
-    "Santa Hat": "b577efed-76dc-410f-bda9-edae43ab0f4a",
-    "Cookie Heart": "35c106ab-7133-4f10-a502-e2c602b64da9",
-    "Spiced Wine": "9aac072e-34d6-4819-a7f4-70ad25af8196",
-    "Hex Pot": "66e62058-8600-471f-909b-844751f5f103",
-    "Lunar Snake": "a4b271b4-efa3-4854-b53f-9ae6f3ecac59",
-    "Hypno Lollipop": "fe1816f1-a6a9-4770-8921-839a5bfa5a22",
-    "Star Notepad": "a76231dd-a8be-4f06-b7a3-e119b65074da",
-    "Snake Box": "f50f29bb-70b5-4502-a21b-8eadf20518fa",
-    "Jester Hat": "ea32e880-b03c-4791-9385-68d24db9784b",
-    "Winter Wreath": "13bada87-1353-4db5-b77c-d451c95365e0"
+# API constants for direct requests (async)
+API_URL = "https://portals-market.com/api/"
+SORTS = {
+    "latest": "&sort_by=listed_at+desc",
+    "price_asc": "&sort_by=price+asc",
+    "price_desc": "&sort_by=price+desc",
+    "gift_id_asc": "&sort_by=external_collection_number+asc",
+    "gift_id_desc": "&sort_by=external_collection_number+desc",
+    "model_rarity_asc": "&sort_by=model_rarity+asc",
+    "model_rarity_desc": "&sort_by=model_rarity+desc"
+}
+HEADERS = {
+    "Authorization": "",
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9,ru;q=0.8",
+    "Origin": "https://portals-market.com",
+    "Referer": "https://portals-market.com/",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0"
+}
+
+
+# Helper functions for search() and collections()
+def cap(value: str) -> str:
+    return value.strip().capitalize()
+
+
+def listToURL(items: list) -> str:
+    return ",".join([quote_plus(cap(item)) for item in items])
+
+
+def toShortName(gift_name):
+    return gift_name.replace(" ", "").replace("'", "").replace("’", "").replace("-", "")
+
+
+# The per-collection CSV saving is disabled in favor of unified saving at the end.
+# def save_to_csv_partial(data, collection_name):
+#     if not data:
+#         return
+#
+#     filename = f"{collection_name.replace(' ', '_')}.csv"
+#     csv_fields = list(data[0].keys())
+#     write_header = not os.path.exists(filename)
+#     with open(filename, mode='a', newline='', encoding='utf-8') as file:
+#         writer = csv.DictWriter(file, fieldnames=csv_fields)
+#         if write_header:
+#             writer.writeheader()
+#         writer.writerows(data)
+
+
+async def get_collections(limit: int = 100, authData: str = "") -> list:
+    """
+    Retrieves a list of collections and their floors, supply, daily volume etc from the marketplace.
+
+    Args:
+        limit (int): The maximum number of results to return. Defaults to 100.
+        authData (str): The authentication data required for the API request.
+
+    Returns:
+        list: A list of dictionaries containing information about the collections if the request is successful.
+
+    Raises:
+        Exception: If authData is not provided.
+        Exception: If the API request fails or returns a non-200 status code.
+    """
+    URL = API_URL_PORTALS + "/api/collections?limit=" + str(limit)
+    if authData == "":
+        raise Exception("portalsmp: collections(): Error: authData is required")
+
+    headers = {
+        "Authorization": f"tma {authData}",
+        "User-Agent": "TelegramBot",
+        "Accept": "application/json"
     }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(URL, headers=headers) as response:
+            if response.status != 200:
+                raise Exception(
+                    f"portalsmp: collections(): Error: status_code: {response.status}, response_text: {await response.text()}"
+                )
+
+            json_data = await response.json()
+            return json_data.get("collections", json_data)
 
 
 async def get_portals_auth_token(api_id: int, api_hash: str) -> str:
-    async with Client(":memory:", api_id=api_id, api_hash=api_hash, phone_number=PHONE_NUMBER, password=TWO_FA_PASSWORD) as app:
-        me = await app.get_me()
-
-        web_view = await app.invoke(
+    async with Client("giftalyzerauth", api_id=api_id, api_hash=api_hash, phone_number=PHONE_NUMBER, password=TWO_FA_PASSWORD) as client:
+        peer = await client.resolve_peer("portals")
+        user_full = await client.invoke(GetUsers(id=[peer]))
+        bot_raw = user_full[0]
+        bot = InputUser(user_id=bot_raw.id, access_hash=bot_raw.access_hash)
+        bot_app = InputBotAppShortName(bot_id=bot, short_name="market")
+        web_view = await client.invoke(
             RequestAppWebView(
-                peer=await app.resolve_peer("giftalyzer_admin"),
-                app=InputUser(user_id=6136187493, access_hash=5521816162305789110),
-                platform="android",
-                from_bot_menu=False,
-                url="https://app.portals-market.com"
+                peer=peer,
+                app=bot_app,
+                platform="desktop",
             )
         )
-        # Extract token from the URL returned
-        url = web_view.url
-        auth_part = url.split("tma=")[-1]
-        return auth_part
+        initData = unquote(web_view.url.split('tgWebAppData=', 1)[1].split('&tgWebAppVersion', 1)[0])
+        # print("🔐 WebView URL:", web_view.url)
+        # print("📦 InitData:", initData)
+        return initData
 
 
-async def fetch_all_portals_gifts(collection_name: str):
-    collection = quote_plus(collection_name)
+async def get_gifts_by_collection_name(collection_name: str, auth_token: str) -> list:
+    """
+    Fetch all gifts for a given collection name with improved pagination handling.
+
+    Args:
+        collection_name (str): Name of the collection to fetch gifts from.
+        auth_token (str): Telegram Mini App auth token.
+
+    Returns:
+        list: A list of dictionaries containing gift data.
+    """
+    # Get configuration for this collection
+    config = get_pagination_config(collection_name)
+    api_config = get_api_config()
+    error_config = get_error_config()
+    
+    # Use the actual collection name as seen in the collections list for search
+    collection = quote_plus(collection_name.strip().replace("'", "'"))
     offset = 0
-    limit = 50
+    limit = config["limit"]
     all_items = []
+    seen_ids = set()
+    consecutive_empty_pages = 0
+    consecutive_repeated_pages = 0
 
     headers = {
-        "User-Agent": "TelegramBot",
-        "Accept": "application/json",
-        "Authorization": f"tma {PORTALS_AUTH}"
+        **api_config["headers"],
+        "Authorization": f"tma {auth_token}"
     }
 
     async with aiohttp.ClientSession(headers=headers) as session:
-        while True:
+        while offset < config["max_offset"]:
             url = (
                 f"{API_URL_PORTALS}/api/nfts/search"
                 f"?offset={offset}&limit={limit}"
-                f"&filter_by_collections={collection}"
-                f"&sort_by=price+asc"
-                f"&status=listed"
+                f"&collections={collection}"
+                f"&status={api_config['default_status']}"
             )
+            print(f"🌐 Requesting URL: {url}")
 
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    print(f"❌ HTTP {resp.status}")
-                    break
-                data = await resp.json()
-                items = data.get("results", [])
-                if not items:
-                    break
+            # Retry logic for failed requests
+            max_retries = config["max_retries"]
+            retry_delay = config["retry_delay"]
+            
+            for attempt in range(max_retries):
+                try:
+                    timeout = aiohttp.ClientTimeout(total=config["request_timeout"])
+                    async with session.get(url, timeout=timeout) as resp:
+                        if resp.status == config["rate_limit_status"]:  # Rate limited
+                            wait_time = retry_delay * (config["retry_backoff_multiplier"] ** attempt)
+                            print(f"⏳ Rate limited, waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
+                            await asyncio.sleep(wait_time)
+                            continue
+                        elif resp.status != config["success_status"]:
+                            error_msg = get_error_message(resp.status, error_config)
+                            print(f"❌ HTTP {resp.status} at offset {offset}: {error_msg}")
+                            
+                            if should_retry_request(resp.status, error_config) and attempt < max_retries - 1:
+                                await asyncio.sleep(retry_delay)
+                                continue
+                            else:
+                                print(f"🛑 Failed after {max_retries} attempts at offset {offset}")
+                                break
+                        
+                        data = await resp.json()
+                        items = data.get("results", [])
+                        
+                        if not items:
+                            consecutive_empty_pages += 1
+                            if config["verbose_logging"]:
+                                print(f"📭 Empty page at offset {offset} (consecutive: {consecutive_empty_pages})")
+                            if consecutive_empty_pages >= config["max_consecutive_empty_pages"]:
+                                print(f"🛑 Stopping pagination after {config['max_consecutive_empty_pages']} consecutive empty pages")
+                                break
+                            offset += limit
+                            continue
+                        else:
+                            consecutive_empty_pages = 0  # Reset counter
 
-                all_items.extend(items)
-                offset += limit
+                        # Check for duplicate IDs within the current batch
+                        current_ids = [item["id"] for item in items]
+                        if len(current_ids) != len(set(current_ids)) and config["log_duplicate_ids"]:
+                            print(f"⚠️ Duplicate IDs in batch at offset {offset}")
 
+                        # Check for repeated IDs from previous pages
+                        new_items = [item for item in items if item["id"] not in seen_ids]
+                        repeated_count = len(items) - len(new_items)
+                        
+                        if repeated_count == len(items):  # All items are repeated
+                            consecutive_repeated_pages += 1
+                            if config["verbose_logging"]:
+                                print(f"🔄 All items repeated at offset {offset} (consecutive: {consecutive_repeated_pages})")
+                            
+                            if consecutive_repeated_pages >= config["max_consecutive_repeated_pages"]:
+                                print(f"🛑 Stopping pagination after {config['max_consecutive_repeated_pages']} consecutive repeated pages")
+                                break
+                        else:
+                            consecutive_repeated_pages = 0  # Reset counter
+                            
+                            if repeated_count > 0 and config["log_repeated_ids"]:
+                                repeated_ids = [item["id"] for item in items if item["id"] in seen_ids]
+                                print(f"🧪 {repeated_count} repeated IDs at offset {offset}: {repeated_ids[:3]}{'...' if len(repeated_ids) > 3 else ''}")
+
+                        # Add new items to our collection
+                        for item in new_items:
+                            seen_ids.add(item["id"])
+                        all_items.extend(new_items)
+
+                        print(f"📥 Fetched {len(all_items)} total gifts for {collection_name} (new: {len(new_items)})")
+                        print(f"🔍 Current offset: {offset}, Items this page: {len(items)}")
+
+                        # Check if we've reached the end of results
+                        if len(items) < limit:
+                            print(f"✅ Reached end of results at offset {offset} (items < limit)")
+                            break
+
+                        offset += limit
+                        break  # Success, exit retry loop
+                        
+                except asyncio.TimeoutError:
+                    print(f"⏰ Timeout at offset {offset}, attempt {attempt + 1}/{max_retries}")
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(retry_delay)
+                    else:
+                        print(f"🛑 Timeout after {max_retries} attempts at offset {offset}")
+                        break
+                except Exception as e:
+                    print(f"❌ Error at offset {offset}, attempt {attempt + 1}/{max_retries}: {e}")
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(retry_delay)
+                    else:
+                        print(f"🛑 Failed after {max_retries} attempts at offset {offset}")
+                        break
+
+            # Calculate adaptive delay
+            delay = calculate_delay(config, consecutive_repeated_pages)
+            await asyncio.sleep(delay)
+
+    print(f"🎯 Final result: {len(all_items)} unique gifts fetched for {collection_name}")
     return all_items
 
 
@@ -159,8 +276,24 @@ async def main():
     api_id = int(os.environ.get("API_ID"))
     api_hash = os.environ.get("API_HASH")
     PORTALS_AUTH = await get_portals_auth_token(api_id, api_hash)
-    gifts = await fetch_all_portals_gifts("Durov’s Cap")
-    for gift in gifts:
-        print(gift["name"], "-", gift["price"])
+    colls = await get_collections(limit=1000, authData=PORTALS_AUTH)
+    print("✅ Retrieved Collections:")
+    for col in colls:
+        print(col["name"], "-", col.get("floor_price"))
+
+    # Accumulate all gifts here
+    all_gifts = []
+    for col in colls:
+        col_name = col["name"]
+        print(f"📦 Fetching gifts for collection: {col_name}")
+        detailed_gifts = await get_gifts_by_collection_name(col_name, PORTALS_AUTH)
+        print(f"✅ Retrieved {len(detailed_gifts)} gifts for {col_name}")
+        all_gifts.extend(detailed_gifts)
+
+    # Save all gifts to a unified CSV file using pandas
+    if all_gifts:
+        all_gifts_df = pd.DataFrame(all_gifts)
+        all_gifts_df.to_csv("all_collections_gifts.csv", index=False)
+        print(f"💾 Saved {len(all_gifts)} gifts to all_collections_gifts.csv")
 
 asyncio.run(main())

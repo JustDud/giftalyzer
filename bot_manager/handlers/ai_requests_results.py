@@ -16,3 +16,7 @@ async def show_ai_analysis_results(message: Message, state: FSMContext, t: dict)
         for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
             await message.answer(chunk)
     await state.clear()
+
+
+def register(dp):
+    dp.include_router(router)
