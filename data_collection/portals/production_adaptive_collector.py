@@ -97,11 +97,11 @@ async def get_collections(limit: int = 100, authData: str = "") -> list:
             return json_data.get("collections", json_data)
 
 
-async def analyze_collection_price_range(collection_name: str, headers: dict):
+async def analyze_collection_price_range(collection_name: str, headers: dict, collection_id: str | None = None):
     """
     Analyze the price range of a collection to find min, max, and distribution.
     """
-    collection = quote_plus(collection_name.strip().replace("'", "'"))
+    collection = quote_plus(collection_id) if collection_id else quote_plus(collection_name.strip().replace("'", "'"))
 
     logger.info(f"Analyzing price range for: {collection_name}")
 
@@ -109,7 +109,7 @@ async def analyze_collection_price_range(collection_name: str, headers: dict):
     url = (
         f"{API_URL_PORTALS}/api/nfts/search"
         f"?offset=0&limit=100"
-        f"&collections={collection}"
+        f"&collection_id={collection}"
         f"&status=listed"
     )
 
@@ -166,22 +166,30 @@ async def analyze_collection_price_range(collection_name: str, headers: dict):
             return None
 
 
-async def collect_items_from_range(collection: str, headers: dict, min_price: float, max_price: float, seen_ids: set):
+async def collect_items_from_range(collection: str, headers: dict, min_price: float, max_price: float, seen_ids: set, force_full_scan: bool = False):
     """
     Collect all items from a specific price range using offsets.
+    Returns (items, meta) where meta contains diagnostic info about the fetch.
     """
     items = []
     offset = 0
     consecutive_repeated = 0
-    max_consecutive_repeated = 3
-    max_offset = 800  # Stop at 800 items per range
+    max_consecutive_repeated = 5  # Increased from 3 to be more thorough
+    max_offset = 800  # Keep at 800 since API sends duplicates after this point
+    empty_results_count = 0
+    max_empty_results = 1  # Stop after first empty page to avoid wasting calls
+    duplicate_threshold = 0.95  # If 95% are duplicates, stop this range
+
+    pages_fetched = 0
+    total_results_returned = 0
+    stopped_reason = "unknown"
 
     async with aiohttp.ClientSession() as session:
         while offset < max_offset:
             url = (
                 f"{API_URL_PORTALS}/api/nfts/search"
                 f"?offset={offset}&limit=100"
-                f"&collections={collection}"
+                f"&collection_id={collection}"
                 f"&status=listed"
                 f"&min_price={min_price}&max_price={max_price}"
             )
@@ -192,7 +200,26 @@ async def collect_items_from_range(collection: str, headers: dict, min_price: fl
                     results = data.get("results", [])
 
                     if not results:
-                        break
+                        # When forcing a full scan, keep advancing offsets up to cap
+                        if force_full_scan:
+                            offset += 100
+                            await asyncio.sleep(0.15)
+                            continue
+                        empty_results_count += 1
+                        if empty_results_count >= max_empty_results:
+                            stopped_reason = "empty_results"
+                            logger.info(f"No more results after {max_empty_results} empty responses at offset {offset}")
+                            break
+                        # Try next offset even if current one is empty
+                        offset += 100
+                        await asyncio.sleep(0.15)
+                        continue
+
+                    # Reset empty results counter when we get results
+                    empty_results_count = 0
+
+                    pages_fetched += 1
+                    total_results_returned += len(results)
 
                     # Check for new items
                     new_items = [item for item in results if item.get("id") not in seen_ids]
@@ -202,17 +229,25 @@ async def collect_items_from_range(collection: str, headers: dict, min_price: fl
                         seen_ids.add(item.get("id"))
                     items.extend(new_items)
 
-                    # If mostly repeats, increment guard
-                    if repeated_count >= len(results) * 0.8:
+                    # If almost all are repeats, this range is exhausted
+                    if repeated_count >= len(results) * duplicate_threshold:
                         consecutive_repeated += 1
                         if consecutive_repeated >= max_consecutive_repeated:
-                            logger.info(f"Hit limit at offset {offset} for range {min_price}-{max_price}")
+                            stopped_reason = "duplicates_exhausted"
+                            logger.info(f"Range exhausted at offset {offset} for range {min_price}-{max_price} (duplicates: {repeated_count}/{len(results)})")
                             break
                     else:
                         consecutive_repeated = 0
 
-                    if len(results) < 100:
-                        break
+                    # Only break if we get significantly fewer results than expected
+                    # This allows for collections that might have gaps in the middle
+                    if not force_full_scan and len(results) < 50:  # Skip this check when forcing scan
+                        # Check if we've been getting consistently low results
+                        if offset > 200:  # Reduced from 500 to 200 to stop earlier
+                            stopped_reason = "low_results_break"
+                            logger.info(f"Consistently low results ({len(results)}) at offset {offset}, stopping")
+                            break
+                        # Otherwise continue to see if it's just a temporary gap
 
                     offset += 100
                     await asyncio.sleep(0.15)  # slightly faster; fetch_json handles backoff on 429
@@ -222,13 +257,52 @@ async def collect_items_from_range(collection: str, headers: dict, min_price: fl
                         # fetch_json already backed off; try the same offset again
                         logger.warning(f"HTTP 429 at offset {offset} – retrying")
                         continue
+                    stopped_reason = f"http_{status}"
                     logger.warning(f"HTTP {status} at offset {offset}")
                     break
 
             except Exception as e:
+                stopped_reason = "exception"
                 logger.error(f"Error at offset {offset}: {e}")
                 break
 
+    avg_page_size = (total_results_returned / pages_fetched) if pages_fetched > 0 else 0
+    if stopped_reason == "unknown" and offset >= max_offset:
+        stopped_reason = "offset_cap"
+    meta = {
+        "last_offset": offset,
+        "pages_fetched": pages_fetched,
+        "avg_page_size": avg_page_size,
+        "stopped_reason": stopped_reason,
+    }
+
+    logger.info(f"Collected {len(items)} items from range {min_price}-{max_price} TON (offset reached: {offset}, pages: {pages_fetched}, avg_page: {avg_page_size:.1f}, reason: {stopped_reason})")
+    return items, meta
+
+
+async def scan_offsets_listed(collection_id: str, headers: dict, seen_ids: set) -> list:
+    """Wide scan for listed items by offsets up to 800 without price filters."""
+    items: list = []
+    collection = quote_plus(collection_id)
+    async with aiohttp.ClientSession() as session:
+        for offset in range(0, 800, 100):
+            url = (
+                f"{API_URL_PORTALS}/api/nfts/search"
+                f"?offset={offset}&limit=100&collection_id={collection}&status=listed"
+            )
+            status, data = await fetch_json(session, url, headers)
+            if status != 200 or not data:
+                break
+            results = data.get("results", [])
+            if not results:
+                break
+            new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
+            for it in new_items:
+                seen_ids.add(it["id"])
+            items.extend(new_items)
+            if len(results) < 100:
+                break
+    logger.info(f"Wide scan collected {len(items)} items")
     return items
 
 
@@ -236,7 +310,18 @@ async def collect_with_production_strategy(collection_name: str, auth_token: str
     """
     Production-ready adaptive collection strategy.
     """
-    collection = quote_plus(collection_name.strip().replace("'", "'"))
+    logger.info(f"Starting production collection for: {collection_name}")
+
+    # Resolve collection UUID (id) for the given name
+    raw_cols = await get_collections(limit=500, authData=auth_token)
+    name_to_id = {c.get("name"): c.get("id") for c in raw_cols if c.get("name") and c.get("id")}
+    coll_id = name_to_id.get(collection_name)
+    all_items = []
+    if not coll_id:
+        logger.error(f"No collection_id (UUID) found for '{collection_name}' — skipping.")
+        return all_items
+    collection = quote_plus(coll_id)
+    logger.info(f"Using collection_id={coll_id} for '{collection_name}'")
 
     headers = {
         "User-Agent": "TelegramBot",
@@ -244,13 +329,10 @@ async def collect_with_production_strategy(collection_name: str, auth_token: str
         "Authorization": f"tma {auth_token}"
     }
 
-    logger.info(f"Starting production collection for: {collection_name}")
-
-    all_items = []
     seen_ids = set()
 
     # Step 1: Analyze price range
-    price_analysis = await analyze_collection_price_range(collection_name, headers)
+    price_analysis = await analyze_collection_price_range(collection_name, headers, collection_id=coll_id)
 
     if not price_analysis:
         logger.error(f"Could not analyze price range for {collection_name}")
@@ -261,84 +343,139 @@ async def collect_with_production_strategy(collection_name: str, auth_token: str
 
     logger.info(f"Price range: {min_price:.2f} - {max_price:.2f} TON")
 
-    # Step 2: Test the full range first
-    logger.info("Testing full price range...")
-    full_range_items = await collect_items_from_range(
-        collection, headers, min_price, max_price, seen_ids
-    )
-    all_items.extend(full_range_items)
+    # Simple two-phase strategy
+    # Phase 1: Wide scan by offsets without price filters
+    logger.info("Phase 1: Wide scan (listed only)...")
+    wide_items = await scan_offsets_listed(coll_id, headers, seen_ids)
+    all_items.extend(wide_items)
 
-    logger.info(f"Full range: {len(full_range_items)} items")
+    # Phase 2: Proportional granular ranges (~40)
+    logger.info("Phase 2: Proportional granular ranges...")
+    price_ranges = []
+    range_size = max_price - min_price
+    target_ranges = 40
+    base_step = max(range_size / target_ranges, 0.1)
+    step = _nice_step(base_step)
 
-    # Step 3: If we collected a lot of items, the range might be hitting limits
-    # Go deeper with smaller ranges
-    if len(full_range_items) >= 700:  # Threshold for going deeper
-        logger.info("High item count detected - going deeper with smaller ranges...")
+    current_price = min_price
+    while current_price < max_price:
+        next_price = min(current_price + step, max_price)
+        price_ranges.append((current_price, next_price))
+        current_price = next_price
 
-        # Create smaller price ranges
-        price_ranges = []
-        range_size = max_price - min_price
+    logger.info(f"Created {len(price_ranges)} ranges (step: {step} TON)")
 
-        # Calculate optimal step size based on range
-        if range_size > 200:
-            step = 20
-        elif range_size > 100:
-            step = 10
-        elif range_size > 50:
-            step = 5
-        elif range_size > 20:
-            step = 2
-        elif range_size > 10:
-            step = 1
-        else:
-            step = 0.5
+    for i, (range_min, range_max) in enumerate(price_ranges):
+        logger.info(f"Processing range {i+1}/{len(price_ranges)}: {range_min:.2f}-{range_max:.2f} TON")
+        range_items, _ = await collect_items_from_range(
+            collection, headers, range_min, range_max, seen_ids, force_full_scan=False
+        )
+        all_items.extend(range_items)
+        logger.info(f"Range {i+1}: {len(range_items)} items (Total: {len(all_items)})")
+        await asyncio.sleep(0.15)
 
-        current_price = min_price
-        while current_price < max_price:
-            next_price = min(current_price + step, max_price)
-            price_ranges.append((current_price, next_price))
-            current_price = next_price
+    logger.info(f"Collection strategies complete: {len(all_items)} total items found")
+    
+    # Final deduplication to ensure we have unique items
+    unique_items = []
+    seen_final = set()
+    for item in all_items:
+        item_id = item.get("id")
+        if item_id and item_id not in seen_final:
+            seen_final.add(item_id)
+            unique_items.append(item)
+    
+    logger.info(f"Collection complete: {len(unique_items)} unique items (raw total: {len(all_items)})")
+    
+    # Step 4: Try alternative collection approaches to find more items
+    if len(unique_items) < 500:  # If we didn't get many items, try alternative approaches
+        logger.info("Low item count - trying alternative collection approaches...")
+        additional_items = await collect_items_with_different_approaches(collection, headers, seen_final)
+        
+        # Final deduplication including additional items
+        final_items = []
+        final_seen = set()
+        
+        for item in unique_items + additional_items:
+            item_id = item.get("id")
+            if item_id and item_id not in final_seen:
+                final_seen.add(item_id)
+                final_items.append(item)
+        
+        logger.info(f"Final collection with alternative approaches: {len(final_items)} unique items")
+        return final_items
+    
+    return unique_items
 
-        logger.info(f"Created {len(price_ranges)} smaller ranges (step: {step} TON)")
 
-        # Collect from each smaller range
-        for i, (range_min, range_max) in enumerate(price_ranges):
-            logger.info(f"Processing range {i+1}/{len(price_ranges)}: {range_min:.2f}-{range_max:.2f} TON")
+async def collect_items_with_different_approaches(collection: str, headers: dict, seen_ids: set):
+    """
+    Try different collection approaches to find items that might be missed by price-based collection.
+    """
+    additional_items = []
+    
+    # Approach 1: Try without price filters to get all listed items
+    logger.info("Trying collection without price filters...")
+    try:
+        url = (
+            f"{API_URL_PORTALS}/api/nfts/search"
+            f"?offset=0&limit=100"
+            f"&collection_id={collection}"
+            f"&status=listed"
+        )
+        
+        async with aiohttp.ClientSession() as session:
+            status, data = await fetch_json(session, url, headers)
+            if status == 200 and data:
+                results = data.get("results", [])
+                new_items = [item for item in results if item.get("id") not in seen_ids]
+                
+                for item in new_items:
+                    seen_ids.add(item.get("id"))
+                additional_items.extend(new_items)
+                
+                logger.info(f"Found {len(new_items)} additional items without price filters")
+                
+                # If we found items, try to get more with offsets
+                if new_items:
+                    offset = 100
+                    while offset < 800:  # Stay within the 800 limit
+                        url = (
+                            f"{API_URL_PORTALS}/api/nfts/search"
+                            f"?offset={offset}&limit=100"
+                            f"&collection_id={collection}"
+                            f"&status=listed"
+                        )
+                        
+                        status, data = await fetch_json(session, url, headers)
+                        if status == 200 and data:
+                            results = data.get("results", [])
+                            if not results:
+                                break
+                                
+                            new_items = [item for item in results if item.get("id") not in seen_ids]
+                            
+                            # If mostly duplicates, stop
+                            if len(new_items) < len(results) * 0.1:  # Less than 10% new items
+                                logger.info(f"Stopping at offset {offset} due to high duplicates")
+                                break
+                                
+                            for item in new_items:
+                                seen_ids.add(item.get("id"))
+                            additional_items.extend(new_items)
+                            
+                            offset += 100
+                            await asyncio.sleep(0.15)
+                        else:
+                            break
+    except Exception as e:
+        logger.warning(f"Error in price-filter-free collection: {e}")
+    
+    logger.info(f"Total additional items found with different approaches: {len(additional_items)}")
+    return additional_items
 
-            range_items = await collect_items_from_range(
-                collection, headers, range_min, range_max, seen_ids
-            )
-            all_items.extend(range_items)
 
-            logger.info(f"Range {i+1}: {len(range_items)} items (Total: {len(all_items)})")
 
-            # If this range also collected a lot, go ultra-granular
-            if len(range_items) >= 700 and range_max - range_min > 2:
-                logger.info(f"Range {i+1} hit high count - going ultra-granular...")
-
-                # Create ultra-granular ranges
-                ultra_step = max(0.1, (range_max - range_min) / 10)
-                ultra_current = range_min
-
-                while ultra_current < range_max:
-                    ultra_next = min(ultra_current + ultra_step, range_max)
-
-                    ultra_items = await collect_items_from_range(
-                        collection, headers, ultra_current, ultra_next, seen_ids
-                    )
-                    all_items.extend(ultra_items)
-
-                    ultra_current = ultra_next
-                    await asyncio.sleep(0.3)  # Ultra-fast delay
-
-                logger.info(f"Ultra-granular complete for range {i+1}")
-
-            await asyncio.sleep(0.25)  # Ultra-fast delay
-    else:
-        logger.info("Full range collection sufficient - no need for deeper granularity")
-
-    logger.info(f"Collection complete: {len(seen_ids)} unique items")
-    return all_items
 
 
 async def collect_multiple_collections(collections: list, auth_token: str):
@@ -572,6 +709,22 @@ async def parse_and_save_to_csv():
             logger.warning("⚠️ No items to write to CSV.")
 
     logger.info("✅ All data saved to CSV.")
+
+
+# Helper to choose a "nice" step close to a target value
+def _nice_step(target_step: float) -> float:
+    """Return a human-friendly step size >= target_step."""
+    candidates = [
+        0.1, 0.2, 0.5,
+        1, 2, 5,
+        10, 20, 25, 50,
+        100, 200, 250, 500,
+        1000, 2000, 5000
+    ]
+    for cand in candidates:
+        if cand >= target_step:
+            return cand
+    return candidates[-1]
 
 
 if __name__ == "__main__":

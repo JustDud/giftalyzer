@@ -22,3 +22,5 @@ data_collection/portals/nfts_output.csv
 data_collection/portals/collections_output.csv
 data_collection/portals/collections_output_old.csv
 data_collection/portals/nfts_output_old.csv
+/data_collection/portals/archive
+nft_price_output.csv
