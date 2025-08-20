@@ -24,46 +24,45 @@ async def convert_ton_to_usd(ton):
 
 
 async def get_data(nft_id):
-    nft = await nfts_collection.find_one({"nft_id": nft_id})
+    nft = await nfts_collection.find_one({
+        "$or": [
+            {"_id": nft_id},
+            {"external_ids.portals.id": nft_id}
+        ]
+    })
     if not nft:
         raise ValueError("NFT not found in the database.")
 
-    collection_address = nft.get("collection_address")
-    if not collection_address:
-        raise ValueError("Collection address not found in NFT data.")
+    collection_uid = nft.get("collection_uid")
+    if not collection_uid:
+        raise ValueError("Collection UID not found in NFT data.")
 
-    collection = await collections_collection.find_one({"address": collection_address})
+    collection = await collections_collection.find_one({"_id": collection_uid})
     if not collection:
         raise ValueError("Collection not found in the database.")
 
-    if 'floor' not in collection:
-        raise KeyError(f"'floor' key not found in collection: {collection}")
+    market_data = collection.get("markets", {}).get("portals", {})
+    if 'floor_price' not in market_data:
+        raise KeyError(f"'floor_price' key not found in collection: {collection}")
 
-    top_order_raw = collection.get("top_order")
-    floor_raw = collection.get("floor")
+    traits = {t["type"]: t["value"] for t in nft.get("traits", [])}
 
-    if top_order_raw is None and floor_raw is None:
-        raise ValueError("Neither top_order nor floor is available in collection.")
-
-    top_order = float(top_order_raw if top_order_raw is not None else floor_raw)
-    floor = float(collection["floor"])
     return {
         "name": nft.get("name", "Unknown"),
-        "symbol": nft.get("symbol", "Unknown"),
-        "model": nft.get("model", "Unknown"),
-        "backdrop": nft.get("backdrop", "Unknown"),
-        "market": nft.get("market", "Unknown"),
-        "price": float(str(nft.get("price", "0")).replace(",", "") or 0),
-        "last_sale": float(str(nft.get("last_sale", nft.get("price", "0"))).replace(",", "") or 0),
-        "rarity": int(str(nft.get("rarity", "9999")).replace(",", "") or 9999),
-        "max_rarity": int(collection.get("max_rarity", int(collection.get("supply", 2800)) * 0.9)),
-        "floor": floor,
-        "top_order": top_order,
-        "volume": float(collection.get("volume", 0)),
-        "owners": int(collection.get("owners", 1)),
-        "supply": int(collection.get("supply", 2800)),
-        "collection_address": collection_address,
-
+        "symbol": traits.get("symbol", "Unknown"),
+        "model": traits.get("model", "Unknown"),
+        "backdrop": traits.get("backdrop", "Unknown"),
+        "market": "portals",
+        "price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
+        "last_sale": float(nft.get("markets", {}).get("portals", {}).get("floor_price", {}).get("amount", 0)),
+        "rarity": int(traits.get("rarity_per_mille", 9999)),
+        "max_rarity": int(market_data.get("supply", 2800) * 0.9),
+        "floor": float(market_data.get("floor_price", {}).get("amount", 0)),
+        "top_order": float(market_data.get("floor_price", {}).get("amount", 0)),
+        "volume": float(market_data.get("volume", {}).get("amount", 0)),
+        "owners": int(market_data.get("owners", 1)),
+        "supply": int(market_data.get("supply", 2800)),
+        "collection_address": collection_uid,
     }
 
 

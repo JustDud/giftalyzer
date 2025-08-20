@@ -10,7 +10,7 @@ from bot_manager.keyboards.ai_requests_keyboard import (
     get_ai_help_keyboard
 )
 from mongo import collections_collection
-from bot_manager.decorators.access import subscription_required
+from bot_manager.decorators.access import ai_access_required
 from analyser.ai_requests_analyser import analyse_ai_request
 
 router = Router()
@@ -23,17 +23,57 @@ async def ai_help_start(message: Message, state: FSMContext, t):
 
 
 @router.callback_query(F.data == "ai_analyze_gift")
+@ai_access_required
 async def handle_ai_analyze_gift(call: CallbackQuery, state: FSMContext, t: dict):
+    from bot_manager.keyboards.ai_requests_keyboard import get_analysis_method_keyboard
     await call.answer()
     await state.update_data(user_question="🔍 Проанализируй NFT")
+    await call.message.edit_text(t["choose_analysis_method"])
+    await call.message.edit_reply_markup(reply_markup=get_analysis_method_keyboard(t))
 
+
+# Handler for manual analysis entry (choose collection manually)
+@router.callback_query(F.data == "ai_analysis_manual")
+async def handle_manual_analysis_entry(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] async for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections, t=t)
-
-    await call.message.edit_text("Теперь выбери коллекцию:")
+    await call.message.edit_text(t["prompt_select_collection"])
     await call.message.edit_reply_markup(reply_markup=keyboard)
     await state.set_state(AIRequestState.selecting_collection)
+
+
+# Handler for analysis by link
+@router.callback_query(F.data == "ai_analysis_by_link")
+async def handle_link_analysis_entry(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
+    await call.message.edit_text(t["id_input_prompt"])
+    if call.message.reply_markup:
+        try:
+            await call.message.edit_reply_markup(reply_markup=None)
+        except TelegramBadRequest as e:
+            if "message is not modified" not in str(e):
+                raise
+    await state.set_state(AIRequestState.entering_link)
+
+
+# Handler for processing the link input from user
+@router.message(AIRequestState.entering_link)
+async def process_link_input(message: Message, state: FSMContext, t: dict):
+    gift_id = message.text.strip()
+    if "/nft/" in gift_id:
+        gift_id = gift_id.split("/nft/")[-1]
+    elif "/" in gift_id:
+        gift_id = gift_id.rsplit("/", 1)[-1]
+    gift_id = gift_id.strip().strip("/")
+
+    from aiogram.types import ReplyKeyboardRemove
+    temp = await message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
+    await message.answer("⌛ Генерация анализа, пожалуйста подождите...")
+    await state.set_state(AIRequestState.loading_results)
+
+    await analyse_ai_request(message, state, t, temp, gift_id=gift_id)
 
 
 @router.callback_query(AIRequestState.selecting_backdrop, F.data == "ai_back_to_models")
@@ -48,11 +88,19 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
     if not collection:
         await call.answer(t["ai_collection_not_found"])
         return
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
 
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = sorted({doc["model"] async for doc in nft_cursor if "model" in doc})
+    nft_cursor = nfts_collection.find(
+        {"collection_uid": collection_uid, "markets": {"$exists": True}},
+        {"traits": 1}
+    )
+    models = set()
+    async for doc in nft_cursor:
+        for trait in doc.get("traits", []):
+            if trait.get("type") == "model":
+                models.add(trait.get("value"))
+    nfts = sorted(models)
 
     keyboard = get_nft_keyboard(nfts, page=page, selected_models=selected_models, include_select_all=True, t=t)
 
@@ -81,7 +129,6 @@ async def handle_pagination(call: CallbackQuery, state: FSMContext, t: dict):
 
 
 @router.message(lambda msg, t: msg.text == t["btn_enter_manual"])
-@subscription_required
 async def handle_manual_input(message: Message, state: FSMContext, t: dict):
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] async for col in collections_cursor if "name" in col]
@@ -90,8 +137,32 @@ async def handle_manual_input(message: Message, state: FSMContext, t: dict):
     await state.set_state(AIRequestState.selecting_collection)
 
 
-@router.callback_query(AIRequestState.selecting_collection, lambda call, t: call.data.startswith("ai_collection:"))
+@router.callback_query(AIRequestState.selecting_collection)
 async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t: dict):
+    import re
+    # If user pasted a link directly instead of pressing a button
+    if not call.data.startswith("ai_collection:"):
+        # Extract potential gift ID from link
+        gift_id = call.data.strip()
+        if "/nft/" in gift_id:
+            gift_id = gift_id.split("/nft/")[-1]
+        elif "/" in gift_id:
+            gift_id = gift_id.rsplit("/", 1)[-1]
+        gift_id = gift_id.strip().strip("/")
+
+        await call.answer()
+        from aiogram.types import ReplyKeyboardRemove
+        temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
+        await call.message.edit_reply_markup(reply_markup=None)
+        await call.message.edit_text("⌛ Генерация анализа, пожалуйста подождите...", reply_markup=None)
+        await state.set_state(AIRequestState.loading_results)
+
+        from analyser.ai_requests_analyser import analyse_ai_request
+        # Emulate Message object so we can reuse analyse_ai_request
+        call.text = gift_id  # Assign stripped ID to .text
+        await analyse_ai_request(call, state, t, temp)
+        return
+
     await call.answer()
     await state.update_data(cached_nfts=None, selected_models=[])
     collection_name = call.data.split(":", 1)[1]
@@ -102,10 +173,18 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         await call.message.answer(t["ai_collection_not_found"])
         return
 
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = sorted({doc["model"] async for doc in nft_cursor if "model" in doc})
+    nft_cursor = nfts_collection.find(
+        {"collection_uid": collection_uid, "markets": {"$exists": True}},
+        {"traits": 1}
+    )
+    models = set()
+    async for doc in nft_cursor:
+        for trait in doc.get("traits", []):
+            if trait.get("type") == "model":
+                models.add(trait.get("value"))
+    nfts = sorted(models)
     await state.update_data(cached_nfts=nfts)  # Кешируем модели
 
     keyboard = get_nft_keyboard(nfts, selected_models=[], include_select_all=True, t=t)
@@ -165,13 +244,19 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext, t: dict
         await call.answer(t["ai_collection_not_found"])
         return
 
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
-        "collection_address": collection_address,
-        "model": {"$in": [model]}
-    }, {"backdrop": 1})
-    backdrops = sorted({doc["backdrop"] async for doc in nft_cursor if "backdrop" in doc})
+        "collection_uid": collection_uid,
+        "markets": {"$exists": True},
+        "traits": {"$elemMatch": {"type": "model", "value": model}}
+    }, {"traits": 1})
+    backdrops = set()
+    async for doc in nft_cursor:
+        for trait in doc.get("traits", []):
+            if trait.get("type") == "backdrop":
+                backdrops.add(trait.get("value"))
+    backdrops = sorted(backdrops)
 
     if not backdrops:
         await call.answer(t["ai_no_backdrops_available"], show_alert=True)
@@ -245,14 +330,20 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
     if not collection:
         await call.answer(t["ai_collection_not_found"])
         return
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
 
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
-        "collection_address": collection_address,
-        "model": {"$in": selected_models}
-    }, {"backdrop": 1})
-    backdrops = sorted({doc["backdrop"] async for doc in nft_cursor if "backdrop" in doc})
+        "collection_uid": collection_uid,
+        "markets": {"$exists": True},
+        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}}
+    }, {"traits": 1})
+    backdrops = set()
+    async for doc in nft_cursor:
+        for trait in doc.get("traits", []):
+            if trait.get("type") == "backdrop":
+                backdrops.add(trait.get("value"))
+    backdrops = sorted(backdrops)
 
     if not backdrops:
         await call.answer(t["ai_no_backdrops_available"], show_alert=True)
@@ -324,6 +415,7 @@ async def toggle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
 
 
 @router.callback_query(AIRequestState.selecting_backdrop, F.data == "ai_show_results")
+@ai_access_required
 async def validate_and_proceed_to_ai(call: CallbackQuery, state: FSMContext, t: dict):
     data = await state.get_data()
     selected_backdrops = data.get("selected_backdrops", [])

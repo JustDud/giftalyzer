@@ -213,4 +213,8 @@ texts = {
     "ai_prompt_select_collection": "Выберите коллекцию:",
     "ai_collection_not_found": "Коллекция не найдена в AI-режиме.",
     "ai_select_backdrop": "Выберите фон",
+
+    "btn_link_analysis": "🔗 Вставить ссылку",
+    "btn_manual_analysis": "📦 Выбрать вручную",
+    "choose_analysis_method": "Как ты хочешь проанализировать подарок?",
 }

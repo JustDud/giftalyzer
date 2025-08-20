@@ -11,7 +11,7 @@ from aiogram.fsm.context import FSMContext
 from bot_manager.promocodes import apply_promo, list_all_promos, finalize_promo_usage
 
 
-BASE_PRICE_XTR = 10  # Base subscription price in XTR
+BASE_PRICE_XTR = 1  # Base subscription price in XTR
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 
@@ -74,12 +74,16 @@ async def start_promo_flow(message: Message, t: dict, state: FSMContext):
 
 @router.message(PromoApplyFSM.waiting_for_promo_code)
 async def process_promo_code(message: Message, state: FSMContext, t: dict):
+    if not message.text.strip().isalnum():
+        await message.answer("❌ Неверный формат промокода. Введите код латиницей или нажмите 'Пропустить'.")
+        return await start_promo_flow(message, t, state)
+
     data = await state.get_data()
     code = message.text.strip().upper()
     user_id = message.from_user.id
     price = BASE_PRICE_XTR  # base price in XTR
 
-    result = apply_promo(user_id, code, price)
+    result = await apply_promo(user_id, code, price)
     await state.clear()
 
     if "error" in result:

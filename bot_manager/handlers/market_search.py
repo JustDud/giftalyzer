@@ -16,17 +16,22 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
     data = await state.get_data()
     collection_name = data.get("selected_collection")
     selected_models = data.get("selected_models", [])
-    page = data.get("current_nft_page", 0)
+    page = min(data.get("current_nft_page", 0), 3)
 
     collection = await collections_collection.find_one({"name": collection_name})
     if not collection:
         await call.answer(t["collection_not_found"])
         return
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
 
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = sorted({doc["model"] async for doc in nft_cursor if "model" in doc})
+    nft_cursor = nfts_collection.find({"collection_uid": collection_uid}, {"traits": 1})
+    nfts = sorted({
+        trait["value"]
+        async for doc in nft_cursor
+        for trait in doc.get("traits", [])
+        if trait.get("type") == "model"
+    })
 
     from bot_manager.keyboards.search_keyboard import get_nft_keyboard
     keyboard = get_nft_keyboard(nfts, page=page, selected_models=selected_models, include_select_all=True, t=t)
@@ -43,7 +48,7 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
 @router.callback_query(F.data.startswith("prev_page:"))
 async def handle_pagination(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
-    page = int(call.data.split(":")[1])
+    page = min(int(call.data.split(":")[1]), 3)
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] async for col in collections_cursor if "name" in col]
     keyboard = get_collection_keyboard(collections, page=page, t=t)
@@ -76,10 +81,15 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         await call.message.answer(t["collection_not_found"])
         return
 
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_address": collection_address}, {"model": 1})
-    nfts = sorted({doc["model"] async for doc in nft_cursor if "model" in doc})
+    nft_cursor = nfts_collection.find({"collection_uid": collection_uid}, {"traits": 1})
+    nfts = sorted({
+        trait["value"]
+        async for doc in nft_cursor
+        for trait in doc.get("traits", [])
+        if trait.get("type") == "model"
+    })
     await state.update_data(cached_nfts=nfts)  # Кешируем модели
 
     keyboard = get_nft_keyboard(nfts, selected_models=[], include_select_all=True, t=t)
@@ -107,10 +117,10 @@ async def handle_nft_pagination(call: CallbackQuery, state: FSMContext, t: dict)
         await call.answer(t["collection_not_found"])
         return
 
-    page = int(call.data.split(":")[1])
+    page = min(int(call.data.split(":")[1]), 3)
     nfts = data.get("cached_nfts", [])
     selected_models = data.get("selected_models", [])
-    await state.update_data(current_nft_page=page)
+    await state.update_data(current_nft_page=min(page, 3))
     keyboard = get_nft_keyboard(nfts, page=page, selected_models=selected_models, include_select_all=True, t=t)
 
     try:
@@ -205,14 +215,19 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
     if not collection:
         await call.answer(t["collection_not_found"])
         return
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
 
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
-        "collection_address": collection_address,
-        "model": {"$in": selected_models}
-    }, {"backdrop": 1})
-    backdrops = sorted({doc["backdrop"] async for doc in nft_cursor if "backdrop" in doc})
+        "collection_uid": collection_uid,
+        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}}
+    }, {"traits": 1})
+    backdrops = sorted({
+        trait["value"]
+        async for doc in nft_cursor
+        for trait in doc.get("traits", [])
+        if trait.get("type") == "backdrop"
+    })
 
     if not backdrops:
         await call.answer(t["no_backdrops_available"], show_alert=True)
@@ -296,6 +311,13 @@ async def validate_and_proceed_to_results(call: CallbackQuery, state: FSMContext
             import logging
             logging.exception("Failed to send backdrop selection warning: %s", e)
         return
+
+    collection_name = data.get("selected_collection")
+    collection = await collections_collection.find_one({"name": collection_name})
+    if not collection:
+        await call.message.answer(t["collection_not_found"])
+        return
+    await state.update_data(selected_collection_uid=collection["_id"])
 
     await state.set_state(MarketSearchState.loading_results)
     from bot_manager.handlers.search_results import show_filtered_nfts

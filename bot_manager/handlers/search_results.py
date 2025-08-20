@@ -44,24 +44,28 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
         return
 
     await call.message.edit_text(interim_messages[1])
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
     nft_cursor = nfts_collection.find({
-        "collection_address": collection_address,
-        "model": {"$in": selected_models},
-        "backdrop": {"$in": selected_backdrops}
-    })
+        "collection_uid": collection_uid,
+        "traits": {
+            "$all": [
+                {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}},
+                {"$elemMatch": {"type": "backdrop", "value": {"$in": selected_backdrops}}}
+            ]
+        }
+    }).limit(10)
 
     results = []
     async for nft in nft_cursor:
         try:
-            nft_id = nft.get("nft_id")
+            nft_id = nft.get("_id")
             ton_price = await estimate_ton_price(nft_id) if nft_id else 0.0
         except Exception as e:
             print(f"[ERROR] Estimating price failed for NFT: {nft.get('name')}, reason: {e}")
             ton_price = 0.0
 
         try:
-            market_price = float(nft.get("price", 0.0) or 0.0)
+            market_price = float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0.0) or 0.0)
         except Exception:
             market_price = 0.0
 
@@ -70,12 +74,12 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
 
         result = {
             "name": nft.get("name", "Unknown"),
-            "model": nft.get("model", ""),
-            "symbol": nft.get("symbol", ""),
-            "backdrop": nft.get("backdrop", ""),
+            "model": next((t["value"] for t in nft.get("traits", []) if t["type"] == "model"), ""),
+            "symbol": next((t["value"] for t in nft.get("traits", []) if t["type"] == "symbol"), ""),
+            "backdrop": next((t["value"] for t in nft.get("traits", []) if t["type"] == "backdrop"), ""),
             "ton": ton_price,
             "usd_estimated": usd_estimated,
-            "market": nft.get("market", "N/A"),
+            "market": "portals",
             "market_price": market_price,
             "usd_market": usd_market,
         }

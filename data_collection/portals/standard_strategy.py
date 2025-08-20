@@ -9,6 +9,12 @@ import random
 import csv
 
 from auth import get_portals_auth_token, get_auth_credentials
+from mongo import (
+    init_indexes,
+    upsert_collections_and_build_map,
+    upsert_nfts_for_collection,
+    reset_market_state_for_collection,
+)
 
 
 load_dotenv()
@@ -24,8 +30,8 @@ async def _sleep_backoff(attempt: int, retry_after: float | None = None):
     if retry_after is not None:
         await asyncio.sleep(float(retry_after))
         return
-    delay = 0.5 * (2 ** attempt) + random.random() * 0.25
-    await asyncio.sleep(min(delay, 8))
+    delay = 0.2 * (2 ** attempt) + random.random() * 0.1
+    await asyncio.sleep(min(delay, 4))
 
 
 async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *, max_retries: int = 6) -> Tuple[int, dict | None]:
@@ -120,17 +126,17 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.05)
                 continue
             results = data.get("results", [])
             if not results:
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.05)
                 continue
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.15)
+            await asyncio.sleep(0.05)
     logger.info(f"Wide scan collected {len(items)} items")
     return items
 
@@ -148,17 +154,17 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.05)
                 continue
             results = data.get("results", [])
             if not results:
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.05)
                 continue
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.15)
+            await asyncio.sleep(0.05)
     return items
 
 
@@ -192,17 +198,17 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                 )
                 s2, d2 = await fetch_json(session, url, headers)
                 if s2 != 200 or not d2:
-                    await asyncio.sleep(0.15)
+                    await asyncio.sleep(0.05)
                     continue
                 results = d2.get("results", [])
                 if not results:
-                    await asyncio.sleep(0.15)
+                    await asyncio.sleep(0.05)
                     continue
                 new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
                 for it in new_items:
                     seen_ids.add(it["id"])
                 items.extend(new_items)
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.05)
     return items
 
 
@@ -371,13 +377,14 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
     if not cols:
         logger.warning("No collections received; aborting")
         return
+    # Ensure collections exist in DB and build id -> uid map for anchor market
+    id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
     write_collections_csv(cols, filename="collections_output.csv")
 
     names = [c.get("name") for c in cols if c.get("name")]
     logger.info(f"📋 Processing {len(names)} collections (offset-only)")
 
     seen_ids_global: Set[str] = set()
-    all_items: List[Dict] = []
 
     # Iterate all collections and gather NFTs using simple offset scan
     for idx, name in enumerate(names, 1):
@@ -395,13 +402,16 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
                 "Accept": "application/json",
             }
             items = await scan_offsets(coll_id, headers, seen_ids_global)
-            all_items.extend(items)
+            # Anchor reset for this collection+market before rewriting state
+            collection_uid = id_to_uid.get(str(coll_id))
+            if collection_uid:
+                await reset_market_state_for_collection(collection_uid, market="portals")
+                await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
             logger.warning(f"Failed '{name}': {e}")
-        await asyncio.sleep(0.15)
-
-    # Write all collected NFTs to CSV
-    append_nfts_csv(all_items, filename="nfts_output.csv")
+        await asyncio.sleep(0.05)
+    # Optional: write last run items to CSV is disabled for DB anchor path
+    # append_nfts_csv(all_items, filename="nfts_output.csv")
 
 
 # --- Existing richer logic (commented out for offset-only mode) ---
@@ -421,9 +431,12 @@ async def main():
     names = sys.argv[1:]
     api_id, api_hash = get_auth_credentials()
     auth_token = await get_portals_auth_token(api_id, api_hash)
+    # Initialize DB indexes once
+    await init_indexes()
     if names:
         # If names provided, run offset-only for those
         cols = await get_collections(500, auth_token)
+        id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
         name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
         headers = {
             "Authorization": f"tma {auth_token}",
@@ -431,17 +444,19 @@ async def main():
             "Accept": "application/json",
         }
         seen_ids: Set[str] = set()
-        all_items: List[Dict] = []
         for name in names:
             coll_id = name_to_id.get(name)
             if not coll_id:
                 logger.warning(f"No id for '{name}', skipping")
                 continue
             items = await scan_offsets(coll_id, headers, seen_ids)
-            all_items.extend(items)
-        # Write outputs
+            collection_uid = id_to_uid.get(str(coll_id))
+            if collection_uid:
+                await reset_market_state_for_collection(collection_uid, market="portals")
+                await upsert_nfts_for_collection(items, collection_uid, market="portals")
+            await asyncio.sleep(0.05)
+        # Optionally still write collections CSV for diagnostics
         write_collections_csv(cols, filename="collections_output.csv")
-        append_nfts_csv(all_items, filename="nfts_output.csv")
     else:
         # Process all collections
         await offset_only_all(auth_token)

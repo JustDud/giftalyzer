@@ -4,45 +4,114 @@ from mongo import nfts_collection
 import json
 from bot_manager.keyboards.default import get_main_menu
 from aiogram.exceptions import TelegramBadRequest
-async def analyse_ai_request(call, state, t, temp):
+from analyser.forecaster import render_forecast, render_many, render_response, calculate_forecast
+from mongo import collections_collection
+
+
+async def analyse_ai_request(call, state, t, temp, gift_id=None):
+    # msg refers to the main message object (Message or call.message)
+    if hasattr(call, "message"):
+        msg = call.message
+    else:
+        msg = call
+    # Use gift_id if provided, otherwise use call.text, but only if call has .text
+    if gift_id is not None:
+        input_id = gift_id
+    elif hasattr(call, "text"):
+        input_id = call.text
+    else:
+        input_id = ""
     data = await state.get_data()
     user_question = data.get("user_question")
     selected_models = data.get("selected_models", [])
     selected_backdrops = data.get("selected_backdrops", [])
     selected_collection = data.get("selected_collection")
 
-    # Get collection address by name
-    from mongo import collections_collection
-    collection = await collections_collection.find_one({"name": selected_collection})
+    # Fallback: extract model and backdrop from gift link if not already selected
+    if not selected_models and gift_id:
+        from analyser.page_parser import parse_telegram_gift_page
+        parsed = await parse_telegram_gift_page(gift_id)
+        if parsed:
+            selected_models = [parsed["model"]]
+            selected_backdrops = [parsed["backdrop"]]
+            await state.update_data(selected_models=selected_models, selected_backdrops=selected_backdrops)
+        else:
+            await msg.answer("❌ Не удалось извлечь данные из ссылки.")
+            await state.clear()
+            return
+
+    # Get collection address by name or slug
+    collection = None
+    collection_slug = ""
+    if selected_collection:
+        collection = await collections_collection.find_one({"name": selected_collection})
+    if not collection and gift_id:
+        import re as _re
+        collection_name = _re.sub(r'\d+', '', gift_id.split("-")[0])
+        collection_slug = _re.sub(r'(?<!^)(?=[A-Z])', '-', collection_name).lower()
+        collection = await collections_collection.find_one({"slug": collection_slug})
     if not collection:
-        await call.message.answer(f"❌ Коллекция '{selected_collection}' не найдена.")
+        await msg.answer(f"❌ Коллекция '{selected_collection or collection_slug}' не найдена.")
         return
 
-    collection_address = collection["address"]
+    collection_uid = collection["_id"]
+    collection_slug = collection.get("slug", "")  # Assuming slug is stored in collection
+
+    from itertools import product
+    from mongo import find_nft_id_by_traits
 
     nft_details = []
-    for model in selected_models:
+    backdrop_combinations = selected_backdrops if selected_backdrops else [None]
+
+    for model, backdrop in product(selected_models, backdrop_combinations):
+        # Attempt to find nft_id by traits
+        nft_id = await find_nft_id_by_traits(collection_slug, model, backdrop or "", "")
+        if not nft_id:
+            # If not found, skip this combination
+            continue
+
         query = {
-            "collection_address": collection_address,
-            "model": model
+            "collection_uid": collection_uid,
+            "markets": {"$exists": True},
+            "traits": {
+                "$all": [
+                    {"$elemMatch": {"type": "model", "value": model}}
+                ]
+            }
         }
-        if selected_backdrops:
-            query["backdrop"] = {"$in": selected_backdrops}
+        if backdrop:
+            query["traits"]["$all"].append({"$elemMatch": {"type": "backdrop", "value": backdrop}})
 
         async for nft in nfts_collection.find(query):
+            traits = {t["type"]: t["value"] for t in nft.get("traits", [])}
+            # Use nft_id found by traits instead of from DB _id
+            # nft_id = nft.get("nft_id") or (nft.get("_id", "").split("#")[1] if "#" in nft.get("_id", "") else "")
+
+            # Get collection-level volume
+            volume_of_sales = int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
+
+            rarity = None
+            for trait in nft.get("traits", []):
+                if trait.get("type") == "model" and "rarity_per_mille" in trait:
+                    rarity = int(trait["rarity_per_mille"])
+                    break
+
             nft_details.append({
                 "collection": selected_collection,
-                "model": nft.get("model", model),
-                "backdrop": nft.get("backdrop", ""),
-                "nft_id": nft.get("nft_id", ""),
-                "rarity": int(nft.get("rarity", 0)),
-                "real_price": float(nft.get("price", 0)),
-                "estimated_ton": float(await estimate_ton_price(nft.get("nft_id"))) if nft.get("nft_id") else 0.0,
-                "symbol": nft.get("symbol", ""),
-                "volume_of_sales": int(nft.get("volume_of_sales", 0))
+                "model": traits.get("model", model),
+                "backdrop": traits.get("backdrop", backdrop or ""),
+                "nft_id": nft_id,  # full ID used for analysis
+                "display_name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
+                "rarity": rarity if rarity is not None else 99999,
+                "real_price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
+                "estimated_ton": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
+                "symbol": traits.get("symbol", ""),
+                "volume_of_sales": volume_of_sales
             })
 
     print(f"ANALYSIS DATA (detailed): {nft_details}")
+
+    nft_details = calculate_forecast(nft_details)
 
     # Choose the system prompt
     if user_question == "🔍 Проанализируй NFT":
@@ -100,41 +169,55 @@ async def analyse_ai_request(call, state, t, temp):
         system_prompt = "TEMPLATE: default prompt"
 
     try:
-        ai_response = await generate_response(system_prompt, json.dumps(nft_details, ensure_ascii=False))
+        ai_response = await generate_response(system_prompt, json.dumps(nft_details, ensure_ascii=False, indent=2))
+        if not ai_response or "Прогноз" not in ai_response:
+            print("⚠️ Falling back to render_forecast...")
+            ai_response = render_response(nft_details, user_question)
+
+        # Commented out escape_md_v2 function and related code
+        # import re
+        # def escape_md_v2(text):
+        #     return re.sub(r'([_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!\\])', r'\\\1', text)
+
+        for nft in nft_details:
+            ai_response = ai_response.replace(nft["nft_id"], nft["display_name"])
+        ai_response = ai_response.replace("*", "")
+        ai_response = ai_response.replace("#", "")
+
         try:
             if len(ai_response) <= 4000:
-                await call.message.answer(f"📊 Результат анализа:\n\n{ai_response}", parse_mode="MarkdownV2")
+                await msg.answer(ai_response)
             else:
                 for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
-                    await call.message.answer(f"{chunk}", parse_mode="MarkdownV2")
+                    await msg.answer(chunk)
         except Exception as send_error:
             import logging
             logging.exception("❌ Ошибка при отправке AI-ответа: %s", send_error)
-            await call.message.answer("❌ Не удалось отправить результат. Попробуй позже.")
+            await msg.answer("❌ Не удалось отправить результат. Попробуй позже.")
     except Exception as e:
         import logging
         logging.exception("AI request failed: %s", e)
         try:
-            await call.message.edit_text("❌ Не удалось получить ответ от AI. Попробуйте позже.")
+            await msg.edit_text("❌ Не удалось получить ответ от AI. Попробуйте позже.")
         except TelegramBadRequest as e2:
             if "message is not modified" not in str(e2):
                 raise
     finally:
         # Restore the main menu keyboard safely: clear inline keyboard if needed, then send confirmation with reply keyboard
         from aiogram.types import InlineKeyboardMarkup
-        current_reply_markup = call.message.reply_markup
+        current_reply_markup = msg.reply_markup
         if current_reply_markup and getattr(current_reply_markup, "inline_keyboard", None):
             if current_reply_markup.inline_keyboard:
                 try:
                     try:
-                        await call.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+                        await msg.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
                     except TelegramBadRequest as e:
                         if "message is not modified" not in str(e):
                             raise
                 except Exception as e:
                     import logging
                     logging.warning(f"⚠️ Failed to edit reply markup: {e}")
-        await call.message.answer("✅ Функциональность восстановлена.", reply_markup=get_main_menu(t))
+        await msg.answer("✅ Функциональность восстановлена.", reply_markup=get_main_menu(t))
         try:
             await temp.delete()
         except:

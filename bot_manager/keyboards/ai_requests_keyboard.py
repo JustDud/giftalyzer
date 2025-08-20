@@ -115,3 +115,11 @@ def get_ai_backdrop_keyboard(
     rows.append([InlineKeyboardButton(text=t["btn_back_to_models"], callback_data="ai_back_to_models")])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def get_analysis_method_keyboard(t: dict) -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(text=t["btn_link_analysis"], callback_data="ai_analysis_by_link")],
+        [InlineKeyboardButton(text=t["btn_manual_analysis"], callback_data="ai_analysis_manual")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)

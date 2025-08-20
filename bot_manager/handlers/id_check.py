@@ -7,8 +7,8 @@ from bot_manager.keyboards.default import get_check_again_keyboard, get_main_men
 from analyser.price_analyser import estimate_ton_price, convert_ton_to_usd
 from analyser.page_parser import parse_telegram_gift_page
 
-from mongo import get_nfts_strict_match, get_nfts_loose_match
-from mongo import get_nft_by_id_or_name, normalize_nft_name, get_nfts_model_only
+from mongo import get_nft_by_id_or_name, normalize_nft_name
+from mongo import find_nft_id_by_traits_flexible
 
 from bot_manager.decorators.access import subscription_required
 
@@ -56,71 +56,94 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
     data = await get_nft_by_id_or_name(normalized_id)
     if data is None:
         parsed_data = await parse_telegram_gift_page(normalized_id)
-        print(f"[DEBUG] Parsed data from Telegram page: {parsed_data}")
+        print(f"[🔍 Trait Matching] Parsed traits: {parsed_data}")
 
         collection_name = re.sub(r'\d+', '', normalized_id.split("-")[0])
+        # Normalize collection slug to match DB format (e.g. SnoopCigar -> snoop-cigar)
+        import re as _re
+        collection_slug = _re.sub(r'(?<!^)(?=[A-Z])', '-', collection_name).lower()
+        print(f"[🔍 Trait Matching] Collection slug: {collection_slug}")
 
         if parsed_data is None:
             await message.answer(t["gift_extraction_failed"])
             await state.set_state(GiftStates.WaitingForGiftID)
             return
 
-        strict = await get_nfts_strict_match(
+        gift_data = await find_nft_id_by_traits_flexible(
             model=parsed_data["model"],
+            backdrop=parsed_data["backdrop"],
             symbol=parsed_data["symbol"],
-            backdrop=parsed_data["backdrop"],
-            collection_name=collection_name
+            collection_slug=collection_slug
         )
+        print(f"[🔍 Trait Matching] Matching results: {gift_data}")
 
-        loose = await get_nfts_loose_match(
-            model=parsed_data["model"],
-            backdrop=parsed_data["backdrop"],
-            collection_name=collection_name
-        )
-
-        strict_ids = {gift["nft_id"] for gift in strict}
-        loose_filtered = [gift for gift in loose if gift["nft_id"] not in strict_ids]
-
-        model_only = await get_nfts_model_only(
-            model=parsed_data["model"],
-            collection_name=collection_name
-        )
-
-        all_found_ids = strict_ids.union({gift["nft_id"] for gift in loose_filtered})
-        model_only_filtered = [gift for gift in model_only if gift["nft_id"] not in all_found_ids]
-
-        if not (strict or loose_filtered or model_only_filtered):
+        if not gift_data:
             await message.answer(t["no_similar_gifts"])
             await state.set_state(GiftStates.WaitingForGiftID)
             return
 
-        strict_sorted = sorted(strict, key=lambda x: float(x["price"]))
-        loose_sorted = sorted(loose_filtered, key=lambda x: float(x["price"]))
-        model_only_sorted = sorted(model_only_filtered, key=lambda x: float(x["price"]))
-
-        result_found = False
-
-        if strict_sorted:
-            await message.answer(t["exact_match_found"])
-            for gift in strict_sorted[:5]:
-                await send_gift_result(message, gift, t)
-            result_found = True
-
-        if not result_found and loose_sorted:
-            await message.answer(t["partial_match_found"])
-            for gift in loose_sorted[:5]:
-                await send_gift_result(message, gift, t)
-            result_found = True
-
-        if not result_found and model_only_sorted:
-            await message.answer(t["model_only_match_found"])
-            for gift in model_only_sorted[:5]:
-                await send_gift_result(message, gift, t)
-            result_found = True
-
-        if not result_found:
-            await message.answer(t["no_gift_found_final"])
+        gift_sorted = sorted(gift_data, key=lambda x: float(x["markets"]["portals"]["price"]["amount"]))
+        await message.answer(t["exact_match_found"])
+        for gift in gift_sorted[:5]:
+            await send_gift_result(message, gift, t)
         return
+
+        # strict = await get_nfts_strict_match(
+        #     model=parsed_data["model"],
+        #     symbol=parsed_data["symbol"],
+        #     backdrop=parsed_data["backdrop"],
+        #     collection_name=collection_name
+        # )
+        #
+        # loose = await get_nfts_loose_match(
+        #     model=parsed_data["model"],
+        #     backdrop=parsed_data["backdrop"],
+        #     collection_name=collection_name
+        # )
+        #
+        # strict_ids = {gift["nft_id"] for gift in strict}
+        # loose_filtered = [gift for gift in loose if gift["nft_id"] not in strict_ids]
+        #
+        # model_only = await get_nfts_model_only(
+        #     model=parsed_data["model"],
+        #     collection_name=collection_name
+        # )
+        #
+        # all_found_ids = strict_ids.union({gift["nft_id"] for gift in loose_filtered})
+        # model_only_filtered = [gift for gift in model_only if gift["nft_id"] not in all_found_ids]
+        #
+        # if not (strict or loose_filtered or model_only_filtered):
+        #     await message.answer(t["no_similar_gifts"])
+        #     await state.set_state(GiftStates.WaitingForGiftID)
+        #     return
+        #
+        # strict_sorted = sorted(strict, key=lambda x: float(x["price"]))
+        # loose_sorted = sorted(loose_filtered, key=lambda x: float(x["price"]))
+        # model_only_sorted = sorted(model_only_filtered, key=lambda x: float(x["price"]))
+        #
+        # result_found = False
+        #
+        # if strict_sorted:
+        #     await message.answer(t["exact_match_found"])
+        #     for gift in strict_sorted[:5]:
+        #         await send_gift_result(message, gift, t)
+        #     result_found = True
+        #
+        # if not result_found and loose_sorted:
+        #     await message.answer(t["partial_match_found"])
+        #     for gift in loose_sorted[:5]:
+        #         await send_gift_result(message, gift, t)
+        #     result_found = True
+        #
+        # if not result_found and model_only_sorted:
+        #     await message.answer(t["model_only_match_found"])
+        #     for gift in model_only_sorted[:5]:
+        #         await send_gift_result(message, gift, t)
+        #     result_found = True
+        #
+        # if not result_found:
+        #     await message.answer(t["no_gift_found_final"])
+        # return
 
     price = await estimate_ton_price(data["nft_id"])
     await send_gift_result(message, {
@@ -136,22 +159,42 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
 
 
 async def send_gift_result(message: types.Message, gift: dict, t: dict):
-    estimated_price = await estimate_ton_price(gift["nft_id"]) if "nft_id" in gift else float(gift["price"])
-    market_price = float(gift["price"])
+    market_data = gift.get("markets", {})
+    if not market_data:
+        await message.answer(t["gift_extraction_failed"])
+        return
 
+    # Pick cheapest available listing across markets
+    cheapest_market = None
+    cheapest_price = float("inf")
+    for market_name, data in market_data.items():
+        if data.get("is_listed") and "price" in data:
+            price = float(data["price"]["amount"])
+            if price < cheapest_price:
+                cheapest_price = price
+                cheapest_market = (market_name, data)
+
+    if not cheapest_market:
+        await message.answer(t["gift_extraction_failed"])
+        return
+
+    market_name, market_info = cheapest_market
+    market_price = float(market_info["price"]["amount"])
+    estimated_price = await estimate_ton_price(gift.get("nft_id") or gift.get("_id"))
     usd_estimated = await convert_ton_to_usd(estimated_price)
-    usd_market = await convert_ton_to_usd(market_price) if market_price is not None else "—"
+    usd_market = await convert_ton_to_usd(market_price)
 
     result = {
         "name": gift["name"],
-        "model": gift["model"],
-        "symbol": gift["symbol"],
-        "backdrop": gift["backdrop"],
+        "model": next((t["value"] for t in gift.get("traits", []) if t["type"] == "model"), "—"),
+        "symbol": next((t["value"] for t in gift.get("traits", []) if t["type"] == "symbol"), "—"),
+        "backdrop": next((t["value"] for t in gift.get("traits", []) if t["type"] == "backdrop"), "—"),
         "ton": estimated_price,
         "usd_estimated": usd_estimated,
-        "market": gift.get("market", "N/A"),
-        "market_price": market_price if market_price is not None else "—",
-        "usd_market": usd_market
+        "market": market_name,
+        "market_price": market_price,
+        "usd_market": usd_market,
+        "nft_id": gift.get("nft_id") or gift.get("_id"),
     }
 
     await message.answer(
