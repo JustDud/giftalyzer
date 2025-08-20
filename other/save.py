@@ -619,7 +619,7 @@ async def parse_and_save_to_csv():
         {k: v for k, v in collection.items() if k not in {"photo_url", "is_favorite"}}
         for collection in raw_collections
     ]
-    with open("collections_output.csv", "w", newline="", encoding="utf-8") as f:
+    with open("../data_collection/portals/collections_output.csv", "w", newline="", encoding="utf-8") as f:
         if filtered_collections:
             writer = csv.DictWriter(f, fieldnames=filtered_collections[0].keys())
             writer.writeheader()

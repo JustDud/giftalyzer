@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-"""
-Standard collection strategy (minimal, testable):
-1) Wide scan: fetch listed items by offsets up to 800
-2) Granular pass: split price range into ~40 proportional ranges and scan each
-
-Run:
-  python data_collection/portals/standard_strategy.py "Plush Pepe" "Snoop Dogg"
-"""
-
 import asyncio
 import aiohttp
 import os
@@ -275,11 +265,45 @@ def write_collections_csv(collections: List[Dict], filename: str = "collections_
 
 def append_nfts_csv(items: List[Dict], filename: str = "nfts_output.csv") -> None:
     logger.info("💾 Writing all NFT items to nfts_output.csv...")
-    # Clean fields and dedupe by id within the batch
-    cleaned_items = [
-        {k: v for k, v in it.items() if k not in {"photo_url", "status", "animation_url", "emoji_id", "has_animation"}}
-        for it in items
-    ]
+    # Clean fields, flatten attributes, and dedupe by id within the batch
+    cleaned_items = []
+    for it in items:
+        base = {k: v for k, v in it.items() if k not in {"photo_url", "status", "animation_url", "emoji_id", "has_animation", "attributes"}}
+
+        # Defaults for flattened attributes
+        model = ""
+        model_rpm = ""
+        symbol = ""
+        symbol_rpm = ""
+        backdrop = ""
+        backdrop_rpm = ""
+
+        attrs = it.get("attributes") or []
+        if isinstance(attrs, list):
+            for a in attrs:
+                try:
+                    atype = str(a.get("type", "")).lower()
+                except Exception:
+                    atype = ""
+                val = a.get("value", "")
+                rpm = a.get("rarity_per_mille", "")
+                if atype == "model":
+                    model, model_rpm = val, rpm
+                elif atype == "symbol":
+                    symbol, symbol_rpm = val, rpm
+                elif atype == "backdrop":
+                    backdrop, backdrop_rpm = val, rpm
+
+        base.update({
+            "model": model,
+            "model_rarity_per_mille": model_rpm,
+            "symbol": symbol,
+            "symbol_rarity_per_mille": symbol_rpm,
+            "backdrop": backdrop,
+            "backdrop_rarity_per_mille": backdrop_rpm,
+        })
+        cleaned_items.append(base)
+
     dedup_map: Dict[str, Dict] = {}
     for row in cleaned_items:
         rid = row.get("id")
@@ -290,7 +314,9 @@ def append_nfts_csv(items: List[Dict], filename: str = "nfts_output.csv") -> Non
     # Fixed field order for CSV stability
     fieldnames = [
         "id", "name", "collection_id", "external_collection_number", "price",
-        "floor_price", "listed_at", "unlocks_at", "tg_id", "is_owned"
+        "floor_price", "listed_at", "unlocks_at", "tg_id", "is_owned",
+        "model", "model_rarity_per_mille", "symbol", "symbol_rarity_per_mille",
+        "backdrop", "backdrop_rarity_per_mille"
     ]
     actual_keys = {key for it in cleaned_items for key in it}
     missing = [k for k in fieldnames if k not in actual_keys]
