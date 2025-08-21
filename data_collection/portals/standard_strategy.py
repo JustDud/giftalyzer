@@ -8,7 +8,7 @@ from typing import Tuple, List, Dict, Set
 import random
 import csv
 
-from auth import get_portals_auth_token, get_auth_credentials
+from data_collection.auth import get_portals_auth_token, get_auth_credentials
 from mongo import (
     init_indexes,
     upsert_collections_and_build_map,
@@ -429,7 +429,7 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
 async def main():
     import sys
     names = sys.argv[1:]
-    api_id, api_hash = get_auth_credentials()
+    api_id, api_hash = await get_auth_credentials()
     auth_token = await get_portals_auth_token(api_id, api_hash)
     # Initialize DB indexes once
     await init_indexes()

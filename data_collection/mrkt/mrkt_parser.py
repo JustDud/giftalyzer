@@ -113,15 +113,11 @@ def fetch_saling_by_collection(collection_name, token):
     return all_gifts
 
 
-async def fetch_mrkt_token() -> str:
+async def fetch_mrkt_token(init_data: str) -> str:
     url = "https://api.tgmrkt.io/api/v1/auth"
-
     payload = {
-        "data": "query_id=AAGirOBUAwAAAKKs4FQjt0TZ&user=%7B%22id%22%3A7866461346%2C%22first_name%22%3A%22David%22%2C%22last_name%22%3A%22Rubenstein%22%2C%22username%22%3A%22davidrubenstein1%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FIvRaHaB6hcKqa9fYq8i12fItl_gsR452TOPLcfJ9gSzjr_lGC-_IcdRJsb4XSfuh.svg%22%7D&auth_date=1753886793&signature=c9SHhFiwvk527sFPRYEUEj5ywvIWWt0SFVkxDrkbqC_8x3ZOZmE3kbR6Rd-a9znf9BZccvrkomzMpj5BVhQcBA&hash=fd4377449929b2ad88194d585043ad2858ac4ef516b54856804595575868536d",
-        "photo": "https://t.me/i/userpic/320/IvRaHaB6hcKqa9fYq8i12fItl_gsR452TOPLcfJ9gSzjr_lGC-_IcdRJsb4XSfuh.svg",
-        "appId": None
+        "initData": init_data
     }
-
     headers = {
         "Content-Type": "application/json",
         "Origin": "https://cdn.tgmrkt.io",
@@ -134,9 +130,6 @@ async def fetch_mrkt_token() -> str:
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload) as resp:
                 print(f"📡 Статус ответа token: {resp.status}")
-                text = await resp.text()
-                #print(f"📨 Тело ответа: {text}")
-
                 if resp.status == 200:
                     data = await resp.json()
                     token = data.get("token")
@@ -145,13 +138,18 @@ async def fetch_mrkt_token() -> str:
                         return token
                     else:
                         print("⚠️ Токен не найден в ответе JSON.")
+                else:
+                    print("❌ Ответ:", await resp.text())
     except Exception as e:
         print(f"❌ Ошибка получения токена: {e}")
     return None
 
 
 async def get_valid_token() -> str:
-    return await fetch_mrkt_token()
+    from data_collection.auth import get_tgmrkt_init_data, get_auth_credentials
+    api_id, api_hash = await get_auth_credentials()
+    init_data = await get_tgmrkt_init_data(api_id, api_hash)
+    return await fetch_mrkt_token(init_data)
 
 
 async def main():
