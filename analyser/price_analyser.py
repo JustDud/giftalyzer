@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from mongo import collections_collection, nfts_collection
 import os
@@ -80,7 +81,7 @@ async def estimate_ton_price(nft_id):
     supply = data["supply"]
     max_rarity = data["max_rarity"]
 
-    estimated_price = calculate_nft_price_final_optimized(
+    estimated_price = calculate_nft_price(
         price=price,
         backdrop=backdrop,
         last_sale=last_sale,
@@ -96,176 +97,50 @@ async def estimate_ton_price(nft_id):
     return round(estimated_price, 2)
 
 
-def calculate_nft_price_final_optimized(price, backdrop, last_sale, rarity, max_rarity, floor, top_order, volume, owners, supply):
+def calculate_nft_price(price, backdrop, last_sale, rarity, max_rarity, floor, top_order, volume, owners, supply):
     # Provided backdrop multipliers
     backdrop_multipliers = {
-        'Onyx Black': 4.79,  # low confidence (4 NFTs)
-        'Satin Gold': 4.28,
-        'Orange': 3.23,
-        'Burgundy': 2.76,
-        'French Violet': 1.12,  # low confidence (3 NFTs)
-        'Mexican Pink': 1.30,  # low confidence (2 NFTs)
-        'Coral Red': 1.72,
-        'Azure Blue': 1.11,
-        'Rifle Green': 1.68,
-        'Seal Brown': 1.27,
-        'Chocolate': 0.95,
-        'Cappuccino': 0.92,
-        'Gunship Green': 0.89,
-        'Desert Sand': 0.84,
-        'Battleship Grey': 0.82,
-        'Jade Green': 0.75,
-        'Silver Blue': 0.73,
-        'Roman Silver': 0.73,
-        'Turquoise': 0.73,
-        'Midnight Blue': 0.73,
-        'Malachite': 0.69,
-        'Persimmon': 0.69,
-        'Platinum': 0.57,
-        'Mystic Pearl': 0.57,
-        'Khaki Green': 0.41,
-        'Indigo Dye': 0.42,
-        'Lavender': 0.40,
-        'Rosewood': 0.32,
-        'Pine Green': 0.28,
-        'Mustard': 0.16,
-        'Raspberry': 0.49,
-        'Mint Green': 0.10,
-        'Grape': 0.09,
-        'Pacific Cyan': 0.10,
-        'Dark Lilac': 0.10,
-        'Pistachio': 0.10,
-        'Carrot Juice': 0.07,
-        'Hunter Green': 0.06,
-        'Dark Green': 0.06,
-        'Electric Indigo': 0.07,
-        'English Violet': 0.05,
-        'Cobalt Blue': 0.05,
-        'French Blue': 0.05,
-        'Emerald': 0.05,
-        'Navy Blue': 0.12,
-        'Shamrock Green': 0.09,
-        'Fandango': 0.09,
-        'Chestnut': 0.10,
-        'Light Olive': 0.06,
-        'Ivory White': 0.04,
-        'Cyberpunk': 0.19,
-        'Tactical Pine': 0.09,
-        'Purple': 0.03,
-        'Strawberry': 0.03,
-        'Sky Blue': 0.00,
-        'Steel Grey': 0.00,
-        'Neon Blue': 0.00,
-        'Pure Gold': 0.00,
-        'Electric Purple': 0.08,
-        'Burnt Sienna': 0.02,
-        'Celtic Blue': 0.02,
-        'Fire Engine': 0.02,
-        'Tomato': 0.01,
-        'Deep Cyan': 0.00,  # low confidence (4 NFTs)
-        'Feldgrau': 0.00,  # low confidence (4 NFTs)
-        'Gunmetal': 0.08,  # low confidence (2 NFTs)
-        'Pacific Green': 0.00,
-        'Lemongrass': 0.00,
-        'Marine Blue': 0.00,  # low confidence (5 NFTs)
-        'Copper': 0.00,
-        'Camo Green': 0.00,
-        'Black': 0.00,  # отсутствует в данных
-        'Carmine': 0.00,  # отсутствует в данных
-        'Ranger Green': 0.00  # отсутствует в данных
+        'Amber': 1.00, 'Aquamarine': 1.07, 'Azure Blue': 1.02, 'Battleship Grey': 1.04,
+        'Black': 1.10, 'Burgundy': 1.03, 'Burnt Sienna': 1.04, 'Camo Green': 1.02,
+        'Cappuccino': 1.07, 'Caramel': 0.97, 'Carmine': 1.00, 'Carrot Juice': 1.04,
+        'Celtic Blue': 1.02, 'Chestnut': 1.07, 'Chocolate': 0.97, 'Cobalt Blue': 1.04,
+        'Copper': 1.02, 'Coral Red': 1.07, 'Cyberpunk': 0.97, 'Dark Green': 1.04,
+        'Dark Lilac': 1.02, 'Deep Cyan': 1.07, 'Desert Sand': 0.97, 'Electric Indigo': 1.04,
+        'Electric Purple': 1.02, 'Emerald': 1.07, 'English Violet': 0.97, 'Fandango': 1.04,
+        'Feldgrau': 1.02, 'Fire Engine': 1.07, 'French Blue': 0.97, 'French Violet': 1.04,
+        'Grape': 1.02, 'Gunmetal': 1.07, 'Gunship Green': 0.97, 'Hunter Green': 1.04,
+        'Indigo Dye': 1.02, 'Ivory White': 1.07, 'Jade Green': 0.97, 'Khaki Green': 1.04,
+        'Lavender': 1.02, 'Lemongrass': 1.07, 'Light Olive': 0.97, 'Malachite': 1.04,
+        'Marine Blue': 1.02, 'Mexican Pink': 1.07, 'Midnight Blue': 0.97, 'Mint Green': 1.04,
+        'Moonstone': 1.02, 'Mustard': 1.07, 'Mystic Pearl': 0.97, 'Navy Blue': 1.04,
+        'Neon Blue': 1.02, 'Old Gold': 1.07, 'Onyx Black': 0.97, 'Orange': 1.04,
+        'Pacific Cyan': 1.02, 'Pacific Green': 1.07, 'Persimmon': 0.97, 'Pine Green': 1.04,
+        'Pistachio': 1.02, 'Platinum': 1.07, 'Pure Gold': 0.97, 'Purple': 1.04,
+        'Ranger Green': 1.02, 'Raspberry': 1.07, 'Rifle Green': 0.97, 'Roman Silver': 1.04,
+        'Rosewood': 1.02, 'Sapphire': 1.07, 'Satin Gold': 0.97, 'Seal Brown': 1.04,
+        'Shamrock Green': 1.02, 'Silver Blue': 1.07, 'Sky Blue': 0.97, 'Steel Grey': 1.04,
+        'Strawberry': 1.02, 'Tactical Pine': 1.07, 'Tomato': 0.97, 'Turquoise': 1.04
     }
 
-    # BasePrice: уменьшенное влияние разрыва
-    price_gap = min(0.2 * abs(price - last_sale) / (price + last_sale), 0.05)
-    base_price = max(price, last_sale) * (1 + floor / (supply * max(15, supply / 1000)) + price_gap)
-
-    # RarityFactor: усиленный, чтобы компенсировать отсутствие AttributeFactor
-    rarity_factor = min(max(1.5 / (rarity / max_rarity), 1.2), 2.0)
-
-    # MarketLiquidityFactor: сбалансированный
-    market_liquidity_factor = min((volume / (owners * max(floor, top_order))) * 0.02 + 0.7, 0.9)
-
-    # Расчет оценочной цены
-    estimated_price = base_price * rarity_factor * market_liquidity_factor
-
-    # Ограничения
-    lower_bound = (price + last_sale) / 2 * 0.98
-    upper_bound = price * 1.2
-
-    if backdrop in backdrop_multipliers and backdrop_multipliers[backdrop] > 0.0:
-        multiplier = backdrop_multipliers[backdrop]
-        print(f"Applying backdrop multiplier for {backdrop}: {multiplier}")
-        estimated_price *= multiplier
-    else:
-        print(f"No valid multiplier for backdrop {backdrop}, using original formula")
-
-    # Корректировка для аномалий
-    if abs(price - last_sale) / (price + last_sale) > 0.1:
-        estimated_price = min(estimated_price, (price + last_sale) / 2 * 1.15)
-    print(f"Actual Price: {price}")
-    #print(f"Estimated Price: {estimated_price}")
-
-    return min(max(estimated_price, lower_bound), upper_bound)
+    """
+        Финальная формула оценки цены NFT:
+        - Использует rarity, volume, supply и backdrop multipliers
+        - last_sale и owners не участвуют
+        - Динамический шум теперь ±20% для симметричного разброса
+        """
 
 
-async def analyse_gift(nft_id):
-    data = await get_data(nft_id)
+    # Фактор редкости
+    rarity_factor = min(max(1.5 / max(rarity / max_rarity, 0.001), 1.2), 2.0)
+    # Фактор рынка (без owners)
+    market_factor = min((volume / max(supply, 1)) * 0.01 + 0.7, 0.9)
+    # Фактор бекдропа
+    backdrop_factor = backdrop_multipliers.get(backdrop, 1.0)
 
-    rarity = data["rarity"]
-    price = data["price"]
-    backdrop = data["backdrop"]
-    model = data["model"]
-    symbol = data["symbol"]
-    volume_of_sales = data["volume"]
-    last_sale = data["last_sale"]
+    # Базовая цена
+    estimated_price = price * rarity_factor * market_factor * backdrop_factor
 
+    # Динамический шум ±20%
+    noise = np.random.uniform(-0.2, 0.2)
+    return round(estimated_price * (1 + noise), 2)
 
-    # Инициализация estimated_price
-    estimated_price = await estimate_ton_price(nft_id)
-
-    lower_bound = (price + last_sale) / 2 * 0.98
-    upper_bound = price * 1.2
-
-    # Логика прогнозирования движения цены
-    score = 0
-
-    # Редкость
-    if rarity < 50000:
-        score += 1
-    elif rarity > 75000:
-        score -= 1
-
-    # Цена vs оценка
-    price_ratio = price / estimated_price if estimated_price > 0 else 1
-    if price_ratio < 0.95:
-        score += 1
-    elif price_ratio > 1.05:
-        score -= 1
-
-    # Популярные атрибуты
-    popular_attributes = {"Neon Blue", "Caramel", "Cotton Candy", "Indigo Dye", "Navy Blue"}
-    if any(attr in popular_attributes for attr in [backdrop, model, symbol] if attr):
-        score += 1
-
-    # Объем продаж
-    if volume_of_sales and volume_of_sales > 100:
-        score += 1
-
-    # Определение прогноза
-    if score >= 2:
-        prediction = "up"
-    elif score <= -2:
-        prediction = "down"
-    else:
-        prediction = "neutral"
-
-    print("Обоснование:")
-    print(f"На основании тщательного анализа данных, цена данного NFT с высокой степенью вероятности {'продемонстрирует устойчивый рост' if prediction == 'up' else 'подвергнется коррекции' if prediction == 'down' else 'сохранит текущую стабильность'} в течение ближайших 30 дней.")
-    print(f"Редкость: показатель {rarity} {'отражает исключительную редкость актива, усиливая его ценность' if score > 0 else 'указывает на широкую распространенность, что ограничивает потенциал' if score < 0 else 'поддерживает нейтральную позицию на рынке'}.")
-    print(f"Сравнение цены с оценочной: текущая цена {price} {'значительно ниже' if price_ratio < 0.95 else 'превышает' if price_ratio > 1.05 else 'соответствует'} оценке {estimated_price}, {'подтверждая недооценку с перспективой роста' if price_ratio < 0.95 else 'сигнализируя о переоценке с риском снижения' if price_ratio > 1.05 else 'поддерживая текущую рыночную оценку'}.")
-    print(f"Популярные атрибуты: {'наличие' if any(attr in popular_attributes for attr in [backdrop, model, symbol] if attr) else 'отсутствие'} черт, таких как {', '.join(popular_attributes)}, {'гарантирует повышенный спрос и привлекательность' if score > 0 else 'не оказывает заметного влияния на рыночный интерес'}.")
-    print(f"Рыночная активность: объем продаж {volume_of_sales if volume_of_sales else 'не указан'} {'подтверждает высокий уровень ликвидности и интереса со стороны инвесторов' if volume_of_sales and volume_of_sales > 100 else 'не демонстрирует значительной рыночной активности'}.")
-    print(f"Итог: совокупность факторов {'формирует убедительный восходящий тренд с техническим потенциалом роста' if score >= 2 else 'не выявляет явных сигналов для кардинальных изменений' if -1 <= score <= 1 else 'предостерегает о возможном нисходящем давлении'}.")
-    print(f"Прогноз: **{prediction}**")
-
-    return min(max(estimated_price, lower_bound), upper_bound)

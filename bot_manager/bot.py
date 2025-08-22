@@ -1,3 +1,4 @@
+ALLOWED_USER_IDS = {474039722, 7866461346}
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, F, types
@@ -13,6 +14,10 @@ from middleware.i18n import I18nMiddleware
 
 from bot_manager.texts.ru import texts as ru
 from bot_manager.texts.en import texts as en
+
+from middleware.dev_guard import DevGuardMiddleware
+
+
 
 BOT_TOKEN = os.getenv("BOT_API")
 
@@ -38,6 +43,8 @@ dp = Dispatcher()
 
 dp.update.middleware(I18nMiddleware())
 
+# Global message handler to restrict access during development
+dp.message.middleware(DevGuardMiddleware())
 
 # @dp.message(Command("start"))
 # async def start_handler(message: Message):

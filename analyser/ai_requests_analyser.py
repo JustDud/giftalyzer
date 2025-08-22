@@ -1,10 +1,9 @@
-from analyser.model_provider import generate_response
 from analyser.price_analyser import estimate_ton_price
 from mongo import nfts_collection
 import json
 from bot_manager.keyboards.default import get_main_menu
 from aiogram.exceptions import TelegramBadRequest
-from analyser.forecaster import render_forecast, render_many, render_response, calculate_forecast
+from analyser.forecaster import render_forecast, render_many
 from mongo import collections_collection
 
 
@@ -97,70 +96,36 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
                     break
 
             nft_details.append({
-                "collection": selected_collection,
-                "model": traits.get("model", model),
+                "id": nft_id,
+                "name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
                 "backdrop": traits.get("backdrop", backdrop or ""),
-                "nft_id": nft_id,  # full ID used for analysis
-                "display_name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
-                "rarity": rarity if rarity is not None else 99999,
-                "real_price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
-                "estimated_ton": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
-                "symbol": traits.get("symbol", ""),
-                "volume_of_sales": volume_of_sales
+                "price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
+                "est_price": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
+                "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
+                "liquidity": int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
             })
 
     print(f"ANALYSIS DATA (detailed): {nft_details}")
 
-    nft_details = calculate_forecast(nft_details)
 
     # Choose the system prompt
     if user_question == "🔍 Проанализируй NFT":
-        system_prompt = (
-            "Ты — ведущий аналитик цифрового рынка NFT. На основе предоставленных данных проведи детальный анализ и выдай краткий, уверенный прогноз движения цены: up, neutral или down. "
-            "Сравни до двух NFT, если данные указаны, и учти любые доступные рыночные тренды на 27 июля 2025 года, если возможно. Используй следующую логику:\n\n"
-            "Редкость: < 50,000 → +1, > 75,000 → -1, иначе 0\n"
-            "Цена vs оценка: < 95% от estimated_ton → +1, > 105% от estimated_ton → -1, иначе 0\n"
-            "Популярные атрибуты: наличие Neon Blue, Caramel, Cotton Candy, Indigo Dye, Navy Blue → +1, иначе 0\n"
-            "Объем продаж: > 100 → +1, иначе 0\n"
-            "Сумма баллов: ≥ 2 → up, ≤ -2 → down, между -1 и 1 → neutral\n\n"
-            "Форматируй ответ в следующем виде:\n\n"
-            "Обоснование:\n\n"
-            "Начни с уверенного вывода о динамике цены в ближайшие 30 дней для каждого NFT. Затем по пунктам объясни влияние факторов:\n"
-            "Редкость: укажи значение и его рыночное значение (редкий, распространенный или нейтральный).\n"
-            "Сравнение цены с оценочной: проанализируй отклонение и его влияние на ценность.\n"
-            "Популярные атрибуты: отметь наличие популярных черт и их эффект на спрос.\n"
-            "Рыночная активность: прокомментируй объем продаж и его роль в ликвидности.\n"
-            "Итог: подведи итог с акцентом на формирующийся тренд или стабильность.\n"
-            "Прогноз: up / neutral / down\n\n"
-            "Пример входных данных:\n\n"
-            "{\n"
-            "\"nft_id\": \"EQDmbKmCH8r2egTHXYLaL10iQvbIZSzFanlexW5aaX5aFm6H\",\n"
-            "\"rarity\": 2114,\n"
-            "\"real_price\": 420,\n"
-            "\"estimated_ton\": 478.8,\n"
-            "\"backdrop\": \"Navy Blue\",\n"
-            "\"model\": \"Party-Ready\",\n"
-            "\"symbol\": \"Cocktail\",\n"
-            "\"volume_of_sales\": 185\n"
-            "},\n"
-            "{\n"
-            "\"nft_id\": \"EQBWQcgVQtFTLqIpFhwbp5oW4MPxkoL9sSUYv1d-dHBcjsI3\",\n"
-            "\"rarity\": 100850,\n"
-            "\"real_price\": 7000,\n"
-            "\"estimated_ton\": 4025.0,\n"
-            "\"backdrop\": \"Sapphire\",\n"
-            "\"model\": \"Birmingham\",\n"
-            "\"symbol\": \"Ice Pop\",\n"
-            "\"volume_of_sales\": 40\n"
-            "}\n\n"
-            "Ожидаемый ответ для примера:\n\n"
-            "Для NFT EQDmbKmCH8r2egTHXYLaL10iQvbIZSzFanlexW5aaX5aFm6H цена с высокой вероятностью продемонстрирует устойчивый рост в ближайшие 30 дней.\n\n"
-            "Редкость: 2114 отражает исключительную редкость актива, усиливая его ценность.\n"
-            "Сравнение цены с оценочной: цена 420 на 12% ниже 478.8, подтверждая недооценку с потенциалом роста.\n"
-            "Популярные атрибуты: наличие Navy Blue гарантирует повышенный спрос.\n"
-            "Рыночная активность: объем продаж 185 подтверждает высокий уровень ликвидности.\n"
-            "Итог: совокупность факторов формирует убедительный восходящий тренд."
-        )
+        if nft_details:
+            try:
+                ai_response = await render_forecast(nft_details[0])
+                if len(ai_response) <= 4000:
+                    await msg.answer(ai_response)
+                else:
+                    for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
+                        await msg.answer(chunk)
+            except Exception as e:
+                import logging
+                logging.exception("❌ Ошибка при генерации ответа: %s", e)
+                await msg.answer("❌ Не удалось сгенерировать прогноз.")
+        else:
+            await msg.answer("❌ Не удалось найти подходящие NFT.")
+        await state.clear()
+        return
     elif user_question == "📈 Покажи недооцененные":
         system_prompt = "TEMPLATE: add undervalued NFT analysis prompt here"
     elif user_question == "⬆ Только с прогнозом 'up'":
@@ -168,58 +133,23 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
     else:
         system_prompt = "TEMPLATE: default prompt"
 
-    try:
-        ai_response = await generate_response(system_prompt, json.dumps(nft_details, ensure_ascii=False, indent=2))
-        if not ai_response or "Прогноз" not in ai_response:
-            print("⚠️ Falling back to render_forecast...")
-            ai_response = render_response(nft_details, user_question)
-
-        # Commented out escape_md_v2 function and related code
-        # import re
-        # def escape_md_v2(text):
-        #     return re.sub(r'([_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!\\])', r'\\\1', text)
-
-        for nft in nft_details:
-            ai_response = ai_response.replace(nft["nft_id"], nft["display_name"])
-        ai_response = ai_response.replace("*", "")
-        ai_response = ai_response.replace("#", "")
-
-        try:
-            if len(ai_response) <= 4000:
-                await msg.answer(ai_response)
-            else:
-                for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
-                    await msg.answer(chunk)
-        except Exception as send_error:
-            import logging
-            logging.exception("❌ Ошибка при отправке AI-ответа: %s", send_error)
-            await msg.answer("❌ Не удалось отправить результат. Попробуй позже.")
-    except Exception as e:
-        import logging
-        logging.exception("AI request failed: %s", e)
-        try:
-            await msg.edit_text("❌ Не удалось получить ответ от AI. Попробуйте позже.")
-        except TelegramBadRequest as e2:
-            if "message is not modified" not in str(e2):
-                raise
-    finally:
-        # Restore the main menu keyboard safely: clear inline keyboard if needed, then send confirmation with reply keyboard
-        from aiogram.types import InlineKeyboardMarkup
-        current_reply_markup = msg.reply_markup
-        if current_reply_markup and getattr(current_reply_markup, "inline_keyboard", None):
-            if current_reply_markup.inline_keyboard:
+    # Restore the main menu keyboard safely: clear inline keyboard if needed, then send confirmation with reply keyboard
+    from aiogram.types import InlineKeyboardMarkup
+    current_reply_markup = msg.reply_markup
+    if current_reply_markup and getattr(current_reply_markup, "inline_keyboard", None):
+        if current_reply_markup.inline_keyboard:
+            try:
                 try:
-                    try:
-                        await msg.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
-                    except TelegramBadRequest as e:
-                        if "message is not modified" not in str(e):
-                            raise
-                except Exception as e:
-                    import logging
-                    logging.warning(f"⚠️ Failed to edit reply markup: {e}")
+                    await msg.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+                except TelegramBadRequest as e:
+                    if "message is not modified" not in str(e):
+                        raise
+            except Exception as e:
+                import logging
+                logging.warning(f"⚠️ Failed to edit reply markup: {e}")
         await msg.answer("✅ Функциональность восстановлена.", reply_markup=get_main_menu(t))
-        try:
-            await temp.delete()
-        except:
-            pass
-        await state.clear()  # или верни в главное меню, если нужно
+    try:
+        await temp.delete()
+    except:
+        pass
+    await state.clear()
