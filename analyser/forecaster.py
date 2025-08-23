@@ -224,8 +224,8 @@ async def render_forecast(item: dict) -> str:
 
     return (
         f"🎁 {label} — {fupper} {emoji}\n"
-        f"Метрики: {price_s} TON | редкость {rare_s} | бэкдроп {backdrop} 🎯 ({bd_hint})\n"
-        f"Обзор: {overview}"
+        f"Метрики: \n{price_s} TON | редкость {rare_s} | бэкдроп {backdrop} 🎯 ({bd_hint})\n"
+        f"Обзор: \n{overview}"
     )
 
 async def render_many(items: Iterable[dict], sep: str = "\n\n") -> str:

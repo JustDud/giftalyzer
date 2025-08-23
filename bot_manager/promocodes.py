@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Dict, Any
 from mongo import promo_codes_collection, promo_usage_collection
 import random
@@ -6,23 +6,23 @@ import string
 import asyncio
 
 
-def validate_promo_data(discount_percent: float, owner_profit_percent: float):
+async def validate_promo_data(discount_percent: float, owner_profit_percent: float):
     if not (0 <= discount_percent <= 100):
         raise ValueError("Discount percent must be between 0 and 100")
     if not (0 <= owner_profit_percent <= 100):
         raise ValueError("Owner profit percent must be between 0 and 100")
 
 
-def generate_promo_code(length: int = 8) -> str:
+async def generate_promo_code(length: int = 8) -> str:
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 
 async def create_promo(code: str, owner_id: int, discount_percent: float,
                  owner_profit_percent: float, is_single_use: bool = False) -> Dict[str, Any]:
     """Create a new promo code in MongoDB."""
-    validate_promo_data(discount_percent, owner_profit_percent)
+    await validate_promo_data(discount_percent, owner_profit_percent)
     if not code:
-        code = generate_promo_code()
+        code = await generate_promo_code()
     promo = {
         "code": code.upper(),
         "owner_id": owner_id,
@@ -32,7 +32,7 @@ async def create_promo(code: str, owner_id: int, discount_percent: float,
         "is_active": True,
         "usage_count": 0,
         "total_profit": 0.0,
-        "created_at": datetime.utcnow()
+        "created_at": datetime.now(UTC)
     }
     await promo_codes_collection.insert_one(promo)
     return promo
@@ -56,12 +56,12 @@ async def apply_promo(user_id: int, code: str, price: float) -> Dict[str, Any]:
     """Check promo code and calculate discounted price without updating stats."""
     promo = await get_promo_by_code(code)
     if not promo or not promo.get("is_active"):
-        return {"error": "Promo code is inactive or does not exist"}
+        return {"error_code": "promo_not_found_or_inactive"}
 
     if promo.get("is_single_use"):
         already_used = await promo_usage_collection.find_one({"promo_code": promo["code"], "user_id": user_id})
         if already_used:
-            return {"error": "You have already used this promo code"}
+            return {"error_code": "promo_already_used"}
 
     discount = price * (promo["discount_percent"] / 100)
     final_price = price - discount
@@ -90,7 +90,7 @@ async def finalize_promo_usage(user_id: int, promo_code: str, paid_price: float)
             "user_id": user_id,
             "profit_to_owner": owner_profit,
             "discount_applied": promo["discount_percent"],
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(UTC)
         })
     except Exception as e:
         print(f"[ERROR] Failed to insert promo usage record: {e}")

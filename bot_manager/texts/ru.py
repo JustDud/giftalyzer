@@ -13,7 +13,7 @@ texts = {
             "👇 Выбери, как хочешь продолжить:"),
 
 
-    "id_input_prompt": "Пришли ID подарка (например: MadPumpkin-1218)",
+    "id_input_prompt": "Пришлите ссылку на подарок (например: https://t.me/nft/SnoopCigar-53556)",
     "gift_result": (
             "🎁 Подарок: {name}\n"
             "💎 Модель: {model}\n"
@@ -24,8 +24,8 @@ texts = {
     ),
     "btn_check_another": "🔁 Проверить другой",
     "btn_back": "🔙 Назад",
-    "btn_enter_id": "🔎 Ввести ID подарка",
-    "btn_enter_manual": "✍️ Поиск по маркетам (тип, фон..)",
+    "btn_enter_id": "🔎 Оценить подарок по ссылке",
+    "btn_enter_manual": "✍️ Оценить подарки с маркетов (тип, фон..)",
     "btn_ask_ai": "🤖 Задать вопрос AI",
     "btn_help": "🆘 Помощь",
     "btn_subscription": "🌟 Подписка",
@@ -36,7 +36,7 @@ texts = {
     "btn_subscription_stats": "📊 Статистика подписок",
     "nft_not_found": "❌ Подарок не найден в базе данных. Попробуйте другой ID.",
     "returned_to_menu": "Вы вернулись в главное меню. Выберите действие 👇",
-    "keyboard_restored": "Функционал разблокирован",
+    "keyboard_restored": "✅ Функционал разблокирован",
     "loading_phrases": [
         "📦 Перебираем подарки... сравниваем параметры",
         "🧩 Анализируем редкость и ценность...",
@@ -207,8 +207,10 @@ texts = {
     "ai_analyse_gift": "🔎 Проанализируй подарок",
     "ai_undervalued": "📈 Покажи недооцененные",
     "ai_only_up": "⬆ Только с прогнозом 'up'",
+    "ai_analyse_collection": "🧪 Проанализируй подарок без улучшения",
+    "ai_analyse_collection_description": "",
     "ai_prompt_select_model": "Выберите модель для анализа: {collection_name}",
-    "ai_prompt_select_backdrop": "Выберите до 3 фонов для анализа коллекции {collection_name}:",
+    "ai_prompt_select_backdrop": "Выберите фон для анализа коллекции {collection_name}:",
     "ai_btn_show_results": "Показать результаты AI-анализа",
     "ai_prompt_select_collection": "Выберите коллекцию:",
     "ai_collection_not_found": "Коллекция не найдена в AI-режиме.",
@@ -217,4 +219,23 @@ texts = {
     "btn_link_analysis": "🔗 Вставить ссылку",
     "btn_manual_analysis": "📦 Выбрать вручную",
     "choose_analysis_method": "Как ты хочешь проанализировать подарок?",
+
+
+    "ai_prompt_enter_supply": "📦 Введи саплай (supply):",
+    "ai_prompt_enter_price": "💰 Теперь введи цену в звёздах:",
+    "ai_error_invalid_supply": "❌ Введи корректное целое число для саплая.",
+    "ai_error_invalid_price": "❌ Введи корректное целое число для цены.",
+    "ai_analysis_collection_result_template": (
+        "📊 Результат анализа:\n\n"
+        "• Саплай: {supply} 📦\n"
+        "• Цена: {price} ⭐\n"
+        "• Вердикт: {verdict}\n"
+        "• Обоснование: {explanation}\n\n"
+        "📌 {policy}"
+    ),
+    "ai_collection_analysis_intro": "✨ Давай проверим, насколько выгодно брать твой подарок. \n\n📦 Пришли саплай для коллекции",
+    "promo_error_not_found_or_inactive": "Промокод не существует или неактивен.",
+    "promo_error_already_used": "Вы уже использовали этот промокод.",
+    "promo_error_unknown": "Произошла неизвестная ошибка с промокодом.",
+
 }

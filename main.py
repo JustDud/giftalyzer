@@ -21,20 +21,5 @@ async def main():
     # export_all_nft_prices_to_csv(estimate_ton_price, convert_ton_to_usd)
 
 
-
-
-def test_estimate_price():
-    nft_id = "EQAWChTROtqH_-qum38ToUSPl4AfiHmUBJTH8ZcSEoooyao5"
-    collection_address = "EQA3-i1IUFjWyDhaIoCGdYUB4nt2IYaT3T-95CHPrSvV3AfX"
-
-    estimated_price = estimate_ton_price(nft_id)
-    usd = convert_ton_to_usd(estimated_price)
-
-    print("Estimated TON Price:", estimated_price)
-    print("USD: ", usd)
-    assert isinstance(estimated_price, float)
-    assert estimated_price > 0
-
-
 if __name__ == "__main__":
     main()

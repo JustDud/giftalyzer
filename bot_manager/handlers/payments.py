@@ -4,14 +4,14 @@ from aiogram import Router, F
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
 from subscription.manager import add_subscription
 from mongo import subscriptions_collection, get_all_subscriptions
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from bot_manager.utils import is_admin
 from bot_manager.states.admin_states import PromoApplyFSM
 from aiogram.fsm.context import FSMContext
 from bot_manager.promocodes import apply_promo, list_all_promos, finalize_promo_usage
 
 
-BASE_PRICE_XTR = 1  # Base subscription price in XTR
+BASE_PRICE_XTR = 10  # Base subscription price in XTR
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 
@@ -79,19 +79,33 @@ async def process_promo_code(message: Message, state: FSMContext, t: dict):
         return await start_promo_flow(message, t, state)
 
     data = await state.get_data()
+    # Brute-force protection
+    attempts = data.get("promo_attempts", 0) + 1
+    if attempts > 5:
+        await message.answer("🚫 Слишком много попыток. Попробуйте позже.")
+        return await state.clear()
+    await state.update_data(promo_attempts=attempts)
+
     code = message.text.strip().upper()
     user_id = message.from_user.id
     price = BASE_PRICE_XTR  # base price in XTR
 
     result = await apply_promo(user_id, code, price)
-    await state.clear()
 
-    if "error" in result:
+    if "error_code" in result:
+        error_msg = {
+            "promo_not_found_or_inactive": t["promo_error_not_found_or_inactive"],
+            "promo_already_used": t["promo_error_already_used"]
+        }.get(result["error_code"], t["promo_error_unknown"])
         try:
-            await message.answer(f"❌ {result['error']}\n{t['promo_try_again_or_skip']}")
+            await message.answer(f"❌ {error_msg}")
+            await start_promo_flow(message, t, state)
         except Exception as e:
             print(f"[ERROR] Failed to send error message in promo flow: {e}")
-        return await start_promo_flow(message, t, state)
+        return
+
+    # Success path
+    await state.clear()
 
     discounted_price = result["final_price"]
     try:
@@ -179,8 +193,8 @@ async def successful_payment(message: Message, t: dict):
     charge_id = message.successful_payment.telegram_payment_charge_id
     await subscriptions_collection.update_one(
         {"user_id": message.from_user.id},
-        {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": datetime.utcnow()}},
-         "$set": {"subscribed": True, "start_date": datetime.utcnow()}},
+        {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": datetime.now(UTC)}},
+         "$set": {"subscribed": True, "start_date": datetime.now(UTC)}},
         upsert=True
     )
     confirmation_text = t["subscription_activated"].format(charge_id=charge_id)
@@ -289,7 +303,7 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             await message.answer(t["transaction_id_mismatch"])
             return
 
-        if (datetime.utcnow() - matched_tx["date"]) > timedelta(days=14):
+        if (datetime.now(UTC) - matched_tx["date"]) > timedelta(days=14):
             await message.answer(t["subscription_expired_no_refund"])
             return
 

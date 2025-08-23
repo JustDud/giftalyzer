@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 from typing import List, Dict, Any
 import csv
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Set
 
 load_dotenv()
@@ -25,6 +25,7 @@ support_collection: AsyncIOMotorCollection = db.support_tickets
 promo_codes_collection: AsyncIOMotorCollection = db.promo_codes
 promo_usage_collection: AsyncIOMotorCollection = db.promo_usage
 users_collection: AsyncIOMotorCollection = db.users
+
 
 async def init_indexes():
     # --- collections ---
@@ -118,7 +119,7 @@ def normalize_token_id(token: str | int) -> str:
 
 async def upsert_collection_market_snapshot(collection_uid: str, market: str, snapshot: Dict[str, Any]):
     """Update collections.markets[market] with latest snapshot (floor, listed_count, url, last_seen)."""
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.now(UTC).timestamp())
     to_set = {f"markets.{market}": {**snapshot, "last_seen": snapshot.get("last_seen", now)}, "updated_at": now}
     await collections_collection.update_one(
         {"_id": collection_uid},
@@ -132,7 +133,7 @@ async def upsert_nft_market_state(collection_uid: str, token_id: str, name: str 
                                   external_item_ids: Dict[str, Any] | None = None,
                                   intrinsic_fields: Dict[str, Any] | None = None):
     """Create/update NFT document and set markets.<market> latest state."""
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.now(UTC).timestamp())
     nft_uid = build_nft_uid(collection_uid, normalize_token_id(token_id))
 
     # $setOnInsert for static bits
@@ -165,7 +166,7 @@ async def upsert_collections_and_build_map(cols: List[Dict], market: str = "port
     """Ensure base collection docs exist and attach per‑market mapping.
     Returns: { <API collection id> -> <collection_uid> }"""
     id_to_uid: Dict[str, str] = {}
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.now(UTC).timestamp())
     for c in cols:
         name = c.get("name") or ""
         api_coll_id = c.get("id")
@@ -423,7 +424,7 @@ async def reconcile_delist_for_collection(collection_uid: str, market: str, seen
         return {"matched": 0, "modified": 0}
 
     seen_list = [str(tid).strip() for tid in seen_token_ids if tid is not None]
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.now(UTC).timestamp())
     filt = {
         "collection_uid": collection_uid,
         f"markets.{market}.is_listed": True,
@@ -440,7 +441,7 @@ async def reset_market_state_for_collection(collection_uid: str, market: str) ->
     Use before a full rewrite from the first parser to avoid slow delisting.
     Returns basic stats {matched, modified}.
     """
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.now(UTC).timestamp())
     filt = {"collection_uid": collection_uid, f"markets.{market}": {"$exists": True}}
     update = {"$unset": {f"markets.{market}": ""}, "$set": {"updated_at": now}}
     res = await nfts_collection.update_many(filt, update)

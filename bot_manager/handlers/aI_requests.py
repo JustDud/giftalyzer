@@ -2,16 +2,17 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
-from bot_manager.states.ai_requests_state import AIRequestState
+from bot_manager.states.ai_requests_state import AIRequestState, AIRequestCollectionAnalysisState
 from bot_manager.keyboards.ai_requests_keyboard import (
     get_ai_collection_keyboard as get_collection_keyboard,
     get_ai_nft_keyboard as get_nft_keyboard,
     get_ai_backdrop_keyboard,
-    get_ai_help_keyboard
+    get_ai_help_keyboard, get_analysis_method_keyboard
 )
 from mongo import collections_collection
 from bot_manager.decorators.access import ai_access_required
 from analyser.ai_requests_analyser import analyse_ai_request
+from analyser.stars_collection import evaluate_gift
 
 router = Router()
 
@@ -22,14 +23,53 @@ async def ai_help_start(message: Message, state: FSMContext, t):
     await message.answer("Выбери действие:", reply_markup=get_ai_help_keyboard(t))
 
 
-@router.callback_query(F.data == "ai_analyze_gift")
+@router.callback_query(F.data == "ai_analyse_gift")
 @ai_access_required
-async def handle_ai_analyze_gift(call: CallbackQuery, state: FSMContext, t: dict):
+async def handle_ai_analyse_gift(call: CallbackQuery, state: FSMContext, t: dict):
     from bot_manager.keyboards.ai_requests_keyboard import get_analysis_method_keyboard
     await call.answer()
     await state.update_data(user_question="🔍 Проанализируй NFT")
     await call.message.edit_text(t["choose_analysis_method"])
     await call.message.edit_reply_markup(reply_markup=get_analysis_method_keyboard(t))
+
+
+@router.callback_query(F.data == "ai_analyse_collection")
+@ai_access_required
+async def handle_ai_analyse_collection(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
+    await call.message.edit_text(t["ai_collection_analysis_intro"])
+    await state.set_state(AIRequestCollectionAnalysisState.entering_supply)
+
+# Handler for entering supply in collection analysis
+@router.message(AIRequestCollectionAnalysisState.entering_supply)
+async def handle_entering_supply(message: Message, state: FSMContext, t: dict):
+    try:
+        supply = int(message.text.strip())
+    except ValueError:
+        await message.answer(t["ai_error_invalid_supply"])
+        return
+
+    await state.update_data(supply=supply)
+    await message.answer(t["ai_prompt_enter_price"])
+    await state.set_state(AIRequestCollectionAnalysisState.entering_price)
+
+
+# Handler for entering price and outputting results
+@router.message(AIRequestCollectionAnalysisState.entering_price)
+async def handle_entering_price(message: Message, state: FSMContext, t: dict):
+    try:
+        price = int(message.text.strip())
+    except ValueError:
+        await message.answer(t["ai_error_invalid_price"])
+        return
+
+    data = await state.get_data()
+    supply = data.get("supply")
+
+    result = evaluate_gift(supply, price)
+    await message.answer(t["ai_analysis_collection_result_template"].format(**result))
+    await state.clear()
+
 
 
 # Handler for manual analysis entry (choose collection manually)
@@ -140,6 +180,10 @@ async def handle_manual_input(message: Message, state: FSMContext, t: dict):
 @router.callback_query(AIRequestState.selecting_collection)
 async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t: dict):
     import re
+    # Exit early if user pressed "Back to main"
+    if call.data == "ai_back_to_analysis_method":
+        await handle_ai_back_to_analysis_method(call, state, t)
+        return
     # If user pasted a link directly instead of pressing a button
     if not call.data.startswith("ai_collection:"):
         # Extract potential gift ID from link
@@ -158,9 +202,8 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         await state.set_state(AIRequestState.loading_results)
 
         from analyser.ai_requests_analyser import analyse_ai_request
-        # Emulate Message object so we can reuse analyse_ai_request
-        call.text = gift_id  # Assign stripped ID to .text
-        await analyse_ai_request(call, state, t, temp)
+        # Instead of assigning .text (which is not allowed/frozen), pass gift_id as an argument
+        await analyse_ai_request(call, state, t, temp, gift_id=gift_id)
         return
 
     await call.answer()
@@ -291,10 +334,22 @@ async def select_all_models(call: CallbackQuery, state: FSMContext, t: dict):
 
 
 @router.callback_query(F.data == "ai_back_to_main")
-async def handle_back_to_main_menu(call: CallbackQuery, state: FSMContext, t: dict):
+async def handle_back_to_ai_help(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
     await state.clear()
-    await call.message.edit_text(t["ai_returned_to_menu"])
+
+    keyboard = get_ai_help_keyboard(t)
+    await call.message.edit_text(t["returned_to_menu"])
+    await call.message.edit_reply_markup(reply_markup=keyboard)
+
+@router.callback_query(F.data == "ai_back_to_analysis_method")
+async def handle_ai_back_to_analysis_method(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
+    await state.clear()
+
+    keyboard = get_analysis_method_keyboard(t)
+    # await call.message.edit_text(t["returned_to_menu"])
+    await call.message.edit_reply_markup(reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "ai_back_to_collections")

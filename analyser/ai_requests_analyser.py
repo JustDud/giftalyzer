@@ -36,6 +36,10 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
             await state.update_data(selected_models=selected_models, selected_backdrops=selected_backdrops)
         else:
             await msg.answer("❌ Не удалось извлечь данные из ссылки.")
+            try:
+                await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+            except Exception:
+                await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
             await state.clear()
             return
 
@@ -113,18 +117,16 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
         if nft_details:
             try:
                 ai_response = await render_forecast(nft_details[0])
-                if len(ai_response) <= 4000:
-                    await msg.answer(ai_response)
-                else:
-                    for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
-                        await msg.answer(chunk)
+                await state.update_data(ai_analysis=ai_response)
+                from bot_manager.handlers.ai_requests_results import show_ai_analysis_results
+                await show_ai_analysis_results(msg, state, t)
+                return
             except Exception as e:
                 import logging
                 logging.exception("❌ Ошибка при генерации ответа: %s", e)
                 await msg.answer("❌ Не удалось сгенерировать прогноз.")
         else:
             await msg.answer("❌ Не удалось найти подходящие NFT.")
-        await state.clear()
         return
     elif user_question == "📈 Покажи недооцененные":
         system_prompt = "TEMPLATE: add undervalued NFT analysis prompt here"
@@ -147,7 +149,15 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
             except Exception as e:
                 import logging
                 logging.warning(f"⚠️ Failed to edit reply markup: {e}")
-        await msg.answer("✅ Функциональность восстановлена.", reply_markup=get_main_menu(t))
+        try:
+            await msg.edit_reply_markup(reply_markup=get_main_menu(t))
+        except Exception as e:
+            await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+    else:
+        try:
+            await msg.edit_reply_markup(reply_markup=get_main_menu(t))
+        except Exception as e:
+            await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
     try:
         await temp.delete()
     except:

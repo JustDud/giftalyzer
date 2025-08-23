@@ -59,23 +59,21 @@ async def main():
     await dp.start_polling(bot)
 
 
-
-
 async def set_commands():
     await bot.set_my_commands([
         BotCommand(command='start', description=ru["start_command"]),
         BotCommand(command='about', description=ru["about_command"]),
-        BotCommand(command='language', description=ru["language_command"]),
         BotCommand(command='support', description=ru["support_command"]),
     ], language_code="ru")
 
     await bot.set_my_commands([
         BotCommand(command='start', description=en["start_command"]),
         BotCommand(command='about', description=en["about_command"]),
-        BotCommand(command='language', description=en["language_command"]),
         BotCommand(command='support', description=en["support_command"]),
     ], language_code="en")
 
+
+#BotCommand(command='language', description=en["language_command"]),
 
 if __name__ == "__main__":
     asyncio.run(main())

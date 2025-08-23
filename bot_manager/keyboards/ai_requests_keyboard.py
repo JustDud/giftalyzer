@@ -4,7 +4,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_ai_help_keyboard(t):
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t["ai_analyse_gift"], callback_data="ai_analyze_gift")],
+            [InlineKeyboardButton(text=t["ai_analyse_gift"], callback_data="ai_analyse_gift")],
+            [InlineKeyboardButton(text=t["ai_analyse_collection"], callback_data="ai_analyse_collection")],
             [InlineKeyboardButton(text=t["ai_undervalued"], callback_data="ai_undervalued")],
             [InlineKeyboardButton(text=t["ai_only_up"], callback_data="ai_only_up")],
     ])
@@ -87,7 +88,7 @@ def get_ai_collection_keyboard(
     if nav_buttons:
         keyboard.inline_keyboard.append(nav_buttons)
 
-    keyboard.inline_keyboard.append([InlineKeyboardButton(text=t["btn_back_to_main"], callback_data="ai_back_to_main")])
+    keyboard.inline_keyboard.append([InlineKeyboardButton(text=t["btn_back_to_main"], callback_data="ai_back_to_analysis_method")])
     return keyboard
 
 
@@ -120,6 +121,7 @@ def get_ai_backdrop_keyboard(
 def get_analysis_method_keyboard(t: dict) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(text=t["btn_link_analysis"], callback_data="ai_analysis_by_link")],
-        [InlineKeyboardButton(text=t["btn_manual_analysis"], callback_data="ai_analysis_manual")]
+        [InlineKeyboardButton(text=t["btn_manual_analysis"], callback_data="ai_analysis_manual")],
+        [InlineKeyboardButton(text=t["btn_back_to_main"], callback_data="ai_back_to_main")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)

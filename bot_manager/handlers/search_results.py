@@ -53,7 +53,7 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
                 {"$elemMatch": {"type": "backdrop", "value": {"$in": selected_backdrops}}}
             ]
         }
-    }).limit(10)
+    }).limit(16)
 
     results = []
     async for nft in nft_cursor:
