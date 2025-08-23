@@ -57,12 +57,6 @@ async def remove_expired_subscriptions():
     print(f"Marked {result.modified_count} subscriptions as inactive.")
 
 
-async def run_daily_check():
-    print(f"[{datetime.now(UTC)}] Running daily subscription check...")
-    await remove_expired_subscriptions()
-    print(f"[{datetime.now(UTC)}] Check complete.")
-
-
 async def get_subscription_stats():
     """Return statistics about total and active subscriptions."""
     total = await subscriptions.count_documents({})

@@ -20,7 +20,7 @@ router = Router()
 @router.message(lambda msg, t: msg.text == t["btn_ask_ai"])
 async def ai_help_start(message: Message, state: FSMContext, t):
     await state.update_data(user_question=message.text)
-    await message.answer("Выбери действие:", reply_markup=get_ai_help_keyboard(t))
+    await message.answer(t["ai_choose_action"], reply_markup=get_ai_help_keyboard(t))
 
 
 @router.callback_query(F.data == "ai_analyse_gift")
@@ -28,7 +28,7 @@ async def ai_help_start(message: Message, state: FSMContext, t):
 async def handle_ai_analyse_gift(call: CallbackQuery, state: FSMContext, t: dict):
     from bot_manager.keyboards.ai_requests_keyboard import get_analysis_method_keyboard
     await call.answer()
-    await state.update_data(user_question="🔍 Проанализируй NFT")
+    await state.update_data(user_question=t["ai_analyse_gift"])
     await call.message.edit_text(t["choose_analysis_method"])
     await call.message.edit_reply_markup(reply_markup=get_analysis_method_keyboard(t))
 

@@ -238,4 +238,11 @@ texts = {
     "promo_error_already_used": "Вы уже использовали этот промокод.",
     "promo_error_unknown": "Произошла неизвестная ошибка с промокодом.",
 
+    "ai_choose_action": "Выбери действие:",
+    "ai_generating": "⌛ Генерация анализа, пожалуйста подождите...",
+    "ai_select_one_model": "Выберите хотя бы одну модель.",
+    "ai_no_backdrops_available": "Нет доступных фонов для выбранных моделей.",
+    "ai_no_analysis_found": "❌ Анализ не найден.",
+    "ai_analysis_result_prefix": "📊 Результат анализа:",
+
 }

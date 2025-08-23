@@ -23,6 +23,8 @@ API_URL_PORTALS = os.environ.get("API_URL_PORTALS")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+OFFSET_STEP = 50
+PAGE_LIMIT = 50
 
 
 async def _sleep_backoff(attempt: int, retry_after: float | None = None):
@@ -63,10 +65,6 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                 continue
             return last_status or 0, None
     return last_status or 0, None
-
-
-OFFSET_STEP = 50
-PAGE_LIMIT = 50
 
 
 def _nice_step(target_step: float) -> float:
@@ -426,7 +424,7 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
 # sub = await scan_price_range(coll_id, headers, current, nxt, seen_ids)
 
 
-async def main():
+async def run_portals_scraper():
     import sys
     names = sys.argv[1:]
     api_id, api_hash = await get_auth_credentials()
@@ -460,9 +458,4 @@ async def main():
     else:
         # Process all collections
         await offset_only_all(auth_token)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
 

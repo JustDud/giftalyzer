@@ -14,7 +14,7 @@ router = Router()
 async def show_ai_analysis_results(message: Message, state: FSMContext, t: dict):
     ai_response = t.get("ai_analysis") or (await state.get_data()).get("ai_analysis", "")
     if not ai_response:
-        await message.answer("❌ Анализ не найден.")
+        await message.answer(t["ai_no_analysis_found"])
         return
 
     nft_details = t.get("nft_details", [])
@@ -23,7 +23,7 @@ async def show_ai_analysis_results(message: Message, state: FSMContext, t: dict)
         ai_response = ai_response.replace("*", "")
 
     if len(ai_response) <= 4000:
-        await message.answer(f"📊 Результат анализа:\n\n{ai_response}")
+        await message.answer(t["ai_analysis_result_prefix"] + "\n\n" + ai_response)
     else:
         for chunk in [ai_response[i:i+4000] for i in range(0, len(ai_response), 4000)]:
             await message.answer(chunk, parse_mode="MarkdownV2")

@@ -75,8 +75,6 @@ async def init_indexes():
     await support_collection.create_index([("user_id", 1), ("created_at", -1)])
 
 
-
-
 def normalize_nft_name(name: str) -> str:
     if not name:
         return ""
@@ -89,8 +87,6 @@ def normalize_nft_name(name: str) -> str:
         return f"{prefix}-{number}"
     return name.replace(" ", "")
 
-
-# --- Canonical ID helpers for multi-market schema ---
 
 def normalize_slug(name: str) -> str:
     if not name:
@@ -114,8 +110,6 @@ def build_nft_uid(collection_uid: str, token_id: str) -> str:
 def normalize_token_id(token: str | int) -> str:
     return str(token).strip()
 
-
-# --- Upsert helpers for scrapers/importers ---
 
 async def upsert_collection_market_snapshot(collection_uid: str, market: str, snapshot: Dict[str, Any]):
     """Update collections.markets[market] with latest snapshot (floor, listed_count, url, last_seen)."""
@@ -161,6 +155,7 @@ async def upsert_nft_market_state(collection_uid: str, token_id: str, name: str 
         update["$set"] = {**update["$set"], f"external_ids.{market}": external_item_ids}
 
     await nfts_collection.update_one({"_id": nft_uid}, update, upsert=True)
+
 
 async def upsert_collections_and_build_map(cols: List[Dict], market: str = "portals") -> Dict[str, str]:
     """Ensure base collection docs exist and attach per‑market mapping.

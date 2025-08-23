@@ -4,6 +4,9 @@ import time
 import random
 import asyncio
 import requests
+from data_collection.auth import get_tgmrkt_init_data, get_auth_credentials
+import os
+import json
 
 
 def fetch_all_collections(token):
@@ -53,6 +56,8 @@ def fetch_all_collections(token):
             print("⚠️ Ошибка:", response.text)
     except Exception as e:
         print("❌ Ошибка при запросе коллекций:", e)
+
+
 def fetch_saling_by_collection(collection_name, token):
     headers = {
         "Authorization": f"Bearer {token}",
@@ -146,16 +151,50 @@ async def fetch_mrkt_token(init_data: str) -> str:
 
 
 async def get_valid_token() -> str:
-    from data_collection.auth import get_tgmrkt_init_data, get_auth_credentials
     api_id, api_hash = await get_auth_credentials()
-    init_data = await get_tgmrkt_init_data(api_id, api_hash)
+    init_data = await get_tgmrkt_init_data(api_id, api_hash, session_name="mrktauth")
     return await fetch_mrkt_token(init_data)
+
+
+async def get_token_with_fallback():
+    token_path = "token.json"
+
+    if os.path.exists(token_path):
+        with open(token_path, "r") as f:
+            cached = json.load(f)
+            token = cached.get("token")
+
+            # Test the token on a lightweight endpoint
+            test_url = "https://api.tgmrkt.io/api/v1/gifts/collections"
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "User-Agent": "Mozilla/5.0",
+            }
+
+            try:
+                response = requests.get(test_url, headers=headers, timeout=5)
+                if response.status_code == 200:
+                    print("✅ Cached token is valid")
+                    return token
+                else:
+                    print(f"⚠️ Cached token invalid: {response.status_code}")
+            except Exception as e:
+                print(f"❌ Error testing token: {e}")
+
+    # If no valid token, get new one
+    new_token = await get_valid_token()
+    if new_token:
+        with open(token_path, "w") as f:
+            json.dump({"token": new_token}, f)
+    return new_token
 
 
 async def main():
 
-    token = await get_valid_token()
+    token = await get_token_with_fallback()
+    #token = "f35ef380-77f6-4415-865c-0141d1187dc3"
     # token = "fdfeac2f-18f1-4b81-8e5b-d8da8cc8c436"
+    print(token)
     if token:
         fetch_all_collections(token)  # ← сначала получить все коллекции (без токена)
 

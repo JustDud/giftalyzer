@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from pyrogram import Client
 from pyrogram.raw.functions.messages import RequestAppWebView
 from pyrogram.raw.types import InputBotAppShortName, InputUser
+
 from pyrogram.raw.functions.users import GetUsers
 
 load_dotenv()
@@ -52,7 +53,7 @@ async def get_portals_auth_token(api_id: int, api_hash: str) -> str:
         return initData
 
 
-async def get_tgmrkt_init_data(api_id: int, api_hash: str) -> str:
+async def get_tgmrkt_init_data(api_id: int, api_hash: str, bot_username="mrkt", short_name="market", session_name="giftalyzerauth") -> str:
     """
     Get Telegram WebApp initData for TGMRKT bot.
 
@@ -63,18 +64,19 @@ async def get_tgmrkt_init_data(api_id: int, api_hash: str) -> str:
     Returns:
         str: Telegram WebApp initData string
     """
-    async with Client("tgmrktauth", api_id=api_id, api_hash=api_hash,
+    async with Client(session_name, api_id=api_id, api_hash=api_hash,
                       phone_number=PHONE_NUMBER, password=TWO_FA_PASSWORD) as client:
-        peer = await client.resolve_peer("tgmrktbot")
+        peer = await client.resolve_peer(bot_username)
         user_full = await client.invoke(GetUsers(id=[peer]))
         bot_raw = user_full[0]
         bot = InputUser(user_id=bot_raw.id, access_hash=bot_raw.access_hash)
-        bot_app = InputBotAppShortName(bot_id=bot, short_name="gifts")
+        bot_app = InputBotAppShortName(bot_id=bot, short_name=short_name)
         web_view = await client.invoke(
             RequestAppWebView(
                 peer=peer,
                 app=bot_app,
-                platform="desktop",
+                platform="android",
+                theme_params=None,
             )
         )
         initData = unquote(web_view.url.split('tgWebAppData=', 1)[1].split('&tgWebAppVersion', 1)[0])
@@ -91,5 +93,4 @@ async def get_auth_credentials():
     api_id = int(os.environ.get("API_ID"))
     api_hash = os.environ.get("API_HASH")
     return api_id, api_hash
-
 

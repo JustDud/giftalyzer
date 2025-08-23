@@ -1,22 +1,18 @@
-ALLOWED_USER_IDS = {474039722, 7866461346}
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.enums import ParseMode
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, BotCommand
-from aiogram.filters import Command
-from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.session.aiohttp import AiohttpSession
 import logging
-
 from bot_manager.handlers import register_all_handlers
-from middleware.i18n import I18nMiddleware
-
+from bot_manager.middleware.i18n import I18nMiddleware
 from bot_manager.texts.ru import texts as ru
 from bot_manager.texts.en import texts as en
-
-from middleware.dev_guard import DevGuardMiddleware
-
+from bot_manager.middleware.dev_guard import DevGuardMiddleware
+from bot_manager.middleware.error_handler import global_error_handler
+from aiogram.enums import ParseMode
+from aiogram.filters import Command
+from aiogram.fsm.storage.memory import MemoryStorage
 
 
 BOT_TOKEN = os.getenv("BOT_API")
@@ -42,17 +38,11 @@ bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
 dp.update.middleware(I18nMiddleware())
-
-# Global message handler to restrict access during development
 dp.message.middleware(DevGuardMiddleware())
-
-# @dp.message(Command("start"))
-# async def start_handler(message: Message):
-#     await message.answer("Привет! Пришли ссылку на подарок или его ID")
-#     # await message.answer("Choose:", reply_markup=reply_kb)
+dp.errors.register(global_error_handler)
 
 
-async def main():
+async def run_bot():
     await set_commands()
     logging.info("🚀 Bot is starting...")
     register_all_handlers(dp)
@@ -75,5 +65,3 @@ async def set_commands():
 
 #BotCommand(command='language', description=en["language_command"]),
 
-if __name__ == "__main__":
-    asyncio.run(main())

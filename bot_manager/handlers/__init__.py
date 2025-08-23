@@ -15,4 +15,5 @@ def register_all_handlers(dp: Dispatcher):
     language.register(dp)
     ai_requests.register(dp)
     ai_requests_results.register(dp)
+    
 
