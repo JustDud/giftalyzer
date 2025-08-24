@@ -121,6 +121,13 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
                 await msg.answer("❌ Не удалось сгенерировать прогноз.")
         else:
             await msg.answer("❌ Не удалось найти подходящие NFT.")
+            try:
+                await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+            except Exception:
+                # на случай, если edit/markup даст ошибку — просто отправим клавиатуру
+                await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+            await state.clear()
+            return
         return
     elif user_question == "📈 Покажи недооцененные":
         system_prompt = "TEMPLATE: add undervalued NFT analysis prompt here"

@@ -82,68 +82,75 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
             await state.set_state(GiftStates.WaitingForGiftID)
             return
 
-        gift_sorted = sorted(gift_data, key=lambda x: float(x["markets"]["portals"]["price"]["amount"]))
-        await message.answer(t["exact_match_found"])
-        for gift in gift_sorted[:5]:
-            await send_gift_result(message, gift, t)
-        return
+        # Classify matches: 3/3 (model, backdrop, symbol), 2/3 (model + backdrop), 1/3 (model only)
+        target_model = parsed_data.get("model")
+        target_backdrop = parsed_data.get("backdrop")
+        target_symbol = parsed_data.get("symbol")
 
-        # strict = await get_nfts_strict_match(
-        #     model=parsed_data["model"],
-        #     symbol=parsed_data["symbol"],
-        #     backdrop=parsed_data["backdrop"],
-        #     collection_name=collection_name
-        # )
-        #
-        # loose = await get_nfts_loose_match(
-        #     model=parsed_data["model"],
-        #     backdrop=parsed_data["backdrop"],
-        #     collection_name=collection_name
-        # )
-        #
-        # strict_ids = {gift["nft_id"] for gift in strict}
-        # loose_filtered = [gift for gift in loose if gift["nft_id"] not in strict_ids]
-        #
-        # model_only = await get_nfts_model_only(
-        #     model=parsed_data["model"],
-        #     collection_name=collection_name
-        # )
-        #
-        # all_found_ids = strict_ids.union({gift["nft_id"] for gift in loose_filtered})
-        # model_only_filtered = [gift for gift in model_only if gift["nft_id"] not in all_found_ids]
-        #
-        # if not (strict or loose_filtered or model_only_filtered):
-        #     await message.answer(t["no_similar_gifts"])
-        #     await state.set_state(GiftStates.WaitingForGiftID)
-        #     return
-        #
-        # strict_sorted = sorted(strict, key=lambda x: float(x["price"]))
-        # loose_sorted = sorted(loose_filtered, key=lambda x: float(x["price"]))
-        # model_only_sorted = sorted(model_only_filtered, key=lambda x: float(x["price"]))
-        #
-        # result_found = False
-        #
-        # if strict_sorted:
-        #     await message.answer(t["exact_match_found"])
-        #     for gift in strict_sorted[:5]:
-        #         await send_gift_result(message, gift, t)
-        #     result_found = True
-        #
-        # if not result_found and loose_sorted:
-        #     await message.answer(t["partial_match_found"])
-        #     for gift in loose_sorted[:5]:
-        #         await send_gift_result(message, gift, t)
-        #     result_found = True
-        #
-        # if not result_found and model_only_sorted:
-        #     await message.answer(t["model_only_match_found"])
-        #     for gift in model_only_sorted[:5]:
-        #         await send_gift_result(message, gift, t)
-        #     result_found = True
-        #
-        # if not result_found:
-        #     await message.answer(t["no_gift_found_final"])
-        # return
+        def _trait_val(g, name):
+            return next((tr.get("value") for tr in g.get("traits", []) if tr.get("type") == name), None)
+
+        exact = []
+        partial = []
+        model_only = []
+        for g in gift_data:
+            g_model = _trait_val(g, "model")
+            g_backdrop = _trait_val(g, "backdrop")
+            g_symbol = _trait_val(g, "symbol")
+
+            m_eq = (g_model == target_model) if target_model else False
+            b_eq = (g_backdrop == target_backdrop) if target_backdrop else False
+            s_eq = (g_symbol == target_symbol) if target_symbol else False
+
+            if m_eq and b_eq and s_eq:
+                exact.append(g)
+            elif m_eq and b_eq:
+                partial.append(g)
+            elif m_eq:
+                model_only.append(g)
+
+        # Helper: return the cheapest listed price across ANY market (fallback to +inf if none)
+        def _min_listed_price(g):
+            markets = g.get("markets", {}) or {}
+            best = float("inf")
+            for _, m in markets.items():
+                try:
+                    if m.get("is_listed") and "price" in m and "amount" in m["price"]:
+                        p = float(m["price"]["amount"])
+                        if p < best:
+                            best = p
+                except Exception:
+                    continue
+            return best
+
+        sent_any = False
+        if exact:
+            exact_sorted = sorted(exact, key=_min_listed_price)
+            await message.answer(t["exact_match_found"])
+            for gift in exact_sorted[:3]:
+                await send_gift_result(message, gift, t)
+            sent_any = True
+
+        if partial:
+            partial_sorted = sorted(partial, key=_min_listed_price)
+            await message.answer(t["similar_gifts_found"])
+            for gift in partial_sorted[:3]:
+                await send_gift_result(message, gift, t)
+            sent_any = True
+
+        if model_only:
+            model_only_sorted = sorted(model_only, key=_min_listed_price)
+            await message.answer(t["model_only_match_found"])
+            for gift in model_only_sorted[:3]:
+                await send_gift_result(message, gift, t)
+            sent_any = True
+
+        if not sent_any:
+            await message.answer(t["no_similar_gifts"])
+            await state.set_state(GiftStates.WaitingForGiftID)
+            return
+
+        return
 
     price = await estimate_ton_price(data["nft_id"])
     await send_gift_result(message, {
