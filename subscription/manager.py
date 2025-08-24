@@ -1,16 +1,41 @@
 from datetime import datetime, timedelta, UTC
 from mongo import subscriptions_collection as subscriptions
 
+# ---- DateTime helpers (single place to handle aware/naive & comparisons) ----
+
+def ensure_aware_utc(dt: datetime | None) -> datetime | None:
+    """Return the same moment as a timezone-aware UTC datetime.
+    If dt is naive, assume it is UTC and attach tzinfo=UTC.
+    If dt is aware but not UTC, convert to UTC.
+    """
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
+def utc_now() -> datetime:
+    """Single source of truth for 'now' in UTC (aware)."""
+    return datetime.now(UTC)
+
+
+def not_expired(end_dt: datetime | None) -> bool:
+    """Generic check used across the codebase to compare end dates with now."""
+    end_dt = ensure_aware_utc(end_dt)
+    return end_dt is not None and utc_now() <= end_dt
+
 
 async def add_subscription(user_id: int, days: int = 30):
     """Extend subscription if already active, otherwise start new."""
-    now = datetime.now(UTC)
+    now = utc_now()
     record = await subscriptions.find_one({"user_id": user_id})
 
-    if record and record.get("subscribed") and record.get("end_date") and record["end_date"] > now:
+    current_end = ensure_aware_utc(record.get("end_date")) if record else None
+    if record and record.get("subscribed") and current_end and current_end > now:
         # Extend from the current end_date if active
-        end_date = record["end_date"] + timedelta(days=days)
-        start_date = record.get("start_date", now)
+        end_date = current_end + timedelta(days=days)
+        start_date = ensure_aware_utc(record.get("start_date")) or now
     else:
         # Start new subscription
         start_date = now
@@ -22,8 +47,8 @@ async def add_subscription(user_id: int, days: int = 30):
             "$set": {
                 "user_id": user_id,
                 "subscribed": True,
-                "start_date": start_date,
-                "end_date": end_date
+                "start_date": ensure_aware_utc(start_date) or now,
+                "end_date": ensure_aware_utc(end_date) or now
             }
         },
         upsert=True
@@ -42,16 +67,14 @@ async def is_subscription_valid(user_id: int) -> bool:
     record = await subscriptions.find_one({"user_id": user_id, "subscribed": True})
     if not record:
         return False
-    end_date = record.get("end_date")
-    if not end_date:
-        return False
-    return datetime.now(UTC) <= end_date
+    end_date = ensure_aware_utc(record.get("end_date"))
+    return not_expired(end_date)
 
 
 async def remove_expired_subscriptions():
     """Mark expired subscriptions as inactive based on end date."""
     result = await subscriptions.update_many(
-        {"end_date": {"$lt": datetime.now(UTC)}, "subscribed": True},
+        {"end_date": {"$lt": utc_now()}, "subscribed": True},
         {"$set": {"subscribed": False}}
     )
     print(f"Marked {result.modified_count} subscriptions as inactive.")

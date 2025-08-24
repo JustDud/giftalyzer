@@ -155,12 +155,13 @@ async def _llm_rewrite_overview(label: str,
     )
 
     last_err = None
-    for a in range(retries + 1):
+    for attempt in range(retries + 1):
         try:
             ai_response = await generate_response(ask)
+            return ai_response
         except Exception as e:
             last_err = e
-            time.sleep(0.6 * (a + 1))
+            time.sleep(0.6 * (attempt + 1))
     return None  # тихий фоллбек
 
 
@@ -217,9 +218,15 @@ async def render_forecast(item: dict) -> str:
             f"Бэкдроп {backdrop} — {bd_hint}. Консолидация/боковик ⚖️. DYOR."
         )
 
-    # Пытаемся «оживить» через LLM
-    llm_text = await _llm_rewrite_overview(label, backdrop, price, estp, rarity_pct or 0.0, liq, forecast)
-    if llm_text:
+    # Пытаемся «оживить» через LLM (фоллбек уже готов выше)
+    llm_text = None
+    if USE_LLM_DEFAULT:
+        try:
+            llm_text = await _llm_rewrite_overview(label, backdrop, price, estp, rarity_pct or 0.0, liq, forecast)
+        except Exception:
+            pass
+
+    if llm_text and str(llm_text).strip():
         overview = llm_text
 
     return (
@@ -233,4 +240,3 @@ async def render_many(items: Iterable[dict], sep: str = "\n\n") -> str:
     Рендерит несколько объектов и возвращает одним текстовым блоком.
     """
     return sep.join([await render_forecast(it) for it in items])
-

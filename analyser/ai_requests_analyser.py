@@ -20,16 +20,18 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
         input_id = call.text
     else:
         input_id = ""
+    link_input = input_id  # ссылка/ID может прийти как gift_id или как текст сообщения
     data = await state.get_data()
     user_question = data.get("user_question")
+    user_question_key = data.get("user_question_key")
     selected_models = data.get("selected_models", [])
     selected_backdrops = data.get("selected_backdrops", [])
     selected_collection = data.get("selected_collection")
 
     # Fallback: extract model and backdrop from gift link if not already selected
-    if not selected_models and gift_id:
+    if not selected_models and link_input:
         from analyser.page_parser import parse_telegram_gift_page
-        parsed = await parse_telegram_gift_page(gift_id)
+        parsed = await parse_telegram_gift_page(link_input)
         if parsed:
             selected_models = [parsed["model"]]
             selected_backdrops = [parsed["backdrop"]]
@@ -48,9 +50,9 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
     collection_slug = ""
     if selected_collection:
         collection = await collections_collection.find_one({"name": selected_collection})
-    if not collection and gift_id:
+    if not collection and link_input:
         import re as _re
-        collection_name = _re.sub(r'\d+', '', gift_id.split("-")[0])
+        collection_name = _re.sub(r'\d+', '', link_input.split("-")[0])
         collection_slug = _re.sub(r'(?<!^)(?=[A-Z])', '-', collection_name).lower()
         collection = await collections_collection.find_one({"slug": collection_slug})
     if not collection:
@@ -73,49 +75,41 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
             # If not found, skip this combination
             continue
 
-        query = {
-            "collection_uid": collection_uid,
-            "markets": {"$exists": True},
-            "traits": {
-                "$all": [
-                    {"$elemMatch": {"type": "model", "value": model}}
-                ]
-            }
-        }
-        if backdrop:
-            query["traits"]["$all"].append({"$elemMatch": {"type": "backdrop", "value": backdrop}})
+        # Узкий выбор: берём ровно тот NFT, который нашли по трейту, вместо сканирования всей коллекции
+        nft = await nfts_collection.find_one({"_id": nft_id})
+        if not nft:
+            continue
 
-        async for nft in nfts_collection.find(query):
-            traits = {t["type"]: t["value"] for t in nft.get("traits", [])}
-            # Use nft_id found by traits instead of from DB _id
-            # nft_id = nft.get("nft_id") or (nft.get("_id", "").split("#")[1] if "#" in nft.get("_id", "") else "")
+        traits = {t.get("type"): t.get("value") for t in nft.get("traits", [])}
 
-            # Get collection-level volume
-            volume_of_sales = int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
-
-            rarity = None
-            for trait in nft.get("traits", []):
-                if trait.get("type") == "model" and "rarity_per_mille" in trait:
+        rarity = None
+        for trait in nft.get("traits", []):
+            if trait.get("type") == "model" and "rarity_per_mille" in trait:
+                try:
                     rarity = int(trait["rarity_per_mille"])
-                    break
+                except Exception:
+                    rarity = None
+                break
 
-            nft_details.append({
-                "id": nft_id,
-                "name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
-                "backdrop": traits.get("backdrop", backdrop or ""),
-                "price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
-                "est_price": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
-                "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
-                "liquidity": int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
-            })
+        nft_details.append({
+            "id": nft_id,
+            "name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
+            "backdrop": traits.get("backdrop", backdrop or ""),
+            "price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
+            "est_price": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
+            "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
+            "liquidity": int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
+        })
 
+    print(f"[AI] nft_details_count={len(nft_details)} user_question={user_question!r}")
     print(f"ANALYSIS DATA (detailed): {nft_details}")
 
-
-    # Choose the system prompt
-    if user_question == "🔍 Проанализируй NFT":
+    ai_analyse_label = t.get("ai_analyse_gift") or "🔎 Проанализируй подарок"
+    if (user_question_key == "ai_analyse_gift") or (user_question == ai_analyse_label):
+        print(f"[AI] route_check: matched ai_analyse_gift (key={user_question_key!r}, text_match={user_question == ai_analyse_label})")
         if nft_details:
             try:
+                print("[AI] Calling render_forecast() for first item…")
                 ai_response = await render_forecast(nft_details[0])
                 await state.update_data(ai_analysis=ai_response)
                 from bot_manager.handlers.ai_requests_results import show_ai_analysis_results

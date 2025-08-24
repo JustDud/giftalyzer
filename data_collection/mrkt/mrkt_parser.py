@@ -192,8 +192,7 @@ async def get_token_with_fallback():
 async def main():
 
     token = await get_token_with_fallback()
-    #token = "f35ef380-77f6-4415-865c-0141d1187dc3"
-    # token = "fdfeac2f-18f1-4b81-8e5b-d8da8cc8c436"
+    
     print(token)
     if token:
         fetch_all_collections(token)  # ← сначала получить все коллекции (без токена)

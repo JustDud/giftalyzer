@@ -6,7 +6,7 @@ load_dotenv()
 api_key = os.environ.get("API_KEY_OPENROUTER")
 
 
-async def generate_response(system_prompt, user_message, model="anthropic/claude-sonnet-4"):
+async def generate_response(prompt, model="anthropic/claude-sonnet-4"):
     print("Sending request to OpenRouter")
     url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -18,8 +18,7 @@ async def generate_response(system_prompt, user_message, model="anthropic/claude
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message}
+            {"role": "user", "content": prompt}
         ],
         "temperature": 0.0
     }

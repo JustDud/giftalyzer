@@ -6,8 +6,8 @@ def get_ai_help_keyboard(t):
         inline_keyboard=[
             [InlineKeyboardButton(text=t["ai_analyse_gift"], callback_data="ai_analyse_gift")],
             [InlineKeyboardButton(text=t["ai_analyse_collection"], callback_data="ai_analyse_collection")],
-            [InlineKeyboardButton(text=t["ai_undervalued"], callback_data="ai_undervalued")],
-            [InlineKeyboardButton(text=t["ai_only_up"], callback_data="ai_only_up")],
+            #[InlineKeyboardButton(text=t["ai_undervalued"], callback_data="ai_undervalued")],
+            #[InlineKeyboardButton(text=t["ai_only_up"], callback_data="ai_only_up")],
     ])
 
 

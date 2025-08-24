@@ -1,10 +1,11 @@
 from aiogram import Dispatcher
 from . import (start, id_check, market_search, search_results, admin_support, support, payments,
-               admin_general, language, ai_requests, ai_requests_results)
+               admin_general, language, ai_requests, ai_requests_results, about)
 
 
 def register_all_handlers(dp: Dispatcher):
     start.register(dp)
+    about.register(dp)
     id_check.register(dp)
     market_search.register(dp)
     search_results.register(dp)

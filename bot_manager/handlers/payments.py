@@ -2,9 +2,9 @@ import os
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
-from subscription.manager import add_subscription
+from subscription.manager import add_subscription, utc_now, ensure_aware_utc
 from mongo import subscriptions_collection, get_all_subscriptions
-from datetime import datetime, timedelta, UTC
+from datetime import timedelta, UTC
 from bot_manager.utils import is_admin
 from bot_manager.states.admin_states import PromoApplyFSM
 from aiogram.fsm.context import FSMContext
@@ -189,12 +189,12 @@ async def pre_checkout_handler(pre_checkout: PreCheckoutQuery):
 
 @router.message(F.successful_payment)
 async def successful_payment(message: Message, t: dict):
-    add_subscription(message.from_user.id)
+    await add_subscription(message.from_user.id)
     charge_id = message.successful_payment.telegram_payment_charge_id
     await subscriptions_collection.update_one(
         {"user_id": message.from_user.id},
-        {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": datetime.now(UTC)}},
-         "$set": {"subscribed": True, "start_date": datetime.now(UTC)}},
+        {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": utc_now()}},
+         "$set": {"subscribed": True, "start_date": utc_now()}},
         upsert=True
     )
     confirmation_text = t["subscription_activated"].format(charge_id=charge_id)
@@ -303,7 +303,8 @@ async def admin_refund_handler(message: Message, *args, t: dict):
             await message.answer(t["transaction_id_mismatch"])
             return
 
-        if (datetime.now(UTC) - matched_tx["date"]) > timedelta(days=14):
+        tx_date = ensure_aware_utc(matched_tx["date"])
+        if (utc_now() - tx_date) > timedelta(days=14):
             await message.answer(t["subscription_expired_no_refund"])
             return
 

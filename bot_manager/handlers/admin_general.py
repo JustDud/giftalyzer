@@ -10,7 +10,9 @@ from bot_manager.utils import is_admin
 from bot_manager.handlers.admin_support import close_all_tickets, show_active_tickets
 from subscription.manager import get_subscription_stats
 from mongo import subscriptions_collection
-from datetime import datetime, timedelta, UTC
+from datetime import timedelta, UTC
+
+from subscription.manager import utc_now
 from bot_manager.states.admin_states import RefundFSM,CheckSubsFSM,PromoStatsFSM,PromoAddFSM,PromoDeleteFSM
 from bot_manager.promocodes import get_promo_stats, create_promo, disable_promo, list_all_promos
 from data_collection.marketapp import data_scraper
@@ -374,13 +376,13 @@ async def admin_force_subscribe(message: Message, t: dict):
         await message.answer("Invalid arguments.")
         return
 
-    end_date = datetime.now(UTC) + timedelta(days=days)
+    end_date = utc_now() + timedelta(days=days)
     await subscriptions_collection.update_one(
         {"user_id": user_id},
         {
             "$set": {
                 "subscribed": True,
-                "start_date": datetime.now(UTC),
+                "start_date": utc_now(),
                 "end_date": end_date
             }
         },
@@ -414,13 +416,11 @@ async def admin_force_cancel(message: Message, t: dict):
         await message.answer("Invalid user_id.")
         return
 
-    from datetime import datetime
-
     await subscriptions_collection.update_one(
         {"user_id": user_id},
         {"$set": {
             "subscribed": False,
-            "ends_at": datetime.now(UTC)
+            "end_date": utc_now()
         }},
     )
     await message.answer(f"✅ Subscription for user {user_id} has been forcibly cancelled.")
