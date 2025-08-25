@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from typing import Callable, Awaitable, Dict
 from aiogram.fsm.context import FSMContext
 
-ALLOWED_USER_IDS = {474039722, 7866461346, 444450069}
+ALLOWED_USER_IDS = {474039722, 7866461346, 444450069, 7540264011}
 
 
 class DevGuardMiddlewareWithSupportBypass(BaseMiddleware):

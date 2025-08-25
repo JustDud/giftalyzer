@@ -35,7 +35,12 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
         if parsed:
             selected_models = [parsed["model"]]
             selected_backdrops = [parsed["backdrop"]]
-            await state.update_data(selected_models=selected_models, selected_backdrops=selected_backdrops)
+            selected_symbol = parsed.get("symbol")
+            await state.update_data(
+                selected_models=selected_models,
+                selected_backdrops=selected_backdrops,
+                selected_symbol=selected_symbol,
+            )
         else:
             await msg.answer("❌ Не удалось извлечь данные из ссылки.")
             try:
@@ -62,24 +67,60 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
     collection_uid = collection["_id"]
     collection_slug = collection.get("slug", "")  # Assuming slug is stored in collection
 
-    from itertools import product
-    from mongo import find_nft_id_by_traits
-
+    # === Bucketed candidate search (3/3 → 2/3 → 1/3) ===
     nft_details = []
+
+    # Pull symbol if present in state (may be None)
+    selected_symbol = data.get("selected_symbol")
+
+    # Helper: extract a trait value by name
+    def _trait_val(g, name):
+        return next((tr.get("value") for tr in g.get("traits", []) if tr.get("type") == name), None)
+
+    # Helper: cheapest listed price across ANY market; +inf if none
+    def _min_listed_price(g):
+        markets = g.get("markets", {}) or {}
+        best = float("inf")
+        for m in markets.values():
+            try:
+                if m.get("is_listed") and "price" in m and "amount" in m["price"]:
+                    best = min(best, float(m["price"]["amount"]))
+            except Exception:
+                continue
+        return best
+
+    # Collect a capped set of candidates for performance
+    cursor = nfts_collection.find(
+        {"collection_uid": collection_uid, "traits": {"$exists": True}},
+        projection={"_id": 1, "traits": 1, "markets": 1},
+    )
+    candidates = await cursor.to_list(length=600)
+
+    exact, partial, model_only = [], [], []
+    from itertools import product as _product
     backdrop_combinations = selected_backdrops if selected_backdrops else [None]
 
-    for model, backdrop in product(selected_models, backdrop_combinations):
-        # Attempt to find nft_id by traits
-        nft_id = await find_nft_id_by_traits(collection_slug, model, backdrop or "", "")
-        if not nft_id:
-            # If not found, skip this combination
-            continue
+    for model, backdrop in _product(selected_models, backdrop_combinations):
+        for g in candidates:
+            gm, gb, gs = _trait_val(g, "model"), _trait_val(g, "backdrop"), _trait_val(g, "symbol")
+            m_eq = (gm == model) if model else False
+            b_eq = (gb == backdrop) if backdrop else False
+            s_eq = (gs == selected_symbol) if selected_symbol else False
+            if m_eq and b_eq and s_eq:
+                exact.append(g)
+            elif m_eq and b_eq:
+                partial.append(g)
+            elif m_eq:
+                model_only.append(g)
 
-        # Узкий выбор: берём ровно тот NFT, который нашли по трейту, вместо сканирования всей коллекции
-        nft = await nfts_collection.find_one({"_id": nft_id})
-        if not nft:
-            continue
+    # Sort each bucket by cheapest listing
+    for bucket in (exact, partial, model_only):
+        bucket.sort(key=_min_listed_price)
 
+    # Pick best available candidate (exact → partial → model_only)
+    chosen = (exact or partial or model_only)
+    if chosen:
+        nft = chosen[0]
         traits = {t.get("type"): t.get("value") for t in nft.get("traits", [])}
 
         rarity = None
@@ -91,14 +132,22 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
                     rarity = None
                 break
 
+        nft_id = nft.get("_id")
+        # use cheapest across markets for display price if needed; fallback 0
+        price_amount = _min_listed_price(nft)
+        if not (price_amount == price_amount):  # NaN guard (unlikely)
+            price_amount = 0.0
+        if price_amount == float("inf"):
+            price_amount = 0.0
+
         nft_details.append({
             "id": nft_id,
-            "name": nft_id.split("|")[-1].replace("-", " ").replace("#", " #").title(),
+            "name": str(nft_id).split("|")[-1].replace("-", " ").replace("#", " #").title(),
             "backdrop": traits.get("backdrop", backdrop or ""),
-            "price": float(nft.get("markets", {}).get("portals", {}).get("price", {}).get("amount", 0)),
+            "price": float(price_amount),
             "est_price": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
             "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
-            "liquidity": int(float(collection.get("markets", {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
+            "liquidity": int(float((collection.get("markets", {}) or {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
         })
 
     print(f"[AI] nft_details_count={len(nft_details)} user_question={user_question!r}")
