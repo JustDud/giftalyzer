@@ -44,7 +44,7 @@ dp.errors.register(global_error_handler)
 
 async def run_bot():
     await set_commands()
-    logging.info("🚀 Bot is starting...")
+    logging.info("Bot is starting...")
     register_all_handlers(dp)
     await dp.start_polling(bot)
 

@@ -24,4 +24,4 @@ async def download_all_collections_to_csv(output_path="all_collections.csv"):
 
 
 if __name__ == "__main__":
-    asyncio.run(download_all_collections_to_csv())
+    asyncio.run(download_all_nfts_to_csv())

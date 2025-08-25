@@ -127,21 +127,21 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
         if exact:
             exact_sorted = sorted(exact, key=_min_listed_price)
             await message.answer(t["exact_match_found"])
-            for gift in exact_sorted[:3]:
+            for gift in exact_sorted[:1]:
                 await send_gift_result(message, gift, t)
             sent_any = True
 
         if partial:
             partial_sorted = sorted(partial, key=_min_listed_price)
             await message.answer(t["similar_gifts_found"])
-            for gift in partial_sorted[:3]:
+            for gift in partial_sorted[:1]:
                 await send_gift_result(message, gift, t)
             sent_any = True
 
         if model_only:
             model_only_sorted = sorted(model_only, key=_min_listed_price)
             await message.answer(t["model_only_match_found"])
-            for gift in model_only_sorted[:3]:
+            for gift in model_only_sorted[:1]:
                 await send_gift_result(message, gift, t)
             sent_any = True
 

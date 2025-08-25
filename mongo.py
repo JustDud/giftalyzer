@@ -8,7 +8,8 @@ from typing import List, Dict, Any
 import csv
 from datetime import datetime, UTC
 from typing import Set
-
+import pymongo
+from pymongo import UpdateOne
 
 def utc_now() -> datetime:
     """Return timezone-aware current UTC datetime (PEP 495/PEP 615 safe)."""
@@ -328,6 +329,124 @@ async def upsert_nfts_for_collection(items: List[Dict], collection_uid: str, mar
             external_item_ids=external_ids,
             intrinsic_fields=intrinsic_fields,
         )
+
+
+async def upsert_nfts_for_collection_bulk(
+    items: List[Dict],
+    collection_uid: str,
+    market: str = "portals",
+    batch_size: int = 750
+) -> int:
+    """
+    Faster path: build UpdateOne ops and execute via bulk_write in batches (ordered=False).
+    Avoids high client-side concurrency while significantly reducing round-trips.
+    Returns total count of operations applied (approximate).
+    """
+    if not items:
+        return 0
+
+    def _to_safe_float(x):
+        try:
+            return float(x)
+        except Exception:
+            return None
+
+    ops: List[UpdateOne] = []
+    total = 0
+    now = utc_ts()
+
+    for it in items:
+        token_id = it.get("external_collection_number") or it.get("id")
+        if token_id is None:
+            continue
+        token_id_s = normalize_token_id(token_id)
+        nft_uid = build_nft_uid(collection_uid, token_id_s)
+
+        name = it.get("name")
+        traits = it.get("attributes") or []
+        media = {"image_url": it.get("photo_url")} if it.get("photo_url") else {}
+
+        # Intrinsic fields (flattened)
+        intrinsic_fields: Dict[str, Any] = {}
+        if it.get("model") is not None:
+            intrinsic_fields["model"] = it.get("model")
+        if it.get("model_rarity_per_mille") is not None:
+            val = _to_safe_float(it.get("model_rarity_per_mille"))
+            if val is not None:
+                intrinsic_fields["model_rarity_per_mille"] = val
+        if it.get("symbol") is not None:
+            intrinsic_fields["symbol"] = it.get("symbol")
+        if it.get("symbol_rarity_per_mille") is not None:
+            val = _to_safe_float(it.get("symbol_rarity_per_mille"))
+            if val is not None:
+                intrinsic_fields["symbol_rarity_per_mille"] = val
+        if it.get("backdrop") is not None:
+            intrinsic_fields["backdrop"] = it.get("backdrop")
+        if it.get("backdrop_rarity_per_mille") is not None:
+            val = _to_safe_float(it.get("backdrop_rarity_per_mille"))
+            if val is not None:
+                intrinsic_fields["backdrop_rarity_per_mille"] = val
+
+        # Market state
+        market_state: Dict[str, Any] = {"is_listed": True, "last_seen": now}
+        pv = _to_safe_float(it.get("price"))
+        if pv is not None:
+            market_state["price"] = {"amount": str(pv), "currency": "TON"}
+        fpv = _to_safe_float(it.get("floor_price"))
+        if fpv is not None:
+            market_state["floor_price"] = {"amount": str(fpv), "currency": "TON"}
+        if it.get("listed_at"):
+            market_state["listed_at"] = it.get("listed_at")
+        if it.get("unlocks_at"):
+            market_state["unlocks_at"] = it.get("unlocks_at")
+        if it.get("tg_id") is not None:
+            market_state["tg_id"] = it.get("tg_id")
+        if it.get("is_owned") is not None:
+            market_state["is_owned"] = bool(it.get("is_owned"))
+        share_url = it.get("share_url") or it.get("url")
+        if share_url:
+            market_state["url"] = share_url
+
+        set_on_insert: Dict[str, Any] = {
+            "_id": nft_uid,
+            "collection_uid": collection_uid,
+            "token_id": token_id_s,
+            "traits": traits or [],
+            "media": media or {},
+            "created_at": now,
+        }
+
+        update_set: Dict[str, Any] = {
+            f"markets.{market}": market_state,
+            "updated_at": now,
+        }
+        if intrinsic_fields:
+            update_set.update(intrinsic_fields)
+        if name:
+            update_set["name"] = name
+        external_ids = {"id": it.get("id")}
+        if external_ids:
+            update_set[f"external_ids.{market}"] = external_ids
+
+        ops.append(
+            UpdateOne(
+                {"_id": nft_uid},
+                {"$setOnInsert": set_on_insert, "$set": update_set},
+                upsert=True,
+            )
+        )
+
+        # Flush in batches
+        if len(ops) >= batch_size:
+            res = await nfts_collection.bulk_write(ops, ordered=False)
+            total += (res.upserted_count or 0) + (res.modified_count or 0) + (res.matched_count or 0)
+            ops = []
+
+    if ops:
+        res = await nfts_collection.bulk_write(ops, ordered=False)
+        total += (res.upserted_count or 0) + (res.modified_count or 0) + (res.matched_count or 0)
+
+    return total
 
 
 async def upsert_and_notify_new_collections(
