@@ -355,6 +355,10 @@ async def upsert_nfts_for_collection_bulk(
     total = 0
     now = utc_ts()
 
+    total_upserted = 0
+    total_modified = 0
+    total_matched = 0
+
     for it in items:
         token_id = it.get("external_collection_number") or it.get("id")
         if token_id is None:
@@ -444,9 +448,16 @@ async def upsert_nfts_for_collection_bulk(
 
     if ops:
         res = await nfts_collection.bulk_write(ops, ordered=False)
+        total_upserted += res.upserted_count or 0
+        total_modified += res.modified_count or 0
+        total_matched += res.matched_count or 0
         total += (res.upserted_count or 0) + (res.modified_count or 0) + (res.matched_count or 0)
 
-    return total
+    return {
+        "upserted": total_upserted,
+        "modified": total_modified,
+        "matched": total_matched,
+    }
 
 
 async def upsert_and_notify_new_collections(

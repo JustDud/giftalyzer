@@ -154,9 +154,5 @@ async def fetch_backdrops(tma_token: str, extra_headers: dict | None = None) -> 
 async def get_all_backdrops():
     api_id, api_hash = await get_auth_credentials()
     auth_token = await get_portals_auth_token(api_id, api_hash)
-    print(f"[debug] tma token length: {len(auth_token)}")
-    if not (auth_token.startswith("tma ") or auth_token.startswith("query_id=") or auth_token.startswith("user=")):
-        print("[warn] token doesn't look like initData; got:", auth_token[:40], "...")
-    # Now use that token for backdrops
     bds = await fetch_backdrops(auth_token)
     print(json.dumps(bds, indent=2, ensure_ascii=False))

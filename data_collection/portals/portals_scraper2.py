@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 OFFSET_STEP = 50
 PAGE_LIMIT = 50
-
+SMART_CAP_THRESHOLD = 750  # if offset-only returns fewer than this, skip backdrop checks
 
 async def _sleep_backoff(attempt: int, retry_after: float | None = None):
     """Sleep with exponential backoff and jitter. Honors Retry-After if provided."""
@@ -331,15 +331,17 @@ async def offset_only_all(auth_token: str, limit: int = 500, *, fast_db: bool = 
                 "User-Agent": "TelegramBot",
                 "Accept": "application/json",
             }
-            items = await scan_offsets_with_backdrops(coll_id, headers, global_backdrops, seen_ids_global)
+            items = await smart_scan_collection(coll_id, headers, global_backdrops, seen_ids_global)
             # Anchor reset for this collection+market before rewriting state
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 if not no_reset:
                     await reset_market_state_for_collection(collection_uid, market="portals")
                 if fast_db:
-                    count = await upsert_nfts_for_collection_bulk(items, collection_uid, market="portals", batch_size=750)
-                    logger.info(f"⚡ Bulk upserted ~{count} docs for {name}")
+                    res = await upsert_nfts_for_collection_bulk(items, collection_uid, market="portals", batch_size=750)
+                    logger.info(
+                        f"⚡ Bulk upserted {res['upserted']}, modified {res['modified']}, matched {res['matched']} for {name}"
+                    )
                 else:
                     await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
@@ -390,8 +392,10 @@ async def run_portals_scraper_with_options(names: Optional[List[str]] = None, *,
                 if not no_reset:
                     await reset_market_state_for_collection(collection_uid, market="portals")
                 if fast_db:
-                    count = await upsert_nfts_for_collection_bulk(items, collection_uid, market="portals", batch_size=750)
-                    logger.info(f"⚡ Bulk upserted ~{count} docs for {name}")
+                    res = await upsert_nfts_for_collection_bulk(items, collection_uid, market="portals", batch_size=750)
+                    logger.info(
+                        f"⚡ Bulk upserted {res['upserted']}, modified {res['modified']}, matched {res['matched']} for {name}"
+                    )
                 else:
                     await upsert_nfts_for_collection(items, collection_uid, market="portals")
             return save
@@ -401,7 +405,7 @@ async def run_portals_scraper_with_options(names: Optional[List[str]] = None, *,
             if not coll_id:
                 logger.warning(f"No id for '{name}', skipping")
                 continue
-            items = await scan_offsets_with_backdrops(coll_id, headers, global_backdrops, seen_ids)
+            items = await smart_scan_collection(coll_id, headers, global_backdrops, seen_ids)
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 await save_fn(name, collection_uid, items)
@@ -411,6 +415,21 @@ async def run_portals_scraper_with_options(names: Optional[List[str]] = None, *,
 
     # All collections mode
     await offset_only_all(auth_token, fast_db=fast_db, no_reset=no_reset)
+
+async def smart_scan_collection(collection_id: str, headers: dict, backdrops: List[str], seen_ids: Set[str]) -> List[Dict]:
+    """
+    1) Scan without filters.
+    2) If close to cap (>= SMART_CAP_THRESHOLD), run backdrop-partitioned scan instead.
+    Otherwise, keep the standard results and skip backdrops.
+    """
+    baseline = await scan_offsets(collection_id, headers, seen_ids)
+    if len(baseline) >= SMART_CAP_THRESHOLD:
+        logger.info(f"[{collection_id}] Offset-only returned {len(baseline)} (>= {SMART_CAP_THRESHOLD}); switching to backdrops")
+        # Run full backdrop-partitioned scan to avoid missing items
+        return await scan_offsets_with_backdrops(collection_id, headers, backdrops, seen_ids)
+    logger.info(f"[{collection_id}] Offset-only returned {len(baseline)} (< {SMART_CAP_THRESHOLD}); skipping backdrops")
+    return baseline
+
 
 # Convenience wrappers you can call directly (no CLI flags needed)
 async def run_all_standard():
