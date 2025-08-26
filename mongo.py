@@ -36,7 +36,69 @@ subscriptions_collection: AsyncIOMotorCollection = db.subscriptions
 support_collection: AsyncIOMotorCollection = db.support_tickets
 promo_codes_collection: AsyncIOMotorCollection = db.promo_codes
 promo_usage_collection: AsyncIOMotorCollection = db.promo_usage
+
 users_collection: AsyncIOMotorCollection = db.users
+
+# --- Price existence helpers (DB-level guarantee) ---
+KNOWN_MARKETS = ["portals", "getgems", "tonnel", "fragment"]
+
+def _price_exists_filter(market: str | None, require_listed: bool) -> Dict[str, Any]:
+    """Return a Mongo filter that ensures at least one price exists.
+    - If require_listed is False → returns {} (no constraint)
+    - If market is a specific name → require markets.<market>.price.amount exists
+    - If market is None / "any" / "*" → require price in ANY known market via $or
+    """
+    if not require_listed:
+        return {}
+    if market and market not in ("any", "*"):
+        return {f"markets.{market}.price.amount": {"$exists": True}}
+    return {"$or": [{f"markets.{m}.price.amount": {"$exists": True}} for m in KNOWN_MARKETS]}
+
+def _min_any_market_price_in_doc(nft: Dict[str, Any]) -> float:
+    best = float("inf")
+    for m in (nft.get("markets", {}) or {}).values():
+        try:
+            amt = float(m.get("price", {}).get("amount"))
+            if amt < best:
+                best = amt
+        except Exception:
+            continue
+    return best
+
+def _enrich_market_view(nft: Dict[str, Any], preferred_market: str | None = "portals") -> None:
+    """Populate convenience fields price/url/is_listed.
+    Prefers preferred_market; falls back to the cheapest among all markets.
+    """
+    markets = nft.get("markets", {}) or {}
+    price = None
+    url = ""
+    if preferred_market and preferred_market in markets:
+        try:
+            price = float(markets[preferred_market].get("price", {}).get("amount"))
+        except Exception:
+            price = None
+        url = markets[preferred_market].get("url", "")
+    if price is None:
+        best = float("inf"); best_url = ""
+        for mk, data in markets.items():
+            try:
+                amt = float(data.get("price", {}).get("amount"))
+                if amt < best:
+                    best = amt
+                    best_url = data.get("url", "")
+            except Exception:
+                continue
+        if best != float("inf"):
+            price = best
+            url = best_url
+    if price is not None:
+        nft["price"] = price
+        nft["is_listed"] = True
+        nft["url"] = url or nft.get("url", "")
+    else:
+        nft["price"] = 0.0
+        nft["is_listed"] = False
+        nft["url"] = url or nft.get("url", "")
 
 
 async def init_indexes():
@@ -727,17 +789,7 @@ async def find_nfts_by_model(
     require_listed: bool = True,
 ) -> list[dict]:
     """Search NFTs by *model only* (case-insensitive), optionally scoped to a collection.
-
-    Works with both schemas:
-      • flattened fields (nft.model)
-      • traits array (traits[].{type,value})
-
-    If `require_listed` is True (default), we only return items that have a numeric
-    `markets.<market>.price.amount` (tolerant to missing `is_listed`).
-
-    Returns a list of NFT docs enriched with convenience fields:
-      nft["price"], nft["is_listed"], nft["url"]
-    and sorted by cheapest price ascending.
+    DB-level guarantee: only NFTs with price in at least one market are returned if require_listed.
     """
     # Resolve collection_uid from slug, if needed
     if not collection_uid and collection_slug:
@@ -746,9 +798,8 @@ async def find_nfts_by_model(
             return []
         collection_uid = coll["_id"]
 
-    # Build a tolerant listing filter: presence of price amount
-    price_key = f"markets.{market}.price.amount"
-    listing_filter = {price_key: {"$exists": True}} if require_listed else {}
+    # Build a tolerant listing filter: presence of price amount in at least one known market
+    listing_filter = _price_exists_filter(market, require_listed)
 
     # Model-only filter supports both flattened and traits[] forms
     model_regex = {"$regex": f"^{re.escape(model)}$", "$options": "i"}
@@ -770,21 +821,13 @@ async def find_nfts_by_model(
     if collection_uid:
         base_query["collection_uid"] = collection_uid
 
-    # Query and sort by price ascending
-    cursor = nfts_collection.find(base_query).sort([(price_key, 1)])
+    cursor = nfts_collection.find(base_query)
 
     results: list[dict] = []
     async for nft in cursor:
-        mkt = nft.get("markets", {}).get(market, {})
-        # Enrich convenience fields (tolerant parsing)
-        try:
-            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
-        except Exception:
-            nft["price"] = 0.0
-        nft["is_listed"] = bool(mkt.get("is_listed", True))  # default True if price is present
-        nft["url"] = mkt.get("url", "")
+        _enrich_market_view(nft, market if market not in (None, "any", "*") else None)
         results.append(nft)
-
+    results.sort(key=_min_any_market_price_in_doc)
     return results
 
 
@@ -801,12 +844,7 @@ async def find_exact_then_symbolless(
     """Return NFTs matching (in priority order):
     1) exact: model + backdrop + symbol
     2) symbolless: model + backdrop with an empty/missing symbol
-
-    Case-insensitive for model/backdrop/symbol on both flattened fields and traits[].
-    If `require_listed` is True, only include docs with markets.<market>.price.amount.
-
-    The returned list contains only one bucket: exact results if any; otherwise symbolless results.
-    Sorted by markets.<market>.price.amount ascending and enriched with convenience fields.
+    DB-level guarantee: only NFTs with price in at least one market are returned if require_listed.
     """
     # Resolve collection_uid from slug, if needed
     if not collection_uid and collection_slug:
@@ -815,8 +853,7 @@ async def find_exact_then_symbolless(
             return []
         collection_uid = coll["_id"]
 
-    price_key = f"markets.{market}.price.amount"
-    listing_filter = {price_key: {"$exists": True}} if require_listed else {}
+    listing_filter = _price_exists_filter(market, require_listed)
 
     rx = lambda v: {"$regex": f"^{re.escape(v)}$", "$options": "i"}
 
@@ -842,17 +879,12 @@ async def find_exact_then_symbolless(
     if listing_filter:
         exact_query.update(listing_filter)
 
-    exact_cursor = nfts_collection.find(exact_query).sort([(price_key, 1)])
+    exact_cursor = nfts_collection.find(exact_query)
     exact_results: list[dict] = []
     async for nft in exact_cursor:
-        mkt = nft.get("markets", {}).get(market, {})
-        try:
-            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
-        except Exception:
-            nft["price"] = 0.0
-        nft["is_listed"] = bool(mkt.get("is_listed", True))
-        nft["url"] = mkt.get("url", "")
+        _enrich_market_view(nft, market if market not in (None, "any", "*") else None)
         exact_results.append(nft)
+    exact_results.sort(key=_min_any_market_price_in_doc)
 
     if exact_results:
         return exact_results
@@ -886,17 +918,12 @@ async def find_exact_then_symbolless(
     if listing_filter:
         symbolless_query.update(listing_filter)
 
-    sl_cursor = nfts_collection.find(symbolless_query).sort([(price_key, 1)])
+    sl_cursor = nfts_collection.find(symbolless_query)
     symbolless_results: list[dict] = []
     async for nft in sl_cursor:
-        mkt = nft.get("markets", {}).get(market, {})
-        try:
-            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
-        except Exception:
-            nft["price"] = 0.0
-        nft["is_listed"] = bool(mkt.get("is_listed", True))
-        nft["url"] = mkt.get("url", "")
+        _enrich_market_view(nft, market if market not in (None, "any", "*") else None)
         symbolless_results.append(nft)
+    symbolless_results.sort(key=_min_any_market_price_in_doc)
 
     return symbolless_results
 

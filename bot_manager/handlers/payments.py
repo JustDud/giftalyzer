@@ -135,10 +135,15 @@ async def process_promo_code(message: Message, state: FSMContext, t: dict):
 
     await subscriptions_collection.update_one(
         {"user_id": user_id},
-        {"$set": {"last_used_promo": {
-            "promo_code": result["promo_code"],
-            "final_price": discounted_price
-        }}},
+        {"$set": {
+            "last_used_promo": {
+                "promo_code": result["promo_code"],
+                "final_price": discounted_price
+            },
+            "first_name": getattr(message.from_user, "first_name", None),
+            "last_name": getattr(message.from_user, "last_name", None),
+            "username": getattr(message.from_user, "username", None),
+        }},
         upsert=True
     )
 
@@ -206,7 +211,13 @@ async def successful_payment(message: Message, t: dict):
     await subscriptions_collection.update_one(
         {"user_id": message.from_user.id},
         {"$push": {"transactions": {"id": charge_id, "refunded": False, "date": utc_now()}},
-         "$set": {"subscribed": True, "start_date": utc_now()}},
+         "$set": {
+             "subscribed": True,
+             "start_date": utc_now(),
+             "first_name": getattr(message.from_user, "first_name", None),
+             "last_name": getattr(message.from_user, "last_name", None),
+             "username": getattr(message.from_user, "username", None),
+         }},
         upsert=True
     )
     confirmation_text = t["subscription_activated"].format(charge_id=charge_id)
@@ -223,11 +234,14 @@ async def successful_payment(message: Message, t: dict):
 
     promo_data = await subscriptions_collection.find_one({"user_id": message.from_user.id})
     if promo_data and promo_data.get("last_used_promo"):
-        finalize_promo_usage(
-            message.from_user.id,
-            promo_data["last_used_promo"]["promo_code"],
-            promo_data["last_used_promo"]["final_price"]
-        )
+        try:
+            await finalize_promo_usage(
+                message.from_user.id,
+                promo_data["last_used_promo"]["promo_code"],
+                promo_data["last_used_promo"]["final_price"]
+            )
+        except Exception as e:
+            print(f"[PROMO] finalize_promo_usage failed: {e}")
         await subscriptions_collection.update_one(
             {"user_id": message.from_user.id},
             {"$unset": {"last_used_promo": ""}}

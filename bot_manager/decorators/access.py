@@ -27,13 +27,13 @@ def ai_access_required(handler):
         sig = inspect.signature(handler)
         filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
 
-        if await is_subscription_valid(user_id):
-            return await handler(event, *args, **filtered_kwargs)
-
         user = await users_collection.find_one({"user_id": user_id})
         if not user:
             await users_collection.insert_one({
                 "user_id": user_id,
+                "first_name": getattr(event.from_user, "first_name", None),
+                "last_name": getattr(event.from_user, "last_name", None),
+                "username": getattr(event.from_user, "username", None),
                 "free_ai_requests": 10,
                 "language": "ru"
             })
@@ -43,7 +43,12 @@ def ai_access_required(handler):
         if free_left > 0:
             await users_collection.update_one(
                 {"user_id": user_id},
-                {"$inc": {"free_ai_requests": -1}}
+                {"$inc": {"free_ai_requests": -1},
+                 "$set": {
+                    "first_name": getattr(event.from_user, "first_name", None),
+                    "last_name": getattr(event.from_user, "last_name", None),
+                    "username": getattr(event.from_user, "username", None),
+                 }}
             )
             updated = await users_collection.find_one({"user_id": user_id})
             try:

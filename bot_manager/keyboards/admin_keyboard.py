@@ -18,6 +18,6 @@ def get_promocodes_keyboard(t):
         [InlineKeyboardButton(text=t["btn_delete_promocode"], callback_data="admin_delete_promocode")],
         [InlineKeyboardButton(text=t["btn_list_promocodes"], callback_data="admin_list_promocodes")],
         [InlineKeyboardButton(text=t["btn_promocode_stats"], callback_data="admin_promocode_stats")],
-        [InlineKeyboardButton(text=t["btn_top_promocodes"], callback_data="admin_top_promocodes")],
+        # [InlineKeyboardButton(text=t["btn_top_promocodes"], callback_data="admin_top_promocodes")],
         [InlineKeyboardButton(text=t["btn_back_admin"], callback_data="admin_back_main")]
     ])

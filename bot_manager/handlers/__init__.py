@@ -11,10 +11,12 @@ def register_all_handlers(dp: Dispatcher):
     search_results.register(dp)
     admin_support.register(dp)
     support.register(dp)
-    payments.register(dp)
-    admin_general.register(dp)
-    language.register(dp)
     ai_requests.register(dp)
     ai_requests_results.register(dp)
+    admin_general.register(dp)
+    language.register(dp)
+    payments.register(dp)
+
+
     
 

@@ -165,6 +165,7 @@ async def admin_list_promocodes(callback: CallbackQuery, t: dict):
                 f"{t['discount']} {p['discount_percent']}% | "
                 f"{t['profit']} {p.get('total_profit', 0):.2f} | "
                 f"{'✅' if p.get('is_active') else '❌'}\n"
+                f"➡️ {t.get('income_percentage','Доход владельца')} {p.get('owner_profit_percent', 0)}%\n"
             )
 
         await callback.message.answer(text, parse_mode="HTML")
@@ -282,7 +283,7 @@ async def process_add_single_use(message: Message, state: FSMContext, t: dict):
         await message.answer(t["operation_error"])
         return
 
-    promo = create_promo(
+    promo = await create_promo(
         data["code"],
         data["owner_id"],
         data["discount"],
@@ -307,7 +308,7 @@ async def process_delete_promo(message: Message, state: FSMContext, t: dict):
         if message.from_user.id != data.get("starter_id"):
             return
         code = message.text.strip().upper()
-        ok = disable_promo(code)
+        ok = await disable_promo(code)
         await state.clear()
         if ok:
             await message.answer(t["promocode_disabled"].format(code=code))
