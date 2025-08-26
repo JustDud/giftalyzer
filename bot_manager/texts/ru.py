@@ -250,4 +250,6 @@ texts = {
     "ai_no_analysis_found": "❌ Анализ не найден.",
     "ai_analysis_result_prefix": "📊 Результат анализа:",
 
+    "btn_cancel_selection": "🚫 Сбросить выбор",
+
 }

@@ -176,6 +176,23 @@ async def select_all_models(call: CallbackQuery, state: FSMContext, t: dict):
             raise
 
 
+@router.callback_query(MarketSearchState.selecting_gift, F.data == "cancel_selection_models")
+async def cancel_models_selection(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
+    data = await state.get_data()
+    # Clear selected models but keep cached list and current page
+    await state.update_data(selected_models=[])
+
+    nfts = sorted(data.get("cached_nfts", []))
+    page = data.get("current_nft_page", 0)
+    keyboard = get_nft_keyboard(nfts, page=page, selected_models=[], include_select_all=True, t=t)
+    try:
+        await call.message.edit_reply_markup(reply_markup=keyboard)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            raise
+
+
 @router.callback_query(F.data == "back_to_main")
 async def handle_back_to_main_menu(call: CallbackQuery, state: FSMContext, t: dict):
     await call.answer()
@@ -256,6 +273,22 @@ async def select_all_backdrops(call: CallbackQuery, state: FSMContext, t: dict):
 
     from bot_manager.keyboards.search_keyboard import get_backdrop_keyboard
     keyboard = get_backdrop_keyboard(backdrops, selected_backdrops=backdrops, include_show_results_button=True, t=t)
+    try:
+        await call.message.edit_reply_markup(reply_markup=keyboard)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            raise
+
+
+@router.callback_query(MarketSearchState.selecting_backdrop, F.data == "cancel_selection_backdrops")
+async def cancel_backdrops_selection(call: CallbackQuery, state: FSMContext, t: dict):
+    await call.answer()
+    data = await state.get_data()
+    # Clear selected backdrops and reset pagination
+    await state.update_data(selected_backdrops=[])
+
+    backdrops = sorted(data.get("cached_backdrops", []))
+    keyboard = get_backdrop_keyboard(backdrops, selected_backdrops=[], include_show_results_button=True, t=t)
     try:
         await call.message.edit_reply_markup(reply_markup=keyboard)
     except TelegramBadRequest as e:

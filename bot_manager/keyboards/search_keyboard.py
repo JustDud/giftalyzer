@@ -33,6 +33,9 @@ def get_nft_keyboard(
         rows.append([
             InlineKeyboardButton(text=t["btn_select_all_models"], callback_data="select_all_models")
         ])
+        rows.append([
+            InlineKeyboardButton(text=t["btn_cancel_selection"], callback_data="cancel_selection_models")
+        ])
 
     nav_buttons = []
     if page > 0:
@@ -99,6 +102,9 @@ def get_backdrop_keyboard(
 
     rows.append([
         InlineKeyboardButton(text=t["btn_select_all_backdrops"], callback_data="select_all_backdrops")
+    ])
+    rows.append([
+        InlineKeyboardButton(text=t["btn_cancel_selection"], callback_data="cancel_selection_backdrops")
     ])
 
     if include_show_results_button:
