@@ -123,7 +123,7 @@ async def fetch_backdrops(tma_token: str, extra_headers: dict | None = None) -> 
     url = f"{API_URL_PORTALS}/api/collections/filters/backdrops"
     async with aiohttp.ClientSession() as session:
         status, data = await fetch_json(session, url, headers)
-        logger.info(f"GET {url} -> {status}")
+        #logger.info(f"GET {url} -> {status}")
         if status != 200 or not data:
             # Try to show a short body snippet for easier debugging
             try:

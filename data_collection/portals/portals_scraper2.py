@@ -416,17 +416,63 @@ async def run_portals_scraper_with_options(names: Optional[List[str]] = None, *,
     # All collections mode
     await offset_only_all(auth_token, fast_db=fast_db, no_reset=no_reset)
 
+
+async def scan_offsets_ephemeral(collection_id: str, headers: dict) -> List[Dict]:
+    """
+    Wide scan WITHOUT mutating seen_ids. Used by the smart switch to decide whether to switch
+    to backdrop partitioning. Dedupe by id locally and short-circuit as soon as we hit
+    SMART_CAP_THRESHOLD to avoid inflating the count due to duplicates.
+    """
+    items: List[Dict] = []
+    local_ids: Set[str] = set()
+    collection = quote_plus(collection_id)
+    async with aiohttp.ClientSession() as session:
+        for offset in range(0, 800, OFFSET_STEP):
+            url = (
+                f"{API_URL_PORTALS}/api/nfts/search"
+                f"?offset={offset}&limit={PAGE_LIMIT}&collection_id={collection}&status=listed"
+            )
+            status, data = await fetch_json(session, url, headers)
+            if status != 200 or not data:
+                await asyncio.sleep(0.05)
+                continue
+            results = data.get("results", [])
+            if not results:
+                await asyncio.sleep(0.05)
+                continue
+            for it in results:
+                it_id = it.get("id")
+                if not it_id:
+                    continue
+                if it_id in local_ids:
+                    continue
+                local_ids.add(it_id)
+                items.append(it)
+                # Early exit once we reached the threshold of unique items
+                if len(local_ids) >= SMART_CAP_THRESHOLD:
+                    logger.info(f"Wide scan (ephemeral) reached threshold: {len(local_ids)} unique items; stopping early")
+                    return items
+            await asyncio.sleep(0.05)
+    logger.info(f"Wide scan (ephemeral) collected {len(local_ids)} unique items")
+    return items
+
+
 async def smart_scan_collection(collection_id: str, headers: dict, backdrops: List[str], seen_ids: Set[str]) -> List[Dict]:
     """
-    1) Scan without filters.
+    1) Scan without filters (side‑effect free).
     2) If close to cap (>= SMART_CAP_THRESHOLD), run backdrop-partitioned scan instead.
-    Otherwise, keep the standard results and skip backdrops.
+       Otherwise, keep the standard results and skip backdrops.
     """
-    baseline = await scan_offsets(collection_id, headers, seen_ids)
+    baseline = await scan_offsets_ephemeral(collection_id, headers)
     if len(baseline) >= SMART_CAP_THRESHOLD:
         logger.info(f"[{collection_id}] Offset-only returned {len(baseline)} (>= {SMART_CAP_THRESHOLD}); switching to backdrops")
-        # Run full backdrop-partitioned scan to avoid missing items
+        # Do NOT add baseline ids to seen_ids; we switch strategies
         return await scan_offsets_with_backdrops(collection_id, headers, backdrops, seen_ids)
+    # Keep baseline: now merge its IDs into seen_ids so later scans don't duplicate them
+    for it in baseline:
+        it_id = it.get("id")
+        if it_id:
+            seen_ids.add(it_id)
     logger.info(f"[{collection_id}] Offset-only returned {len(baseline)} (< {SMART_CAP_THRESHOLD}); skipping backdrops")
     return baseline
 
@@ -467,4 +513,5 @@ async def run_portals_scraper():
     await run_portals_scraper_with_options(names_or_none, fast_db=fast_db, no_reset=no_reset)
 
 if __name__ == "__main__":
-    asyncio.run(run_all_bulk())
+    #asyncio.run(run_all_bulk())
+    asyncio.run(run_names_bulk(["Swiss Watch"]))

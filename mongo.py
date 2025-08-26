@@ -8,8 +8,8 @@ from typing import List, Dict, Any
 import csv
 from datetime import datetime, UTC
 from typing import Set
-import pymongo
 from pymongo import UpdateOne
+import re as _re
 
 def utc_now() -> datetime:
     """Return timezone-aware current UTC datetime (PEP 495/PEP 615 safe)."""
@@ -688,6 +688,7 @@ async def get_nfts_by_params(model: str, symbol: str | None, backdrop: str, coll
     return results
 
 
+
 async def get_nfts_model_only(model: str, collection_name: str = None, market: str = "portals") -> list[dict]:
     # Fetch collection UID by name if provided
     collection_uid = None
@@ -714,6 +715,190 @@ async def get_nfts_model_only(model: str, collection_name: str = None, market: s
         nft["url"] = m.get("url", "")
         results.append(nft)
     return results
+
+
+
+# --- New flexible model-only NFT search helper ---
+async def find_nfts_by_model(
+    model: str,
+    collection_slug: str | None = None,
+    collection_uid: str | None = None,
+    market: str = "portals",
+    require_listed: bool = True,
+) -> list[dict]:
+    """Search NFTs by *model only* (case-insensitive), optionally scoped to a collection.
+
+    Works with both schemas:
+      • flattened fields (nft.model)
+      • traits array (traits[].{type,value})
+
+    If `require_listed` is True (default), we only return items that have a numeric
+    `markets.<market>.price.amount` (tolerant to missing `is_listed`).
+
+    Returns a list of NFT docs enriched with convenience fields:
+      nft["price"], nft["is_listed"], nft["url"]
+    and sorted by cheapest price ascending.
+    """
+    # Resolve collection_uid from slug, if needed
+    if not collection_uid and collection_slug:
+        coll = await collections_collection.find_one({"slug": collection_slug})
+        if not coll:
+            return []
+        collection_uid = coll["_id"]
+
+    # Build a tolerant listing filter: presence of price amount
+    price_key = f"markets.{market}.price.amount"
+    listing_filter = {price_key: {"$exists": True}} if require_listed else {}
+
+    # Model-only filter supports both flattened and traits[] forms
+    model_regex = {"$regex": f"^{re.escape(model)}$", "$options": "i"}
+    model_filter = {
+        "$or": [
+            {"model": model_regex},
+            {
+                "traits": {
+                    "$elemMatch": {
+                        "type": "model",
+                        "value": model_regex,
+                    }
+                }
+            },
+        ]
+    }
+
+    base_query = {**model_filter, **listing_filter}
+    if collection_uid:
+        base_query["collection_uid"] = collection_uid
+
+    # Query and sort by price ascending
+    cursor = nfts_collection.find(base_query).sort([(price_key, 1)])
+
+    results: list[dict] = []
+    async for nft in cursor:
+        mkt = nft.get("markets", {}).get(market, {})
+        # Enrich convenience fields (tolerant parsing)
+        try:
+            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
+        except Exception:
+            nft["price"] = 0.0
+        nft["is_listed"] = bool(mkt.get("is_listed", True))  # default True if price is present
+        nft["url"] = mkt.get("url", "")
+        results.append(nft)
+
+    return results
+
+
+# --- New: find_exact_then_symbolless ---
+async def find_exact_then_symbolless(
+    model: str,
+    backdrop: str,
+    symbol: str | None = None,
+    collection_slug: str | None = None,
+    collection_uid: str | None = None,
+    market: str = "portals",
+    require_listed: bool = True,
+) -> list[dict]:
+    """Return NFTs matching (in priority order):
+    1) exact: model + backdrop + symbol
+    2) symbolless: model + backdrop with an empty/missing symbol
+
+    Case-insensitive for model/backdrop/symbol on both flattened fields and traits[].
+    If `require_listed` is True, only include docs with markets.<market>.price.amount.
+
+    The returned list contains only one bucket: exact results if any; otherwise symbolless results.
+    Sorted by markets.<market>.price.amount ascending and enriched with convenience fields.
+    """
+    # Resolve collection_uid from slug, if needed
+    if not collection_uid and collection_slug:
+        coll = await collections_collection.find_one({"slug": collection_slug})
+        if not coll:
+            return []
+        collection_uid = coll["_id"]
+
+    price_key = f"markets.{market}.price.amount"
+    listing_filter = {price_key: {"$exists": True}} if require_listed else {}
+
+    rx = lambda v: {"$regex": f"^{re.escape(v)}$", "$options": "i"}
+
+    # --- Build EXACT filter (model + backdrop + symbol) ---
+    exact_symbol = symbol if symbol is not None else ""
+
+    exact_or = [
+        {"$and": [
+            {"model": rx(model)},
+            {"backdrop": rx(backdrop)},
+            {"symbol": rx(exact_symbol)},
+        ]},
+        {"traits": {"$all": [
+            {"$elemMatch": {"type": "model", "value": rx(model)}},
+            {"$elemMatch": {"type": "backdrop", "value": rx(backdrop)}},
+            {"$elemMatch": {"type": "symbol", "value": rx(exact_symbol)}},
+        ]}},
+    ]
+
+    exact_query = {"$or": exact_or}
+    if collection_uid:
+        exact_query["collection_uid"] = collection_uid
+    if listing_filter:
+        exact_query.update(listing_filter)
+
+    exact_cursor = nfts_collection.find(exact_query).sort([(price_key, 1)])
+    exact_results: list[dict] = []
+    async for nft in exact_cursor:
+        mkt = nft.get("markets", {}).get(market, {})
+        try:
+            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
+        except Exception:
+            nft["price"] = 0.0
+        nft["is_listed"] = bool(mkt.get("is_listed", True))
+        nft["url"] = mkt.get("url", "")
+        exact_results.append(nft)
+
+    if exact_results:
+        return exact_results
+
+    # --- Build SYMBOLLESS fallback (model + backdrop, empty/missing symbol) ---
+    blank_vals = [None, "", "-", "—"]
+
+    symbolless_or = [
+        # flattened: symbol in blank values
+        {"$and": [
+            {"model": rx(model)},
+            {"backdrop": rx(backdrop)},
+            {"symbol": {"$in": blank_vals}},
+        ]},
+        # traits: model/backdrop match, and either no symbol trait or only blank-valued symbol trait
+        {"$and": [
+            {"traits": {"$all": [
+                {"$elemMatch": {"type": "model", "value": rx(model)}},
+                {"$elemMatch": {"type": "backdrop", "value": rx(backdrop)}},
+            ]}},
+            {"$or": [
+                {"traits": {"$not": {"$elemMatch": {"type": "symbol"}}}},
+                {"traits": {"$elemMatch": {"type": "symbol", "value": {"$in": blank_vals}}}},
+            ]},
+        ]},
+    ]
+
+    symbolless_query = {"$or": symbolless_or}
+    if collection_uid:
+        symbolless_query["collection_uid"] = collection_uid
+    if listing_filter:
+        symbolless_query.update(listing_filter)
+
+    sl_cursor = nfts_collection.find(symbolless_query).sort([(price_key, 1)])
+    symbolless_results: list[dict] = []
+    async for nft in sl_cursor:
+        mkt = nft.get("markets", {}).get(market, {})
+        try:
+            nft["price"] = float(mkt.get("price", {}).get("amount", 0))
+        except Exception:
+            nft["price"] = 0.0
+        nft["is_listed"] = bool(mkt.get("is_listed", True))
+        nft["url"] = mkt.get("url", "")
+        symbolless_results.append(nft)
+
+    return symbolless_results
 
 
 async def get_nfts_compatible(
@@ -787,8 +972,7 @@ async def find_nft_id_by_traits(
     doc = await nfts_collection.find_one(query, {"_id": 1})
     return doc["_id"] if doc else None
 
-import pymongo
-import re as _re
+
 # Flexible NFT lookup by traits (progressive fallback, case-insensitive, $elemMatch, fallback logic)
 async def find_nft_id_by_traits_flexible(
     model: str,

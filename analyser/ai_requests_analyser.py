@@ -67,62 +67,106 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
     collection_uid = collection["_id"]
     collection_slug = collection.get("slug", "")  # Assuming slug is stored in collection
 
-    # === Bucketed candidate search (3/3 → 2/3 → 1/3) ===
+    # --- Debug: collection context ---
+    print(f"[AI-DBG] collection_uid={collection_uid} slug={collection_slug}")
+
+    # === Candidate search using helper functions (special backdrops vs model-only) ===
     nft_details = []
 
     # Pull symbol if present in state (may be None)
     selected_symbol = data.get("selected_symbol")
 
-    # Helper: extract a trait value by name
+    # Utility: extract trait value
     def _trait_val(g, name):
         return next((tr.get("value") for tr in g.get("traits", []) if tr.get("type") == name), None)
 
-    # Helper: cheapest listed price across ANY market; +inf if none
-    def _min_listed_price(g):
-        markets = g.get("markets", {}) or {}
+    # Utility: min price across any market
+    def _min_any_market_price(g):
         best = float("inf")
-        for m in markets.values():
+        for m in (g.get("markets", {}) or {}).values():
             try:
-                if m.get("is_listed") and "price" in m and "amount" in m["price"]:
-                    best = min(best, float(m["price"]["amount"]))
+                amt = float(m.get("price", {}).get("amount"))
+                if amt < best:
+                    best = amt
             except Exception:
                 continue
         return best
 
-    # Collect a capped set of candidates for performance
-    cursor = nfts_collection.find(
-        {"collection_uid": collection_uid, "traits": {"$exists": True}},
-        projection={"_id": 1, "traits": 1, "markets": 1},
-    )
-    candidates = await cursor.to_list(length=600)
+    def _fmt_min_price(g):
+        p = _min_any_market_price(g)
+        return "∞" if p == float("inf") else f"{p:.2f} TON"
 
-    exact, partial, model_only = [], [], []
-    from itertools import product as _product
-    backdrop_combinations = selected_backdrops if selected_backdrops else [None]
+    def _peek(rows, n=3):
+        out = []
+        for r in rows[:n]:
+            _id = r.get("_id")
+            out.append(f"{_id} @ {_fmt_min_price(r)}")
+        return ", ".join(out)
 
-    for model, backdrop in _product(selected_models, backdrop_combinations):
-        for g in candidates:
-            gm, gb, gs = _trait_val(g, "model"), _trait_val(g, "backdrop"), _trait_val(g, "symbol")
-            m_eq = (gm == model) if model else False
-            b_eq = (gb == backdrop) if backdrop else False
-            s_eq = (gs == selected_symbol) if selected_symbol else False
-            if m_eq and b_eq and s_eq:
-                exact.append(g)
-            elif m_eq and b_eq:
-                partial.append(g)
-            elif m_eq:
-                model_only.append(g)
+    # Decide model/backdrop to search with (first selections or parsed)
+    model = selected_models[0] if selected_models else None
+    backdrop = selected_backdrops[0] if selected_backdrops else None
 
-    # Sort each bucket by cheapest listing
-    for bucket in (exact, partial, model_only):
-        bucket.sort(key=_min_listed_price)
+    print(f"[AI-DBG] selected_models={selected_models} selected_backdrops={selected_backdrops}")
+    print(f"[AI-DBG] parsed model={model!r} backdrop={backdrop!r}")
 
-    # Pick best available candidate (exact → partial → model_only)
-    chosen = (exact or partial or model_only)
-    if chosen:
-        nft = chosen[0]
+    if not model:
+        await msg.answer("❌ Не удалось определить модель для поиска.")
+        try:
+            await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+        except Exception:
+            await msg.answer(t["keyboard_restored"], reply_markup=get_main_menu(t))
+        await state.clear()
+        return
+
+    # Special-backdrop vs model-only logic
+    special_backdrops = {"black", "onyx black", "gunmetal"}
+    backdrop_key = (backdrop or "").strip().lower()
+
+    print(f"[AI-DBG] special_backdrops={sorted(list(special_backdrops))}")
+    print(f"[AI-DBG] backdrop_key={backdrop_key!r} is_special={backdrop_key in special_backdrops}")
+    print(f"[AI-DBG] symbol_for_exact={selected_symbol!r}")
+
+    from mongo import find_nfts_by_model, find_exact_then_symbolless
+
+    results = []
+    if backdrop_key in special_backdrops and backdrop:
+        print("[AI-DBG] calling find_exact_then_symbolless with:",
+              {"model": model, "backdrop": backdrop, "symbol": selected_symbol, "collection_slug": collection_slug, "require_listed": False})
+        # exact → symbolless; broaden, then filter to priced and pick cheapest
+        rows = await find_exact_then_symbolless(
+            model=model,
+            backdrop=backdrop,
+            symbol=selected_symbol,
+            collection_slug=collection_slug,
+            require_listed=False,
+        )
+        print(f"[AI-DBG] exact/symbolless rows={len(rows)} | sample: {_peek(rows)}")
+        priced = [g for g in rows if _min_any_market_price(g) != float("inf")]
+        results = sorted(priced, key=_min_any_market_price)
+        print(f"[AI-DBG] priced_after_filter={len(priced)} | sample: {_peek(priced)}")
+        print(f"[AI-DBG] results_sorted={len(results)} | head: {_peek(results)}")
+    else:
+        print("[AI-DBG] calling find_nfts_by_model with:",
+              {"model": model, "collection_slug": collection_slug, "require_listed": False})
+        # model-only for all non-special backdrops
+        rows = await find_nfts_by_model(
+            model=model,
+            collection_slug=collection_slug,
+            require_listed=False,
+        )
+        print(f"[AI-DBG] model-only rows={len(rows)} | sample: {_peek(rows)}")
+        priced = [g for g in rows if _min_any_market_price(g) != float("inf")]
+        results = sorted(priced, key=_min_any_market_price)
+        print(f"[AI-DBG] priced_after_filter={len(priced)} | sample: {_peek(priced)}")
+        print(f"[AI-DBG] results_sorted={len(results)} | head: {_peek(results)}")
+
+    if results:
+        nft = results[0]
+        print(f"[AI-DBG] chosen_id={nft.get('_id')} | chosen_price={_fmt_min_price(nft)}")
         traits = {t.get("type"): t.get("value") for t in nft.get("traits", [])}
 
+        # rarity (per mille on model trait)
         rarity = None
         for trait in nft.get("traits", []):
             if trait.get("type") == "model" and "rarity_per_mille" in trait:
@@ -133,10 +177,7 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
                 break
 
         nft_id = nft.get("_id")
-        # use cheapest across markets for display price if needed; fallback 0
-        price_amount = _min_listed_price(nft)
-        if not (price_amount == price_amount):  # NaN guard (unlikely)
-            price_amount = 0.0
+        price_amount = _min_any_market_price(nft)
         if price_amount == float("inf"):
             price_amount = 0.0
 
@@ -149,6 +190,8 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
             "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
             "liquidity": int(float((collection.get("markets", {}) or {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
         })
+    else:
+        print(f"[AI] No priced results found for AI analysis | model={model!r} backdrop={backdrop!r} special={backdrop_key in special_backdrops}")
 
     print(f"[AI] nft_details_count={len(nft_details)} user_question={user_question!r}")
     print(f"ANALYSIS DATA (detailed): {nft_details}")

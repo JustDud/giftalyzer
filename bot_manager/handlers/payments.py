@@ -17,6 +17,18 @@ logs_group_id = os.getenv("LOGS_GROUP_ID")
 
 router = Router()
 
+MONTHS_RU = {
+    1: "января", 2: "февраля", 3: "марта",
+    4: "апреля", 5: "мая", 6: "июня",
+    7: "июля", 8: "августа", 9: "сентября",
+    10: "октября", 11: "ноября", 12: "декабря",
+}
+
+def format_date_ru(dt):
+    if not dt:
+        return "—"
+    return f"{dt.day} {MONTHS_RU[dt.month]} {dt.year}"
+
 
 async def has_active_subscription(user_id: int):
     sub = await subscriptions_collection.find_one({"user_id": user_id})
@@ -26,7 +38,7 @@ async def has_active_subscription(user_id: int):
         end_date = sub.get("end_date")
         if not end_date and sub.get("start_date"):
             end_date = sub["start_date"] + timedelta(days=30)
-        return True, end_date
+        return True, end_date  # return datetime; callers will format
     return False, None
 
 
@@ -38,9 +50,9 @@ async def get_subscription_info(user_id: int) -> str:
     start = sub.get("start_date")
     end_date = sub.get("end_date")
     if end_date:
-        end_date = end_date.strftime('%d %B %Y')
+        end_date = format_date_ru(end_date)
     elif start:
-        end_date = (start + timedelta(days=30)).strftime('%d %B %Y')
+        end_date = format_date_ru(start + timedelta(days=30))
     transactions = sub.get("transactions", [])
     transaction_id = transactions[-1]["id"] if transactions else "—"
     return (
@@ -56,7 +68,7 @@ async def get_subscription_info(user_id: int) -> str:
 async def handle_subscription_button(message: Message, state: FSMContext, t: dict):
     active, end_date = await has_active_subscription(message.from_user.id)
     if active:
-        formatted_date = end_date.strftime('%d %B %Y') if end_date else "—"
+        formatted_date = format_date_ru(end_date) if end_date else "—"
         await message.answer(t["active_subscription_until"].format(date=formatted_date))
         return
     await start_promo_flow(message, t, state)
@@ -151,7 +163,7 @@ async def skip_promo(callback: CallbackQuery, state: FSMContext, t: dict):
 async def start_payment_cycle(message: Message, price: float, t: dict):
     active, end_date = await has_active_subscription(message.from_user.id)
     if active:
-        formatted_date = end_date.strftime('%d %B %Y') if end_date else "—"
+        formatted_date = format_date_ru(end_date) if end_date else "—"
         await message.answer(t["active_subscription_until"].format(date=formatted_date))
         return
     try:
