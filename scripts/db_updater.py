@@ -1,5 +1,10 @@
 import asyncio
-from data_collection.portals import portals_scraper, backdropsfiltered_scraper
+from data_collection.portals import backdropsfiltered_scraper
+
+
+async def update_db():
+    while True:
+        await backdropsfiltered_scraper.run_portals_scraper()
 
 
 async def main():

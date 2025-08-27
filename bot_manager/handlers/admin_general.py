@@ -15,7 +15,7 @@ from datetime import timedelta, UTC
 from subscription.manager import utc_now
 from bot_manager.states.admin_states import RefundFSM,CheckSubsFSM,PromoStatsFSM,PromoAddFSM,PromoDeleteFSM
 from bot_manager.promocodes import get_promo_stats, create_promo, disable_promo, list_all_promos
-from data_collection.marketapp import data_scraper
+from scripts.db_updater import update_db
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 
@@ -43,7 +43,7 @@ async def update_db(message: Message, t: dict):
         return
 
     await message.answer(t["db_update_started"])
-    await data_scraper.scrape_and_update_db()
+    await update_db()
     await message.answer(t["db_update_finished"])
 
 

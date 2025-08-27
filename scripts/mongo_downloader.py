@@ -1,12 +1,9 @@
-
 import asyncio
-import json
 import pandas as pd
 from mongo import nfts_collection
 from mongo import collections_collection
 
 
-# New: Export all NFTs to a CSV file
 async def download_all_nfts_to_csv(output_path="all_nfts.csv"):
     """Download all NFTs from the MongoDB collection and save to a CSV file."""
     nfts = [doc async for doc in nfts_collection.find()]
@@ -24,4 +21,7 @@ async def download_all_collections_to_csv(output_path="all_collections.csv"):
 
 
 if __name__ == "__main__":
-    asyncio.run(download_all_nfts_to_csv())
+    asyncio.gather(
+        download_all_collections_to_csv(),
+        download_all_nfts_to_csv()
+    )
