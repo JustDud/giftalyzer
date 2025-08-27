@@ -16,7 +16,7 @@ class DevGuardMiddlewareWithSupportBypass(BaseMiddleware):
                 return await handler(event, data)
 
             if event.from_user.id not in ALLOWED_USER_IDS:
-                await event.answer("🛠 Бот находится в разработке. Чтобы обратиться в тех поддержку - /support\n\nBot is in development. To contact support - /support")
+                await event.answer("🛠 Бот на тех обслуживании. Чтобы обратиться в тех поддержку - /support\n\nThe bot is undergoing maintenance right now. Please check back later. To contact support - /support")
                 return
         elif isinstance(event, CallbackQuery):
             callback_data = (event.data or "").lower()

@@ -2,7 +2,7 @@ import os
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, CallbackQuery
-from subscription.manager import add_subscription, utc_now, ensure_aware_utc
+from subscription.subscription_manager import add_subscription, utc_now, ensure_aware_utc
 from mongo import subscriptions_collection, get_all_subscriptions
 from datetime import timedelta, UTC
 from bot_manager.utils import is_admin
@@ -220,7 +220,9 @@ async def successful_payment(message: Message, t: dict):
          }},
         upsert=True
     )
-    confirmation_text = t["subscription_activated"].format(charge_id=charge_id)
+    end_date = utc_now() + timedelta(days=30)
+    formatted_end = format_date_ru(end_date)
+    confirmation_text = t["subscription_activated"].format(charge_id=charge_id, end_date=formatted_end)
     await message.answer(confirmation_text)
 
     if logs_group_id:

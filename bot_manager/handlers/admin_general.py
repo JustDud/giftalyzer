@@ -8,11 +8,11 @@ from bot_manager.handlers.payments import admin_refund_handler as perform_refund
 from bot_manager.handlers.payments import get_subscription_info
 from bot_manager.utils import is_admin
 from bot_manager.handlers.admin_support import close_all_tickets, show_active_tickets
-from subscription.manager import get_subscription_stats
+from subscription.subscription_manager import get_subscription_stats
 from mongo import subscriptions_collection
 from datetime import timedelta, UTC
 
-from subscription.manager import utc_now
+from subscription.subscription_manager import utc_now
 from bot_manager.states.admin_states import RefundFSM,CheckSubsFSM,PromoStatsFSM,PromoAddFSM,PromoDeleteFSM
 from bot_manager.promocodes import get_promo_stats, create_promo, disable_promo, list_all_promos
 from scripts.db_updater import update_db

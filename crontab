@@ -1,0 +1,9 @@
+# min hour dom mon dow
+CRON_TZ=UTC
+PATH=/usr/local/bin:/usr/bin:/bin
+
+# supercronic: id=check-subscriptions
+15 3 * * * cd /app && /usr/local/bin/python -m manager check-subscriptions
+
+# supercronic: id=update-db
+0 */12 * * * cd /app && /usr/local/bin/python -c "from scripts.db_updater import update_db; update_db()"

@@ -1082,3 +1082,20 @@ async def find_nft_id_by_traits_flexible(
         if results:
             return results
     return []
+
+
+async def cleanup_empty_market_nfts(nfts_collection: AsyncIOMotorCollection):
+    """
+    Remove all NFTs from the collection that have no market data.
+    i.e., where `markets` is missing, null, or an empty dict {}.
+    """
+    query = {
+        "$or": [
+            {"markets": {"$exists": False}},
+            {"markets": None},
+            {"markets": {}}
+        ]
+    }
+    result = await nfts_collection.delete_many(query)
+    print(f"[CLEANUP] Removed {result.deleted_count} NFTs with empty market data.")
+    return result.deleted_count

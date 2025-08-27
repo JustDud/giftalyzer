@@ -392,7 +392,7 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
         return
     # Ensure collections exist in DB and build id -> uid map for anchor market
     id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
-    write_collections_csv(cols, filename="collections_output.csv")
+    #write_collections_csv(cols, filename="collections_output.csv")
 
     names = [c.get("name") for c in cols if c.get("name")]
     logger.info(f"📋 Processing {len(names)} collections (offset-only)")
@@ -435,7 +435,7 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
         logger.warning("No collections received; aborting")
         return
     id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
-    write_collections_csv(cols, filename="collections_output.csv")
+    #write_collections_csv(cols, filename="collections_output.csv")
 
     # Prefetch global backdrops once using the TMA token
     headers = {
@@ -484,13 +484,17 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
 async def run_portals_scraper():
     import sys
     args = sys.argv[1:]
-    by_backdrops = False
-    if "--by-backdrops" in args:
-        by_backdrops = True
-        args = [a for a in args if a != "--by-backdrops"]
     names = args
     api_id, api_hash = await get_auth_credentials()
-    auth_token = await get_portals_auth_token(api_id, api_hash)
+    # Acquire TMA token with gentle retry/backoff to avoid hammering Telegram if session is temporarily unavailable
+    for attempt in range(3):
+        try:
+            auth_token = await get_portals_auth_token(api_id, api_hash)
+            break
+        except Exception as e:
+            if attempt == 2:
+                raise
+            await _sleep_backoff(attempt)
     # Initialize DB indexes once
     await init_indexes()
     if names:
@@ -502,30 +506,23 @@ async def run_portals_scraper():
             "User-Agent": "TelegramBot",
             "Accept": "application/json",
         }
-        # Prefetch once if we are in by-backdrops mode
-        global_backdrops: List[str] = []
-        if by_backdrops:
-            global_backdrops = await get_all_backdrops(auth_token)
-            logger.info(f"Global backdrops loaded once (names-mode): {len(global_backdrops)}")
+        # Always prefetch global backdrops and use backdrop scan for each collection
+        global_backdrops: List[str] = await get_all_backdrops(auth_token)
+        logger.info(f"Global backdrops loaded once (names-mode): {len(global_backdrops)}")
         seen_ids: Set[str] = set()
         for name in names:
             coll_id = name_to_id.get(name)
             if not coll_id:
                 logger.warning(f"No id for '{name}', skipping")
                 continue
-            if by_backdrops:
-                items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids)
-            else:
-                items = await scan_offsets(coll_id, headers, seen_ids)
+            items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids)
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 await reset_market_state_for_collection(collection_uid, market="portals")
                 await upsert_nfts_for_collection(items, collection_uid, market="portals")
             await asyncio.sleep(0.05)
-        write_collections_csv(cols, filename="collections_output.csv")
+        # write_collections_csv(cols, filename="collections_output.csv")
     else:
-        if by_backdrops:
-            await backdrops_partition_all(auth_token)
-        else:
-            await offset_only_all(auth_token)
+        # Always use backdrops partition strategy when names is empty
+        await backdrops_partition_all(auth_token)
 

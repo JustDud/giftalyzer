@@ -1,7 +1,7 @@
 import inspect
 from mongo import users_collection
 from aiogram.types import Message, CallbackQuery
-from subscription.manager import is_subscription_valid
+from subscription.subscription_manager import is_subscription_valid
 from bot_manager.texts import get_texts
 
 
