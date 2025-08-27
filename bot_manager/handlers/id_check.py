@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from bot_manager.states.gift_states import GiftStates
 from bot_manager.keyboards.default import get_check_again_keyboard, get_main_menu, get_back_keyboard
 
-from analyser.price_analyser import estimate_ton_price, convert_ton_to_usd
+from analyser.price_analyser import estimate_u_shape_by_id, convert_ton_to_usd
 from analyser.page_parser import parse_telegram_gift_page
 
 from mongo import get_nft_by_id_or_name, normalize_nft_name
@@ -139,7 +139,7 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
                 await send_gift_result(message, gift, t)
             return
 
-    price = await estimate_ton_price(data["nft_id"])
+    price = await estimate_u_shape_by_id(data["nft_id"])
     await send_gift_result(message, {
         "name": data["name"],
         "model": data["model"],
@@ -177,7 +177,7 @@ async def send_gift_result(message: types.Message, gift: dict, t: dict):
 
     market_name, market_info = cheapest_market
     market_price = float(market_info["price"]["amount"])
-    estimated_price = await estimate_ton_price(gift.get("nft_id") or gift.get("_id"))
+    estimated_price = await estimate_u_shape_by_id(gift.get("nft_id") or gift.get("_id"))
     usd_estimated = await convert_ton_to_usd(estimated_price)
     usd_market = await convert_ton_to_usd(market_price)
 

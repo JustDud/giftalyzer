@@ -27,6 +27,14 @@ def ai_access_required(handler):
         sig = inspect.signature(handler)
         filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
 
+        # If the user has an active subscription, allow without consuming free requests
+        try:
+            if await is_subscription_valid(user_id):
+                return await handler(event, *args, **filtered_kwargs)
+        except Exception:
+            # If subscription check fails, fall back to free-requests logic
+            pass
+
         user = await users_collection.find_one({"user_id": user_id})
         if not user:
             await users_collection.insert_one({
@@ -64,5 +72,10 @@ def ai_access_required(handler):
 
             return await handler(event, *args, **filtered_kwargs)
 
-        await event.answer(t["no_active_subscription"])
+        try:
+            # If CallbackQuery, prefer sending a text message to the chat
+            await event.message.answer(t["no_active_subscription"])
+        except AttributeError:
+            # If Message, answer directly
+            await event.answer(t["no_active_subscription"])
     return wrapped

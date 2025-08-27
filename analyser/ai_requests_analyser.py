@@ -1,4 +1,4 @@
-from analyser.price_analyser import estimate_ton_price
+from analyser.price_analyser import estimate_u_shape_by_id
 from mongo import nfts_collection
 import json
 from bot_manager.keyboards.default import get_main_menu
@@ -186,7 +186,7 @@ async def analyse_ai_request(call, state, t, temp, gift_id=None):
             "name": str(nft_id).split("|")[-1].replace("-", " ").replace("#", " #").title(),
             "backdrop": traits.get("backdrop", backdrop or ""),
             "price": float(price_amount),
-            "est_price": float(await estimate_ton_price(nft_id)) if nft_id else 0.0,
+            "est_price": float(await estimate_u_shape_by_id(nft_id)) if nft_id else 0.0,
             "rarity": f"{rarity / 10:.1f}%" if rarity is not None else "—",
             "liquidity": int(float((collection.get("markets", {}) or {}).get("portals", {}).get("day_volume", {}).get("amount", 0)))
         })
