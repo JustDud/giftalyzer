@@ -8,7 +8,7 @@ from bot_manager.handlers import register_all_handlers
 from bot_manager.middleware.i18n import I18nMiddleware
 from bot_manager.texts.ru import texts as ru
 from bot_manager.texts.en import texts as en
-from bot_manager.middleware.dev_guard import DevGuardMiddleware
+#from bot_manager.middleware.dev_guard import DevGuardMiddleware
 from bot_manager.middleware.error_handler import global_error_handler
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
@@ -38,7 +38,7 @@ bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
 dp.update.middleware(I18nMiddleware())
-dp.message.middleware(DevGuardMiddleware())
+#dp.message.middleware(DevGuardMiddleware())
 dp.errors.register(global_error_handler)
 
 

@@ -11,7 +11,7 @@ from aiogram.fsm.context import FSMContext
 from bot_manager.promocodes import apply_promo, list_all_promos, finalize_promo_usage
 
 
-BASE_PRICE_XTR = 10  # Base subscription price in XTR
+BASE_PRICE_XTR = 499  # Base subscription price in XTR
 
 logs_group_id = os.getenv("LOGS_GROUP_ID")
 

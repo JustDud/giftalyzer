@@ -13,7 +13,7 @@ async def update_db():
         await asyncio.sleep(0.5)
         try:
             pass
-            # await cleanup_empty_market_nfts(db.nfts)
+            await cleanup_empty_market_nfts(db.nfts)
         except Exception as e:
             print(f"[db_cleanup] error: {e!r}")
             await asyncio.sleep(5)

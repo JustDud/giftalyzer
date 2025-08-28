@@ -132,6 +132,10 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
                 await asyncio.sleep(0.05)
                 continue
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
+            # EARLY STOP: page returned only already-seen ids -> stop scanning further offsets
+            if not new_items:
+                logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id}")
+                break
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
@@ -155,11 +159,14 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             if status != 200 or not data:
                 await asyncio.sleep(0.05)
                 continue
-            results = data.get("results", [])
+            results = d2.get("results", []) if (d2 := data) else []
             if not results:
                 await asyncio.sleep(0.05)
                 continue
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
+            if not new_items:
+                logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id} in price range [{pmin}, {pmax}]")
+                break
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
@@ -204,6 +211,9 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                     await asyncio.sleep(0.05)
                     continue
                 new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
+                if not new_items:
+                    logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id} on {param_name}={val}")
+                    break
                 for it in new_items:
                     seen_ids.add(it["id"])
                 items.extend(new_items)
@@ -427,6 +437,58 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
     # append_nfts_csv(all_items, filename="nfts_output.csv")
 
 
+async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int = 700) -> None:
+    logger.info("🔐 Fetching collections list for SMART strategy (offset-first, fallback to backdrops if big)...")
+    cols = await get_collections(limit, auth_token)
+    if not cols:
+        logger.warning("No collections received; aborting")
+        return
+    id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
+
+    headers = {
+        "Authorization": f"tma {auth_token}",
+        "User-Agent": "TelegramBot",
+        "Accept": "application/json",
+    }
+    # Prefetch global backdrops once
+    global_backdrops: List[str] = await get_all_backdrops(auth_token)
+    logger.info(f"Global backdrops loaded once (SMART): {len(global_backdrops)}")
+
+    names = [c.get("name") for c in cols if c.get("name")]
+    logger.info(f"📋 Processing {len(names)} collections (SMART)")
+
+    seen_ids_global: Set[str] = set()
+    name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
+
+    for idx, name in enumerate(names, 1):
+        logger.info(f"[{idx}/{len(names)}] {name}")
+        try:
+            coll_id = name_to_id.get(name)
+            if not coll_id:
+                logger.warning(f"No id for collection '{name}', skipping")
+                continue
+
+            # 1) Wide offset scan up to cap
+            items_offset = await scan_offsets(coll_id, headers, seen_ids_global)
+            logger.info(f"Offset scan found {len(items_offset)} items for collection {name}")
+
+            # 2) Decide: if large, switch to backdrop-partition scan
+            if len(items_offset) > threshold:
+                logger.info(f"➡️  {name}: >{threshold} items from offsets — switching to backdrops partition scan")
+                items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids_global)
+            else:
+                logger.info(f"✅ {name}: ≤{threshold} items — keeping offset scan results")
+                items = items_offset
+
+            collection_uid = id_to_uid.get(str(coll_id))
+            if collection_uid:
+                await reset_market_state_for_collection(collection_uid, market="portals")
+                await upsert_nfts_for_collection(items, collection_uid, market="portals")
+        except Exception as e:
+            logger.warning(f"Failed '{name}': {e}")
+        await asyncio.sleep(0.05)
+
+
 # --- Partitioned by backdrops: orchestrator ---
 async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
     logger.info("🔐 Fetching collections list for backdrop-partition strategy...")
@@ -506,16 +568,25 @@ async def run_portals_scraper():
             "User-Agent": "TelegramBot",
             "Accept": "application/json",
         }
-        # Always prefetch global backdrops and use backdrop scan for each collection
+        # Always prefetch global backdrops once; decide per collection based on threshold
         global_backdrops: List[str] = await get_all_backdrops(auth_token)
-        logger.info(f"Global backdrops loaded once (names-mode): {len(global_backdrops)}")
+        logger.info(f"Global backdrops loaded once (names-mode SMART): {len(global_backdrops)}")
         seen_ids: Set[str] = set()
+        THRESHOLD = 700
         for name in names:
             coll_id = name_to_id.get(name)
             if not coll_id:
                 logger.warning(f"No id for '{name}', skipping")
                 continue
-            items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids)
+            # First do offset scan
+            items_offset = await scan_offsets(coll_id, headers, seen_ids)
+            logger.info(f"[names] {name}: offset scan found {len(items_offset)} items")
+            # Switch if large
+            if len(items_offset) > THRESHOLD:
+                logger.info(f"[names] {name}: >{THRESHOLD} items — switching to backdrops partition scan")
+                items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids)
+            else:
+                items = items_offset
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 await reset_market_state_for_collection(collection_uid, market="portals")
@@ -523,6 +594,6 @@ async def run_portals_scraper():
             await asyncio.sleep(0.05)
         # write_collections_csv(cols, filename="collections_output.csv")
     else:
-        # Always use backdrops partition strategy when names is empty
-        await backdrops_partition_all(auth_token)
+        # Always use SMART partition strategy when names is empty
+        await smart_partition_all(auth_token, limit=500, threshold=700)
 

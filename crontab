@@ -6,4 +6,4 @@ PATH=/usr/local/bin:/usr/bin:/bin
 15 3 * * * cd /app && /usr/local/bin/python -m manager check-subscriptions
 
 # supercronic: id=update-db
-0 */12 * * * cd /app && flock -n /tmp/update-db.lock /usr/local/bin/python -c "from scripts.db_updater import update_db; update_db()"
+0 */12 * * * cd /app && flock -n /tmp/update-db.lock /usr/local/bin/python -m scripts.db_updater
