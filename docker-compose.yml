@@ -1,24 +1,42 @@
+#services:
+#  bot:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    image: giftalyzer/giftalyzerbot:latest
+#    restart: unless-stopped
+#    env_file: .env
+#    volumes:
+#      - ./data_collection/portals:/app/data_collection/portals
+#    environment:
+#        TG_SESSION_PATH: /app/data_collection/portals/giftalyzerauth.session  # <— adjust name if different
+#    command: ["python","-m","manager","run-bot"]
+#
+#  scheduler:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.scheduler
+#    image: giftalyzer/giftalyzerbot-scheduler:latest
+#    restart: unless-stopped
+#    env_file: .env
+#    volumes:
+#      - ./data_collection/portals:/app/data_collection/portals
+#    # environment:
+
 services:
   bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: giftalyzer/giftalyzerbot:latest
+    image: giftalyzer/giftvaluebot:latest
     restart: unless-stopped
     env_file: .env
     volumes:
       - ./data_collection/portals:/app/data_collection/portals
     environment:
-        TG_SESSION_PATH: /app/data_collection/portals/giftalyzerauth.session  # <— adjust name if different
+      TG_SESSION_PATH: /app/data_collection/portals/giftalyzerauth.session
     command: ["python","-m","manager","run-bot"]
 
   scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile.scheduler
-    image: giftalyzer/giftalyzerbot-scheduler:latest
+    image: giftalyzer/giftvaluebot-scheduler:latest
     restart: unless-stopped
     env_file: .env
     volumes:
       - ./data_collection/portals:/app/data_collection/portals
-    # environment:
