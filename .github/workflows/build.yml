@@ -21,8 +21,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
+      - name: Build & Push bot image
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./Dockerfile
           push: true
-          tags: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          platforms: linux/amd64
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/giftvaluebot:latest
+            ${{ vars.DOCKER_USERNAME }}/giftvaluebot:${{ github.sha }}
+
+      - name: Build & Push scheduler image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.scheduler
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/giftvaluebot-scheduler:latest
+            ${{ vars.DOCKER_USERNAME }}/giftvaluebot-scheduler:${{ github.sha }}
