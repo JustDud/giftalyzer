@@ -26,7 +26,6 @@ async def ai_help_start(message: Message, state: FSMContext, t):
 @router.callback_query(F.data == "ai_analyse_gift")
 @ai_access_required
 async def handle_ai_analyse_gift(call: CallbackQuery, state: FSMContext, t: dict):
-    from bot_manager.keyboards.ai_requests_keyboard import get_analysis_method_keyboard
     await call.answer()
     await state.update_data(user_question=t["ai_analyse_gift"])
     await call.message.edit_text(t["choose_analysis_method"])
