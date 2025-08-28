@@ -5,7 +5,7 @@ from mongo import collections_collection, nfts_collection
 from analyser.price_analyser import estimate_u_shape_by_id, convert_ton_to_usd
 from aiogram.exceptions import TelegramBadRequest
 import asyncio
-from bot_manager.handlers.market_search import MarketSearchState
+from .market_search import MarketSearchState
 from bot_manager.keyboards.default import get_main_menu
 
 router = Router()

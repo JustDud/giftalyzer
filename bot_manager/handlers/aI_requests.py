@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from bot_manager.states.ai_requests_state import AIRequestState, AIRequestCollectionAnalysisState
@@ -13,6 +13,8 @@ from mongo import collections_collection
 from bot_manager.decorators.access import ai_access_required
 from analyser.ai_requests_analyser import analyse_ai_request
 from analyser.stars_collection import evaluate_gift
+from mongo import nfts_collection
+from aiogram.types import ReplyKeyboardRemove
 
 router = Router()
 
@@ -107,7 +109,6 @@ async def process_link_input(message: Message, state: FSMContext, t: dict):
         gift_id = gift_id.rsplit("/", 1)[-1]
     gift_id = gift_id.strip().strip("/")
 
-    from aiogram.types import ReplyKeyboardRemove
     temp = await message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
     await message.answer("⌛ Генерация анализа, пожалуйста подождите...")
     await state.set_state(AIRequestState.loading_results)
@@ -129,7 +130,6 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
         return
     collection_uid = collection["_id"]
 
-    from mongo import nfts_collection
     nft_cursor = nfts_collection.find(
         {"collection_uid": collection_uid, "markets": {"$exists": True}},
         {"traits": 1}
@@ -194,13 +194,11 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         gift_id = gift_id.strip().strip("/")
 
         await call.answer()
-        from aiogram.types import ReplyKeyboardRemove
         temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
         await call.message.edit_reply_markup(reply_markup=None)
         await call.message.edit_text("⌛ Генерация анализа, пожалуйста подождите...", reply_markup=None)
         await state.set_state(AIRequestState.loading_results)
 
-        from analyser.ai_requests_analyser import analyse_ai_request
         # Instead of assigning .text (which is not allowed/frozen), pass gift_id as an argument
         await analyse_ai_request(call, state, t, temp, gift_id=gift_id)
         return
@@ -216,7 +214,6 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         return
 
     collection_uid = collection["_id"]
-    from mongo import nfts_collection
     nft_cursor = nfts_collection.find(
         {"collection_uid": collection_uid, "markets": {"$exists": True}},
         {"traits": 1}
@@ -287,7 +284,6 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext, t: dict
         return
 
     collection_uid = collection["_id"]
-    from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
         "collection_uid": collection_uid,
         "markets": {"$exists": True},
@@ -386,7 +382,6 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
         return
     collection_uid = collection["_id"]
 
-    from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
         "collection_uid": collection_uid,
         "markets": {"$exists": True},
@@ -483,7 +478,6 @@ async def validate_and_proceed_to_ai(call: CallbackQuery, state: FSMContext, t: 
         return
 
     await call.answer()
-    from aiogram.types import ReplyKeyboardRemove
     temp = await call.message.answer(t["locking_message"], reply_markup=ReplyKeyboardRemove())
     # Remove inline keyboard safely before editing text
     current_reply_markup = call.message.reply_markup

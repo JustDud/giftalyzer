@@ -6,6 +6,7 @@ from bot_manager.states.marketsearch_states import MarketSearchState
 from bot_manager.keyboards.search_keyboard import get_collection_keyboard, get_nft_keyboard, get_backdrop_keyboard
 from mongo import collections_collection
 from bot_manager.decorators.access import subscription_required
+from .search_results import show_filtered_nfts
 
 router = Router()
 
@@ -353,7 +354,6 @@ async def validate_and_proceed_to_results(call: CallbackQuery, state: FSMContext
     await state.update_data(selected_collection_uid=collection["_id"])
 
     await state.set_state(MarketSearchState.loading_results)
-    from bot_manager.handlers.search_results import show_filtered_nfts
     await show_filtered_nfts(call, state, t)
 
 

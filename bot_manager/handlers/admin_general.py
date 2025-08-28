@@ -4,10 +4,10 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from bot_manager.keyboards.admin_keyboard import get_admin_keyboard, get_promocodes_keyboard
-from bot_manager.handlers.payments import admin_refund_handler as perform_refund
-from bot_manager.handlers.payments import get_subscription_info
+from .payments import admin_refund_handler as perform_refund
+from .payments import get_subscription_info
 from bot_manager.utils import is_admin
-from bot_manager.handlers.admin_support import close_all_tickets, show_active_tickets
+from .admin_support import close_all_tickets, show_active_tickets
 from subscription.subscription_manager import get_subscription_stats
 from mongo import subscriptions_collection
 from datetime import timedelta, UTC
