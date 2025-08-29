@@ -152,7 +152,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.1)
                 continue
             results = data.get("results", [])
             if results is None:
@@ -171,7 +171,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.1)
     logger.info(f"Wide scan collected {len(items)} items")
     return items
 
@@ -189,7 +189,7 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.1)
                 continue
             results = data.get("results", [])
             if results is None:
@@ -208,7 +208,7 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.1)
     return items
 
 
@@ -242,7 +242,7 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                 )
                 s2, d2 = await fetch_json(session, url, headers)
                 if s2 != 200 or not d2:
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0.1)
                     continue
                 results = d2.get("results", [])
                 if results is None:
@@ -261,7 +261,7 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                 for it in new_items:
                     seen_ids.add(it["id"])
                 items.extend(new_items)
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.1)
     return items
 
 
@@ -476,7 +476,7 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
                 await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
             logger.warning(f"Failed '{name}': {e}")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
     # Optional: write last run items to CSV is disabled for DB anchor path
     # append_nfts_csv(all_items, filename="nfts_output.csv")
 
@@ -530,7 +530,7 @@ async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int 
                 await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
             logger.warning(f"Failed '{name}': {e}")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
 
 
 # --- Partitioned by backdrops: orchestrator ---
@@ -572,7 +572,7 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
                 await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
             logger.warning(f"Failed '{name}': {e}")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
 
 
 # --- Existing richer logic (commented out for offset-only mode) ---
@@ -644,7 +644,7 @@ async def scrape_collections_by_backdrop(names: List[str], auth_token: str, limi
                 await upsert_nfts_for_collection(items, collection_uid, market="portals")
         except Exception as e:
             logger.warning(f"Failed '{name}': {e}")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
 
 
 async def run_portals_scraper():
