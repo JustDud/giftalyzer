@@ -50,6 +50,7 @@ async def _global_cooldown():
 
 
 async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *, max_retries: int = 6) -> Tuple[int, dict | None]:
+    global _rate_limit_strikes
     last_status = None
     for attempt in range(max_retries + 1):
         try:
@@ -57,7 +58,6 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                 last_status = resp.status
                 if resp.status == 200:
                     # reset strike counter on success
-                    global _rate_limit_strikes
                     _rate_limit_strikes = 0
                     try:
                         return 200, await resp.json()
@@ -68,7 +68,6 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                         return resp.status, None
                 if resp.status == 429:
                     # too many requests — honor Retry-After if present, else exponential backoff
-                    global _rate_limit_strikes
                     _rate_limit_strikes += 1
                     retry_after = resp.headers.get("Retry-After")
                     if _rate_limit_strikes >= RATE_LIMIT_STRIKES_THRESHOLD:
@@ -80,17 +79,14 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                     continue
                 if resp.status in {500, 502, 503, 504}:
                     # reset strike counter for non-429 server errors
-                    global _rate_limit_strikes
                     _rate_limit_strikes = 0
                     if attempt < max_retries:
                         await _sleep_backoff(attempt)
                         continue
                 # reset strike counter for all other non-429 statuses
-                global _rate_limit_strikes
                 _rate_limit_strikes = 0
                 return resp.status, None
         except aiohttp.ClientError:
-            global _rate_limit_strikes
             _rate_limit_strikes = 0
             if attempt < max_retries:
                 await _sleep_backoff(attempt)
