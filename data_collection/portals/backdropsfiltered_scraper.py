@@ -4,9 +4,10 @@ import os
 import logging
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
-from typing import Tuple, List, Dict, Set
+from typing import Tuple, List, Dict, Set, Optional
 import random
 import csv
+import time
 
 from data_collection.auth import get_portals_auth_token, get_auth_credentials
 from mongo import (
@@ -27,10 +28,56 @@ logger = logging.getLogger(__name__)
 OFFSET_STEP = 50
 PAGE_LIMIT = 50
 
+
 # Rate limit/cooldown configuration and state
-COOLDOWN_SECONDS = int(os.environ.get("PORTALS_COOLDOWN_SECONDS", "300"))  # 5 minutes default
+# Defaults tuned for Portals: modest RPS, jitter, and a 15‑minute global cooldown window
+COOLDOWN_SECONDS = int(os.environ.get("PORTALS_COOLDOWN_SECONDS", "900"))  # 15 minutes default
 RATE_LIMIT_STRIKES_THRESHOLD = int(os.environ.get("PORTALS_RATE_LIMIT_STRIKES", "3"))  # consecutive 429s before cooldown
-_rate_limit_strikes = 0
+BASE_DELAY_BETWEEN_REQUESTS = float(os.environ.get("PORTALS_BASE_DELAY_SEC", "0.25"))
+JITTER_MIN = float(os.environ.get("PORTALS_JITTER_MIN_SEC", "0.05"))
+JITTER_MAX = float(os.environ.get("PORTALS_JITTER_MAX_SEC", "0.15"))
+INTER_PARTITION_PAUSE = float(os.environ.get("PORTALS_INTER_PARTITION_PAUSE_SEC", "4.0"))
+TOKEN_BUCKET_CAPACITY = int(os.environ.get("PORTALS_TOKEN_BUCKET_CAPACITY", "3"))
+TOKEN_BUCKET_RPS = float(os.environ.get("PORTALS_TOKEN_BUCKET_RPS", "3.0"))
+
+# Start index for collections processing
+START_INDEX = int(os.environ.get("PORTALS_START_INDEX", "0"))
+
+
+# --- Token bucket, jitter, and global rate state ---
+class TokenBucket:
+    def __init__(self, capacity: int, refill_rate_per_sec: float):
+        self.capacity = capacity
+        self.tokens = capacity
+        self.refill_rate = refill_rate_per_sec
+        self.last = time.monotonic()
+        self._lock = asyncio.Lock()
+
+    async def acquire(self):
+        async with self._lock:
+            now = time.monotonic()
+            elapsed = now - self.last
+            self.last = now
+            self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate)
+            if self.tokens < 1:
+                wait = (1 - self.tokens) / self.refill_rate
+                await asyncio.sleep(max(0.0, wait))
+                self.tokens = 0
+                self.last = time.monotonic()
+            else:
+                self.tokens -= 1
+
+GLOBAL_BUCKET = TokenBucket(TOKEN_BUCKET_CAPACITY, TOKEN_BUCKET_RPS)
+
+def _jitter() -> float:
+    return random.uniform(JITTER_MIN, JITTER_MAX)
+
+class _RateState:
+    def __init__(self):
+        self.strikes_429: int = 0
+        self.cooldown_until: float = 0.0
+
+RATE = _RateState()
 
 
 
@@ -43,22 +90,43 @@ async def _sleep_backoff(attempt: int, retry_after: float | None = None):
     await asyncio.sleep(min(delay, 4))
 
 
+
 # Global cooldown after too many consecutive 429s
 async def _global_cooldown():
-    logger.warning(f"🧊 Too many 429s in a row — cooling down for {COOLDOWN_SECONDS}s...")
+    now = time.monotonic()
+    if now < RATE.cooldown_until:
+        # already cooling down; just sleep the remainder
+        remaining = RATE.cooldown_until - now
+        logger.warning(f"🧊 Cooldown already active — {remaining:.1f}s remaining...")
+        await asyncio.sleep(remaining)
+        return
+    RATE.cooldown_until = now + COOLDOWN_SECONDS
+    logger.warning(f"🧊 Too many 429s — entering {COOLDOWN_SECONDS}s cooldown window...")
     await asyncio.sleep(COOLDOWN_SECONDS)
 
 
+
 async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *, max_retries: int = 6) -> Tuple[int, dict | None]:
-    global _rate_limit_strikes
-    last_status = None
+    last_status: Optional[int] = None
     for attempt in range(max_retries + 1):
+        # if a global cooldown is active, honour it before issuing a new request
+        now = time.monotonic()
+        if now < RATE.cooldown_until:
+            await asyncio.sleep(RATE.cooldown_until - now)
+
+        # global token bucket + base spacing + jitter to smooth bursts
+        await GLOBAL_BUCKET.acquire()
+        await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
+
         try:
             async with session.get(url, headers=headers) as resp:
                 last_status = resp.status
+
+                # Success path
                 if resp.status == 200:
-                    # reset strike counter on success
-                    _rate_limit_strikes = 0
+                    # decay strikes slowly (don’t flip from near-threshold to zero on a single 200)
+                    if RATE.strikes_429 > 0:
+                        RATE.strikes_429 = max(0, RATE.strikes_429 - 1)
                     try:
                         return 200, await resp.json()
                     except Exception:
@@ -66,32 +134,48 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                             await _sleep_backoff(attempt)
                             continue
                         return resp.status, None
+
+                # Rate limited
                 if resp.status == 429:
-                    # too many requests — honor Retry-After if present, else exponential backoff
-                    _rate_limit_strikes += 1
-                    retry_after = resp.headers.get("Retry-After")
-                    if _rate_limit_strikes >= RATE_LIMIT_STRIKES_THRESHOLD:
-                        # enter a longer cool-down to let the API recover
+                    RATE.strikes_429 += 1
+
+                    ra = resp.headers.get("Retry-After")
+                    wait: float
+                    if ra:
+                        try:
+                            wait = float(ra)
+                        except ValueError:
+                            wait = 5.0
+                    else:
+                        # gentle exponential pre-cooldown backoff + jitter
+                        wait = min(8.0, (1.2 ** RATE.strikes_429)) + random.uniform(0.25, 0.75)
+
+                    # if threshold reached, set (or respect existing) global cooldown
+                    if RATE.strikes_429 >= RATE_LIMIT_STRIKES_THRESHOLD:
                         await _global_cooldown()
-                        _rate_limit_strikes = 0
+                        # do not reset strikes fully; reduce them slightly to avoid oscillation
+                        RATE.strikes_429 = max(0, RATE.strikes_429 - 2)
                         continue
-                    await _sleep_backoff(attempt, retry_after=float(retry_after) if retry_after else None)
+
+                    await asyncio.sleep(wait)
                     continue
+
+                # Transient server errors — brief linear backoff
                 if resp.status in {500, 502, 503, 504}:
-                    # reset strike counter for non-429 server errors
-                    _rate_limit_strikes = 0
                     if attempt < max_retries:
-                        await _sleep_backoff(attempt)
+                        await asyncio.sleep(1.5 + random.uniform(0.0, 0.5))
                         continue
-                # reset strike counter for all other non-429 statuses
-                _rate_limit_strikes = 0
+                    return resp.status, None
+
+                # Other statuses — return to caller
                 return resp.status, None
+
         except aiohttp.ClientError:
-            _rate_limit_strikes = 0
             if attempt < max_retries:
                 await _sleep_backoff(attempt)
                 continue
             return last_status or 0, None
+
     return last_status or 0, None
 
 
@@ -152,7 +236,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
                 continue
             results = data.get("results", [])
             if results is None:
@@ -171,7 +255,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     logger.info(f"Wide scan collected {len(items)} items")
     return items
 
@@ -189,7 +273,7 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             )
             status, data = await fetch_json(session, url, headers)
             if status != 200 or not data:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
                 continue
             results = data.get("results", [])
             if results is None:
@@ -208,7 +292,7 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     return items
 
 
@@ -233,6 +317,10 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
             if status != 200 or not data or not data.get("results"):
                 continue
 
+            # Add spacing between partitions and reset dup counter per value
+            await asyncio.sleep(INTER_PARTITION_PAUSE + _jitter())
+            scan_by_attribute._dup_pages = 0
+
             # Full scan across offsets only for values that returned items
             for offset in range(0, 800, OFFSET_STEP):
                 url = (
@@ -242,7 +330,7 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                 )
                 s2, d2 = await fetch_json(session, url, headers)
                 if s2 != 200 or not d2:
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
                     continue
                 results = d2.get("results", [])
                 if results is None:
@@ -261,7 +349,7 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                 for it in new_items:
                     seen_ids.add(it["id"])
                 items.extend(new_items)
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     return items
 
 
@@ -499,12 +587,16 @@ async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int 
     logger.info(f"Global backdrops loaded once (SMART): {len(global_backdrops)}")
 
     names = [c.get("name") for c in cols if c.get("name")]
+    names = list(reversed(names))
+    if START_INDEX > 0:
+        logger.info(f"⏩ Skipping first {START_INDEX} collections (after reversing order)")
+        names = names[START_INDEX:]
     logger.info(f"📋 Processing {len(names)} collections (SMART, reversed)")
 
     seen_ids_global: Set[str] = set()
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
 
-    for idx, name in enumerate(reversed(names), 1):
+    for idx, name in enumerate(names, 1):
         logger.info(f"[{idx}/{len(names)}] {name}")
         try:
             coll_id = name_to_id.get(name)
@@ -553,7 +645,11 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
     logger.info(f"Global backdrops loaded once: {len(global_backdrops)}")
 
     names = [c.get("name") for c in cols if c.get("name")]
-    logger.info(f"📋 Processing {len(names)} collections (by backdrops)")
+    names = list(reversed(names))
+    if START_INDEX > 0:
+        logger.info(f"⏩ Skipping first {START_INDEX} collections (after reversing order)")
+        names = names[START_INDEX:]
+    logger.info(f"📋 Processing {len(names)} collections (by backdrops, reversed)")
 
     seen_ids_global: Set[str] = set()
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
