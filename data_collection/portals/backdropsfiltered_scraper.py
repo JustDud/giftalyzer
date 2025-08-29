@@ -27,6 +27,12 @@ logger = logging.getLogger(__name__)
 OFFSET_STEP = 50
 PAGE_LIMIT = 50
 
+# Rate limit/cooldown configuration and state
+COOLDOWN_SECONDS = int(os.environ.get("PORTALS_COOLDOWN_SECONDS", "300"))  # 5 minutes default
+RATE_LIMIT_STRIKES_THRESHOLD = int(os.environ.get("PORTALS_RATE_LIMIT_STRIKES", "3"))  # consecutive 429s before cooldown
+_rate_limit_strikes = 0
+
+
 
 async def _sleep_backoff(attempt: int, retry_after: float | None = None):
     """Sleep with exponential backoff and jitter. Honors Retry-After if provided."""
@@ -37,6 +43,12 @@ async def _sleep_backoff(attempt: int, retry_after: float | None = None):
     await asyncio.sleep(min(delay, 4))
 
 
+# Global cooldown after too many consecutive 429s
+async def _global_cooldown():
+    logger.warning(f"🧊 Too many 429s in a row — cooling down for {COOLDOWN_SECONDS}s...")
+    await asyncio.sleep(COOLDOWN_SECONDS)
+
+
 async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *, max_retries: int = 6) -> Tuple[int, dict | None]:
     last_status = None
     for attempt in range(max_retries + 1):
@@ -44,6 +56,9 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
             async with session.get(url, headers=headers) as resp:
                 last_status = resp.status
                 if resp.status == 200:
+                    # reset strike counter on success
+                    global _rate_limit_strikes
+                    _rate_limit_strikes = 0
                     try:
                         return 200, await resp.json()
                     except Exception:
@@ -52,15 +67,31 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
                             continue
                         return resp.status, None
                 if resp.status == 429:
+                    # too many requests — honor Retry-After if present, else exponential backoff
+                    global _rate_limit_strikes
+                    _rate_limit_strikes += 1
                     retry_after = resp.headers.get("Retry-After")
+                    if _rate_limit_strikes >= RATE_LIMIT_STRIKES_THRESHOLD:
+                        # enter a longer cool-down to let the API recover
+                        await _global_cooldown()
+                        _rate_limit_strikes = 0
+                        continue
                     await _sleep_backoff(attempt, retry_after=float(retry_after) if retry_after else None)
                     continue
                 if resp.status in {500, 502, 503, 504}:
+                    # reset strike counter for non-429 server errors
+                    global _rate_limit_strikes
+                    _rate_limit_strikes = 0
                     if attempt < max_retries:
                         await _sleep_backoff(attempt)
                         continue
+                # reset strike counter for all other non-429 statuses
+                global _rate_limit_strikes
+                _rate_limit_strikes = 0
                 return resp.status, None
         except aiohttp.ClientError:
+            global _rate_limit_strikes
+            _rate_limit_strikes = 0
             if attempt < max_retries:
                 await _sleep_backoff(attempt)
                 continue
@@ -543,57 +574,104 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
 # sub = await scan_price_range(coll_id, headers, current, nxt, seen_ids)
 
 
+async def scrape_collections_by_backdrop(names: List[str], auth_token: str, limit: int = 500, threshold: int = 700) -> None:
+    """Targeted scrape for specific collections.
+    Strategy: run an offset scan first; if count exceeds `threshold`, run a backdrop-partitioned scan and merge
+    results using a shared seen_ids set to avoid duplicates. Accepts collection names or ids. Processes in reverse order.
+    """
+    logger.info("🔐 Fetching collections list for targeted strategy (offset-first, thresholded backdrops)...")
+    cols = await get_collections(limit, auth_token)
+    if not cols:
+        logger.warning("No collections received; aborting")
+        return
+    id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
+
+    headers = {
+        "Authorization": f"tma {auth_token}",
+        "User-Agent": "TelegramBot",
+        "Accept": "application/json",
+    }
+
+    # Prefetch global backdrops once
+    global_backdrops: List[str] = await get_all_backdrops(auth_token)
+    logger.info(f"Global backdrops loaded once (targeted): {len(global_backdrops)}")
+
+    name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
+
+    for idx, name in enumerate(reversed(names), 1):
+        coll_id = name_to_id.get(name) or name
+        if not coll_id:
+            logger.warning(f"No id for '{name}', skipping")
+            continue
+
+        logger.info(f"[targeted {idx}/{len(names)}] {name} ({coll_id}) — offset-first (threshold={threshold})")
+        try:
+            # Use a per-collection seen set to dedupe across scans
+            seen_ids_per_run: Set[str] = set()
+
+            # 1) Offset scan first
+            items_offset = await scan_offsets(coll_id, headers, seen_ids_per_run)
+            logger.info(f"[targeted] {name}: offset scan found {len(items_offset)} items")
+
+            items = list(items_offset)  # copy
+
+            # 2) Only if above threshold, run backdrop-partition and merge
+            if len(items_offset) > threshold:
+                logger.info(f"[targeted] {name}: >{threshold} items — running backdrop-partition to reduce misses")
+                part = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids_per_run)
+                if part:
+                    items.extend(part)
+            else:
+                logger.info(f"[targeted] {name}: ≤{threshold} items — skipping backdrop scan to avoid extra requests")
+
+            # Upsert merged results
+            collection_uid = id_to_uid.get(str(coll_id))
+            if collection_uid:
+                await reset_market_state_for_collection(collection_uid, market="portals")
+                await upsert_nfts_for_collection(items, collection_uid, market="portals")
+        except Exception as e:
+            logger.warning(f"Failed '{name}': {e}")
+        await asyncio.sleep(0.05)
+
+
 async def run_portals_scraper():
     import sys
     args = sys.argv[1:]
+    # Modes:
+    #  - default (no flag): scrape ALL collections (SMART over all)
+    #  - --target <names...>: scrape ONLY the provided collections (offset-first, thresholded backdrop)
+    if "--target" in args:
+        target_mode = True
+        args = [a for a in args if a != "--target"]
+    else:
+        target_mode = False
+
     names = args
     api_id, api_hash = await get_auth_credentials()
     # Acquire TMA token with gentle retry/backoff to avoid hammering Telegram if session is temporarily unavailable
+    auth_token = None  # type: str | None
     for attempt in range(3):
         try:
             auth_token = await get_portals_auth_token(api_id, api_hash)
             break
         except Exception as e:
             if attempt == 2:
+                logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
                 raise
             await _sleep_backoff(attempt)
+    if auth_token is None:
+        logger.error("Auth token was not obtained; aborting run_portals_scraper")
+        return
     # Initialize DB indexes once
     await init_indexes()
-    if names:
-        cols = await get_collections(500, auth_token)
-        id_to_uid = await upsert_collections_and_build_map(cols, market="portals")
-        name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
-        headers = {
-            "Authorization": f"tma {auth_token}",
-            "User-Agent": "TelegramBot",
-            "Accept": "application/json",
-        }
-        # Always prefetch global backdrops once; decide per collection based on threshold
-        global_backdrops: List[str] = await get_all_backdrops(auth_token)
-        logger.info(f"Global backdrops loaded once (names-mode SMART): {len(global_backdrops)}")
-        seen_ids: Set[str] = set()
-        THRESHOLD = 700
-        for name in names:
-            coll_id = name_to_id.get(name)
-            if not coll_id:
-                logger.warning(f"No id for '{name}', skipping")
-                continue
-            # First do offset scan
-            items_offset = await scan_offsets(coll_id, headers, seen_ids)
-            logger.info(f"[names] {name}: offset scan found {len(items_offset)} items")
-            # Switch if large
-            if len(items_offset) > THRESHOLD:
-                logger.info(f"[names] {name}: >{THRESHOLD} items — switching to backdrops partition scan")
-                items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids)
-            else:
-                items = items_offset
-            collection_uid = id_to_uid.get(str(coll_id))
-            if collection_uid:
-                await reset_market_state_for_collection(collection_uid, market="portals")
-                await upsert_nfts_for_collection(items, collection_uid, market="portals")
-            await asyncio.sleep(0.05)
-        # write_collections_csv(cols, filename="collections_output.csv")
-    else:
-        # Always use SMART partition strategy when names is empty
-        await smart_partition_all(auth_token, limit=500, threshold=700)
+    if target_mode:
+        if not names:
+            logger.warning("--target mode selected but no collection names/ids were provided; aborting")
+            return
+        await scrape_collections_by_backdrop(names, auth_token, limit=500, threshold=700)
+        return
+
+    # Default: scrape ALL collections regardless of names passed (to keep behaviour predictable)
+    await smart_partition_all(auth_token, limit=500, threshold=700)
+
 
