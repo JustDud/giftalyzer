@@ -159,14 +159,19 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
                 await asyncio.sleep(0.05)
                 continue
             results = data.get("results", [])
-            if not results:
-                await asyncio.sleep(0.05)
-                continue
+            if results is None:
+                results = []
+            if not hasattr(scan_offsets, "_dup_pages"):
+                scan_offsets._dup_pages = 0
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
-            # EARLY STOP: page returned only already-seen ids -> stop scanning further offsets
-            if not new_items:
-                logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id}")
-                break
+            if not new_items and results:
+                scan_offsets._dup_pages += 1
+                logger.info(f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id} [{scan_offsets._dup_pages} consecutive]")
+                if scan_offsets._dup_pages >= 2:
+                    logger.info(f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id}")
+                    break
+            else:
+                scan_offsets._dup_pages = 0
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
@@ -190,14 +195,20 @@ async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax:
             if status != 200 or not data:
                 await asyncio.sleep(0.05)
                 continue
-            results = d2.get("results", []) if (d2 := data) else []
-            if not results:
-                await asyncio.sleep(0.05)
-                continue
+            results = data.get("results", [])
+            if results is None:
+                results = []
+            if not hasattr(scan_price_range, "_dup_pages"):
+                scan_price_range._dup_pages = 0
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
-            if not new_items:
-                logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id} in price range [{pmin}, {pmax}]")
-                break
+            if not new_items and results:
+                scan_price_range._dup_pages += 1
+                logger.info(f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id} in price range [{pmin}, {pmax}] [{scan_price_range._dup_pages} consecutive]")
+                if scan_price_range._dup_pages >= 2:
+                    logger.info(f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id} in price range [{pmin}, {pmax}]")
+                    break
+            else:
+                scan_price_range._dup_pages = 0
             for it in new_items:
                 seen_ids.add(it["id"])
             items.extend(new_items)
@@ -238,13 +249,19 @@ async def scan_by_attribute(collection_id: str, headers: dict, param_name: str, 
                     await asyncio.sleep(0.05)
                     continue
                 results = d2.get("results", [])
-                if not results:
-                    await asyncio.sleep(0.05)
-                    continue
+                if results is None:
+                    results = []
+                if not hasattr(scan_by_attribute, "_dup_pages"):
+                    scan_by_attribute._dup_pages = 0
                 new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
-                if not new_items:
-                    logger.info(f"Early stop (all duplicates) at offset {offset} for collection {collection_id} on {param_name}={val}")
-                    break
+                if not new_items and results:
+                    scan_by_attribute._dup_pages += 1
+                    logger.info(f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id} on {param_name}={val} [{scan_by_attribute._dup_pages} consecutive]")
+                    if scan_by_attribute._dup_pages >= 2:
+                        logger.info(f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id} on {param_name}={val}")
+                        break
+                else:
+                    scan_by_attribute._dup_pages = 0
                 for it in new_items:
                     seen_ids.add(it["id"])
                 items.extend(new_items)
@@ -486,12 +503,12 @@ async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int 
     logger.info(f"Global backdrops loaded once (SMART): {len(global_backdrops)}")
 
     names = [c.get("name") for c in cols if c.get("name")]
-    logger.info(f"📋 Processing {len(names)} collections (SMART)")
+    logger.info(f"📋 Processing {len(names)} collections (SMART, reversed)")
 
     seen_ids_global: Set[str] = set()
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
 
-    for idx, name in enumerate(names, 1):
+    for idx, name in enumerate(reversed(names), 1):
         logger.info(f"[{idx}/{len(names)}] {name}")
         try:
             coll_id = name_to_id.get(name)
