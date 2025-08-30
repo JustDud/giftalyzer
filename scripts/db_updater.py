@@ -11,13 +11,7 @@ async def update_db():
             print(f"[db_updater] error: {e!r}")
             await asyncio.sleep(100)
         await asyncio.sleep(0.5)
-        try:
-            pass
-            await cleanup_empty_market_nfts(db.nfts)
-        except Exception as e:
-            print(f"[db_cleanup] error: {e!r}")
-            await asyncio.sleep(5)
-        await asyncio.sleep(0.5)
+
 
 if __name__ == "__main__":
     asyncio.run(update_db())

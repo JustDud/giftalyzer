@@ -40,8 +40,11 @@ INTER_PARTITION_PAUSE = float(os.environ.get("PORTALS_INTER_PARTITION_PAUSE_SEC"
 TOKEN_BUCKET_CAPACITY = int(os.environ.get("PORTALS_TOKEN_BUCKET_CAPACITY", "3"))
 TOKEN_BUCKET_RPS = float(os.environ.get("PORTALS_TOKEN_BUCKET_RPS", "3.0"))
 
+
 # Start index for collections processing
 START_INDEX = int(os.environ.get("PORTALS_START_INDEX", "0"))
+# Optional reverse processing order via ENV flag ("true"/"false")
+REVERSE_ORDER = os.environ.get("PORTALS_REVERSE_ORDER", "false").lower() == "true"
 
 
 # --- Token bucket, jitter, and global rate state ---
@@ -587,11 +590,15 @@ async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int 
     logger.info(f"Global backdrops loaded once (SMART): {len(global_backdrops)}")
 
     names = [c.get("name") for c in cols if c.get("name")]
-    names = list(reversed(names))
+    if REVERSE_ORDER:
+        names = list(reversed(names))
+        logger.info("🔄 Reverse order enabled for SMART scan")
     if START_INDEX > 0:
-        logger.info(f"⏩ Skipping first {START_INDEX} collections (after reversing order)")
+        logger.info(f"⏩ Skipping first {START_INDEX} collections")
         names = names[START_INDEX:]
-    logger.info(f"📋 Processing {len(names)} collections (SMART, reversed)")
+    logger.info(
+        f"📋 Processing {len(names)} collections (SMART{' reversed' if REVERSE_ORDER else ''})"
+    )
 
     seen_ids_global: Set[str] = set()
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
@@ -645,11 +652,15 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
     logger.info(f"Global backdrops loaded once: {len(global_backdrops)}")
 
     names = [c.get("name") for c in cols if c.get("name")]
-    names = list(reversed(names))
+    if REVERSE_ORDER:
+        names = list(reversed(names))
+        logger.info("🔄 Reverse order enabled for backdrops scan")
     if START_INDEX > 0:
-        logger.info(f"⏩ Skipping first {START_INDEX} collections (after reversing order)")
+        logger.info(f"⏩ Skipping first {START_INDEX} collections")
         names = names[START_INDEX:]
-    logger.info(f"📋 Processing {len(names)} collections (by backdrops, reversed)")
+    logger.info(
+        f"📋 Processing {len(names)} collections (by backdrops{' reversed' if REVERSE_ORDER else ''})"
+    )
 
     seen_ids_global: Set[str] = set()
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
@@ -686,7 +697,7 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
 async def scrape_collections_by_backdrop(names: List[str], auth_token: str, limit: int = 500, threshold: int = 700) -> None:
     """Targeted scrape for specific collections.
     Strategy: run an offset scan first; if count exceeds `threshold`, run a backdrop-partitioned scan and merge
-    results using a shared seen_ids set to avoid duplicates. Accepts collection names or ids. Processes in reverse order.
+    results using a shared seen_ids set to avoid duplicates. Accepts collection names or ids.
     """
     logger.info("🔐 Fetching collections list for targeted strategy (offset-first, thresholded backdrops)...")
     cols = await get_collections(limit, auth_token)
@@ -707,7 +718,10 @@ async def scrape_collections_by_backdrop(names: List[str], auth_token: str, limi
 
     name_to_id = {c.get("name"): c.get("id") for c in cols if c.get("name") and c.get("id")}
 
-    for idx, name in enumerate(reversed(names), 1):
+    if REVERSE_ORDER:
+        names = list(reversed(names))
+        logger.info("🔄 Reverse order enabled for targeted scan")
+    for idx, name in enumerate(names, 1):
         coll_id = name_to_id.get(name) or name
         if not coll_id:
             logger.warning(f"No id for '{name}', skipping")
