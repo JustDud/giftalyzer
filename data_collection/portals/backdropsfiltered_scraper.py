@@ -46,6 +46,41 @@ START_INDEX = int(os.environ.get("PORTALS_START_INDEX", "0"))
 # Optional reverse processing order via ENV flag ("true"/"false")
 REVERSE_ORDER = os.environ.get("PORTALS_REVERSE_ORDER", "false").lower() == "true"
 
+# Optional targeting via ENV (used by run_portals_scraper):
+#  - PORTALS_TARGET_COLLECTIONS: comma/semicolon/newline-separated list of collection names or ids
+#  - PORTALS_TARGET_FILE: path to a file containing the list (one per line)
+#  - PORTALS_LIMIT: override collections fetch limit (default 500)
+def _parse_targets_string(s: str) -> list[str]:
+    targets: list[str] = []
+    if not s:
+        return targets
+    # allow commas, semicolons, and newlines as separators
+    for part in s.replace(";", ",").replace("\n", ",").split(","):
+        t = part.strip()
+        if t:
+            targets.append(t)
+    return targets
+
+def _read_targets_from_env() -> list[str]:
+    # primary: inline list
+    s = os.environ.get("PORTALS_TARGET_COLLECTIONS", "")
+    targets = _parse_targets_string(s)
+    if targets:
+        return targets
+    # secondary: read from file path, one per line
+    path = os.environ.get("PORTALS_TARGET_FILE", "").strip()
+    if path:
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                content = fh.read()
+            return _parse_targets_string(content)
+        except Exception as e:
+            logger.warning(f"Could not read PORTALS_TARGET_FILE='{path}': {e}")
+    return []
+
+# Optional limit override from ENV (defaults to 500)
+PORTALS_LIMIT = int(os.environ.get("PORTALS_LIMIT", "500"))
+
 
 # --- Token bucket, jitter, and global rate state ---
 class TokenBucket:
@@ -230,6 +265,8 @@ def _get_attr(it: Dict, keys: List[str]) -> str | None:
 async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) -> List[Dict]:
     """Wide scan: listed by offsets up to 800 (limit=50). Skips empty/error pages without stopping early."""
     items: List[Dict] = []
+    # reset duplicate-page counter per collection run
+    scan_offsets._dup_pages = 0
     collection = quote_plus(collection_id)
     async with aiohttp.ClientSession() as session:
         for offset in range(0, 800, OFFSET_STEP):
@@ -266,6 +303,8 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
 async def scan_price_range(collection_id: str, headers: dict, pmin: float, pmax: float, seen_ids: Set[str]) -> List[Dict]:
     """Scan a single price subrange with offsets up to 800 (limit=50). Skips empty/error pages."""
     items: List[Dict] = []
+    # reset duplicate-page counter per collection run
+    scan_price_range._dup_pages = 0
     collection = quote_plus(collection_id)
     async with aiohttp.ClientSession() as session:
         for offset in range(0, 800, OFFSET_STEP):
@@ -777,13 +816,18 @@ async def run_portals_scraper():
     # Modes:
     #  - default (no flag): scrape ALL collections (SMART over all)
     #  - --target <names...>: scrape ONLY the provided collections (offset-first, thresholded backdrop)
-    if "--target" in args:
+    env_targets = _read_targets_from_env()
+    if "--target" in args or env_targets:
         target_mode = True
         args = [a for a in args if a != "--target"]
     else:
         target_mode = False
 
-    names = args
+    names = env_targets if env_targets else args
+    if env_targets:
+        preview = ", ".join(env_targets[:3]) + (" …" if len(env_targets) > 3 else "")
+        logger.info(f"🎯 Targets from ENV ({len(env_targets)}): {preview}")
+
     api_id, api_hash = await get_auth_credentials()
     # Acquire TMA token with gentle retry/backoff to avoid hammering Telegram if session is temporarily unavailable
     auth_token = None  # type: str | None
@@ -803,12 +847,12 @@ async def run_portals_scraper():
     await init_indexes()
     if target_mode:
         if not names:
-            logger.warning("--target mode selected but no collection names/ids were provided; aborting")
+            logger.warning("Target mode selected but no collection names/ids were provided via CLI/ENV; aborting")
             return
-        await scrape_collections_by_backdrop(names, auth_token, limit=500, threshold=700)
+        await scrape_collections_by_backdrop(names, auth_token, limit=PORTALS_LIMIT, threshold=700)
         return
 
-    # Default: scrape ALL collections regardless of names passed (to keep behaviour predictable)
-    await smart_partition_all(auth_token, limit=500, threshold=700)
+    # Default: scrape ALL collections
+    await smart_partition_all(auth_token, limit=PORTALS_LIMIT, threshold=700)
 
 
