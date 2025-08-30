@@ -560,6 +560,9 @@ async def offset_only_all(auth_token: str, limit: int = 500) -> None:
                 "Accept": "application/json",
             }
             items = await scan_offsets(coll_id, headers, seen_ids_global)
+            if not items:
+                logger.warning(f"{name}: ZERO_RESULTS — leaving DB untouched for this collection")
+                continue
             # Anchor reset for this collection+market before rewriting state
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
@@ -623,6 +626,10 @@ async def smart_partition_all(auth_token: str, limit: int = 500, threshold: int 
                 logger.info(f"✅ {name}: ≤{threshold} items — keeping offset scan results")
                 items = items_offset
 
+            if not items:
+                logger.warning(f"{name}: ZERO_RESULTS — leaving DB untouched for this collection")
+                continue
+
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 await reset_market_state_for_collection(collection_uid, market="portals")
@@ -673,6 +680,9 @@ async def backdrops_partition_all(auth_token: str, limit: int = 500) -> None:
                 logger.warning(f"No id for collection '{name}', skipping")
                 continue
             items = await scan_all_backdrops_for_collection(coll_id, headers, global_backdrops, seen_ids_global)
+            if not items:
+                logger.warning(f"{name}: ZERO_RESULTS — leaving DB untouched for this collection")
+                continue
             collection_uid = id_to_uid.get(str(coll_id))
             if collection_uid:
                 await reset_market_state_for_collection(collection_uid, market="portals")
@@ -746,6 +756,10 @@ async def scrape_collections_by_backdrop(names: List[str], auth_token: str, limi
                     items.extend(part)
             else:
                 logger.info(f"[targeted] {name}: ≤{threshold} items — skipping backdrop scan to avoid extra requests")
+
+            if not items:
+                logger.warning(f"[targeted] {name}: ZERO_RESULTS — leaving DB untouched for this collection")
+                continue
 
             # Upsert merged results
             collection_uid = id_to_uid.get(str(coll_id))
