@@ -61,7 +61,7 @@ async def handle_pagination(call: CallbackQuery, state: FSMContext, t: dict):
 
 
 @router.message(lambda msg, t: msg.text == t["btn_enter_manual"])
-@subscription_required
+#@subscription_required
 async def handle_manual_input(message: Message, state: FSMContext, t: dict):
     collections_cursor = collections_collection.find({}, {"name": 1}).sort("name", 1)
     collections = [col["name"] async for col in collections_cursor if "name" in col]

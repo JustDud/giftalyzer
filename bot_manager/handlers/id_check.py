@@ -16,7 +16,7 @@ router = Router()
 
 
 @router.message(lambda msg, t: msg.text == t["btn_enter_id"])
-@subscription_required
+#@subscription_required
 async def ask_for_gift_id(message: types.Message, state: FSMContext, t: dict):
     await state.set_state(GiftStates.WaitingForGiftID)
     await message.answer(t["id_input_prompt"], reply_markup=get_back_keyboard(t))

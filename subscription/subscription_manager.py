@@ -58,7 +58,7 @@ async def add_subscription(user_id: int, days: int = 30):
     if not existing:
         await subscriptions.insert_one({
             "user_id": user_id,
-            "free_ai_requests": 10  # or adjust to your default
+            "free_ai_requests": 3  # or adjust to your default
         })
 
 

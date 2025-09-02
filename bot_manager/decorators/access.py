@@ -42,7 +42,7 @@ def ai_access_required(handler):
                 "first_name": getattr(event.from_user, "first_name", None),
                 "last_name": getattr(event.from_user, "last_name", None),
                 "username": getattr(event.from_user, "username", None),
-                "free_ai_requests": 10,
+                "free_ai_requests": 3,
                 "language": "ru"
             })
             return await handler(event, *args, **filtered_kwargs)
