@@ -216,11 +216,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str], co
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
             if not new_items and results:
                 scan_offsets._dup_pages += 1  # type: ignore[attr-defined]
-                logger.info(
-                    f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id}"
-                    + (f" ({collection_name})" if collection_name else "")
-                    + f" [{scan_offsets._dup_pages} consecutive]"
-                )
+
                 if scan_offsets._dup_pages >= 2:  # type: ignore[attr-defined]
                     logger.info(
                         f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id}"
@@ -264,7 +260,7 @@ async def classify_collection_by_threshold(collection_id: str, auth_token: str, 
     count = len(items)
     is_small = count < threshold
     logger.info(
-        f"classify: collection={collection_id}"
+        f"classify:"
         + (f" ({collection_name})" if collection_name else "")
         + f" count={count} threshold={threshold} is_small={is_small}"
     )
