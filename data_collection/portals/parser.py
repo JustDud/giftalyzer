@@ -689,6 +689,9 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
 
 async def run_parser():
         args = sys.argv[1:]
+        logger.info(
+            f"Config → BIG_THRESHOLD={BIG_THRESHOLD}, MAX_OFFSET={MAX_OFFSET}, DISCOVERY_LIMIT={DISCOVERY_LIMIT}"
+        )
         # Default: no args → classify ALL (Step 1 only)
         if not args:
             print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
