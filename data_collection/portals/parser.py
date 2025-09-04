@@ -259,10 +259,9 @@ async def classify_collection_by_threshold(collection_id: str, auth_token: str, 
     items = await scan_offsets(collection_id, headers, seen_ids, collection_name)
     count = len(items)
     is_small = count < threshold
+    name_for_log = collection_name or "<unknown>"
     logger.info(
-        f"classify:"
-        + (f" ({collection_name})" if collection_name else "")
-        + f" count={count} threshold={threshold} is_small={is_small}"
+        f"classify: collection={name_for_log} count={count} threshold={threshold} is_small={is_small}"
     )
     return {
         "collection_id": collection_id,
@@ -462,6 +461,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
     # Fetch model list via filters
     models = await _fetch_models_for_collection(short or name, auth_token)
     logger.info(f"[BIG] Starting processing for collection {name or short or cid} with {len(models)} models")
+    print(f"Processing models for {name or short or cid} (models={len(models)})…")
     if not models:
         logger.warning(f"[BIG] {name or short or cid}: no models discovered via filters; skipping")
         return {"collection_id": cid, "name": name, "short_name": short, "action": "no_models"}
@@ -502,6 +502,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
             # Big model: discover active backdrops then fetch per pair (floors-only by default)
             active_bds = await _discover_active_backdrops_for_model(cid, model, auth_token)
             logger.info(f"[BIG][LARGE-MODEL] {name}/{model}: discovered {len(active_bds)} active backdrops")
+            print(f"Processing backdrops for {name}/{model} (backdrops={len(active_bds)})…")
             if not active_bds:
                 logger.info(f"[BIG][LARGE-MODEL] {name}/{model}: no active backdrops discovered; skipping pairs")
                 per_model_stats.append({"model": model, "count": count, "saved": 0, "mode": "no-active-backdrops"})
@@ -684,91 +685,38 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
 
 
 async def run_parser():
-        args = sys.argv[1:]
-        logger.info(
-            f"Config → BIG_THRESHOLD={BIG_THRESHOLD}, MAX_OFFSET={MAX_OFFSET}, DISCOVERY_LIMIT={DISCOVERY_LIMIT}"
-        )
-        # Default: no args → classify ALL (Step 1 only)
-        if not args:
-            print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
-            api_id, api_hash = await get_auth_credentials()
-            auth_token = None
-            for attempt in range(3):
-                try:
-                    auth_token = await get_portals_auth_token(api_id, api_hash)
-                    break
-                except Exception as e:
-                    if attempt == 2:
-                        logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
-                        raise
-                    await _sleep_backoff(attempt)
-            if auth_token is None:
-                logger.error("Auth token was not obtained; aborting run")
-                return
-            auth = auth_token
-            res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
-            print(_json.dumps(res, ensure_ascii=False, indent=2))
-            logger.info("Parser run complete")
+    args = sys.argv[1:]
+    logger.info(
+        f"Config → BIG_THRESHOLD={BIG_THRESHOLD}, MAX_OFFSET={MAX_OFFSET}, DISCOVERY_LIMIT={DISCOVERY_LIMIT}"
+    )
+    # Default: no args → classify ALL (Step 1 only)
+    if not args:
+        print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
+        api_id, api_hash = await get_auth_credentials()
+        auth_token = None
+        for attempt in range(3):
+            try:
+                auth_token = await get_portals_auth_token(api_id, api_hash)
+                break
+            except Exception as e:
+                if attempt == 2:
+                    logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
+                    raise
+                await _sleep_backoff(attempt)
+        if auth_token is None:
+            logger.error("Auth token was not obtained; aborting run")
             return
+        auth = auth_token
+        res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
+        print(f"Classification complete: {len(res)} collections (threshold={BIG_THRESHOLD}).")
+        logger.info("Parser run complete")
+        return
 
-        # run-step1-branch: fetch all, skip first, classify each, then branch to stub handlers
-        if args[0] == "run-step1-branch":
-            if len(args) == 2:
-                auth = args[1]
-            else:
-                print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
-                api_id, api_hash = await get_auth_credentials()
-                auth_token = None
-                for attempt in range(3):
-                    try:
-                        auth_token = await get_portals_auth_token(api_id, api_hash)
-                        break
-                    except Exception as e:
-                        if attempt == 2:
-                            logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
-                            raise
-                        await _sleep_backoff(attempt)
-                if auth_token is None:
-                    logger.error("Auth token was not obtained; aborting run")
-                    return
-                auth = auth_token
-            res = await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
-            print(_json.dumps(res, ensure_ascii=False, indent=2))
-            return
-
-        # list-collections mode
-        if args[0] == "list-collections":
-            if len(args) == 2:
-                auth = args[1]
-            else:
-                print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
-                api_id, api_hash = await get_auth_credentials()
-                auth_token = None
-                for attempt in range(3):
-                    try:
-                        auth_token = await get_portals_auth_token(api_id, api_hash)
-                        break
-                    except Exception as e:
-                        if attempt == 2:
-                            logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
-                            raise
-                        await _sleep_backoff(attempt)
-                if auth_token is None:
-                    logger.error("Auth token was not obtained; aborting run")
-                    return
-                auth = auth_token
-            cols = await fetch_all_collections(auth)
-            print(_json.dumps(cols, ensure_ascii=False, indent=2))
-            return
-
-        # Single collection classification modes
+    # run-step1-branch: fetch all, skip first, classify each, then branch to stub handlers
+    if args[0] == "run-step1-branch":
         if len(args) == 2:
-            auth, coll = args
-            res = await classify_collection_by_threshold(coll, auth)
-            print(_json.dumps(res, ensure_ascii=False, indent=2))
-            return
-        elif len(args) == 1:
-            coll = args[0]
+            auth = args[1]
+        else:
             print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
@@ -785,9 +733,64 @@ async def run_parser():
                 logger.error("Auth token was not obtained; aborting run")
                 return
             auth = auth_token
-            res = await classify_collection_by_threshold(coll, auth)
-            print(_json.dumps(res, ensure_ascii=False, indent=2))
+        res = await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
+        print("Step1+branch run complete.")
+        return
+
+    # list-collections mode
+    if args[0] == "list-collections":
+        if len(args) == 2:
+            auth = args[1]
+        else:
+            print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
+            api_id, api_hash = await get_auth_credentials()
+            auth_token = None
+            for attempt in range(3):
+                try:
+                    auth_token = await get_portals_auth_token(api_id, api_hash)
+                    break
+                except Exception as e:
+                    if attempt == 2:
+                        logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
+                        raise
+                    await _sleep_backoff(attempt)
+            if auth_token is None:
+                logger.error("Auth token was not obtained; aborting run")
+                return
+            auth = auth_token
+        cols = await fetch_all_collections(auth)
+        print(f"Fetched {len(cols)} collections.")
+        return
+
+    # Single collection classification modes
+    if len(args) == 2:
+        auth, coll = args
+        res = await classify_collection_by_threshold(coll, auth)
+        name_for_log = res.get("name") or res.get("collection_name") or res.get("collection_id", "<unknown>")
+        print(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
+        return
+    elif len(args) == 1:
+        coll = args[0]
+        print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
+        api_id, api_hash = await get_auth_credentials()
+        auth_token = None
+        for attempt in range(3):
+            try:
+                auth_token = await get_portals_auth_token(api_id, api_hash)
+                break
+            except Exception as e:
+                if attempt == 2:
+                    logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
+                    raise
+                await _sleep_backoff(attempt)
+        if auth_token is None:
+            logger.error("Auth token was not obtained; aborting run")
             return
+        auth = auth_token
+        res = await classify_collection_by_threshold(coll, auth)
+        name_for_log = res.get("name") or res.get("collection_name") or res.get("collection_id", "<unknown>")
+        print(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
+        return
 
 
 
