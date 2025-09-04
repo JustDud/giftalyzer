@@ -46,7 +46,13 @@ JITTER_MIN = float(os.environ.get("PORTALS_JITTER_MIN_SEC", "0.05"))
 JITTER_MAX = float(os.environ.get("PORTALS_JITTER_MAX_SEC", "0.15"))
 TOKEN_BUCKET_CAPACITY = int(os.environ.get("PORTALS_TOKEN_BUCKET_CAPACITY", "3"))
 TOKEN_BUCKET_RPS = float(os.environ.get("PORTALS_TOKEN_BUCKET_RPS", "3.0"))
+
 ZERO_RESULTS_FREEZE_SECONDS = int(os.environ.get("PORTALS_ZERO_RESULTS_FREEZE_SEC", "300"))  # default 5 minutes
+
+# New global limits/thresholds
+MAX_OFFSET = int(os.environ.get("PORTALS_MAX_OFFSET", "600"))  # maximum offset value to request (inclusive)
+BIG_THRESHOLD = int(os.environ.get("PORTALS_BIG_THRESHOLD", "500"))  # >500 ⇒ big
+DISCOVERY_LIMIT = int(os.environ.get("PORTALS_DISCOVERY_LIMIT", str(MAX_OFFSET)))  # single-request discovery limit
 
 
 # ---- Minimal helper to obtain auth token with retry/backoff ----
@@ -188,14 +194,14 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
 
 # ---- EXACT working threshold logic (collection) reproduced ----
 async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str], collection_name: str | None = None) -> List[Dict]:
-    """Offset paging up to 800 (limit=50) and early-stop on two duplicate pages.
+    """Offset paging up to MAX_OFFSET (limit=50) and early-stop on two duplicate pages.
     Copied from the working scraper so classification is identical.
     """
     items: List[Dict] = []
     scan_offsets._dup_pages = 0  # type: ignore[attr-defined]
     collection = quote_plus(collection_id)
     async with aiohttp.ClientSession() as session:
-        for offset in range(0, 800, OFFSET_STEP):
+        for offset in range(0, MAX_OFFSET + OFFSET_STEP, OFFSET_STEP):
             url = (
                 f"{API_URL_PORTALS}/api/nfts/search"
                 f"?offset={offset}&limit={PAGE_LIMIT}&collection_id={collection}&status=listed&sort_by=price+asc"
@@ -234,7 +240,7 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str], co
     return items
 
 
-async def classify_collection_by_threshold(collection_id: str, auth_token: str, threshold: int = 700, collection_name: str | None = None) -> dict:
+async def classify_collection_by_threshold(collection_id: str, auth_token: str, threshold: int = BIG_THRESHOLD, collection_name: str | None = None) -> dict:
     """Step 1: EXACTLY the same decision criterion as the working code.
 
     Performs an offset scan (no filters) and uses the item count to decide
@@ -290,9 +296,9 @@ async def _fetch_models_for_collection(short_name: str, auth_token: str) -> list
             logger.warning(f"_fetch_models_for_collection parse failed for {short_name}: {e}")
             return []
 
-async def _discover_active_backdrops_for_model(collection_id: str, model: str, auth_token: str, *, limit: int = 800) -> set[str]:
+async def _discover_active_backdrops_for_model(collection_id: str, model: str, auth_token: str, *, limit: int = DISCOVERY_LIMIT) -> set[str]:
     """Discover active backdrops for a model via a single request with a high limit (no asc/desc paging).
-    Pulls up to `limit` items (default 800) sorted by price asc and extracts all distinct backdrops from attributes.
+    Pulls up to `limit` items (default DISCOVERY_LIMIT) sorted by price asc and extracts all distinct backdrops from attributes.
     """
     headers = {"Authorization": f"tma {auth_token}", "User-Agent": "TelegramBot", "Accept": "application/json"}
     collection = quote_plus(collection_id)
@@ -319,15 +325,15 @@ async def _discover_active_backdrops_for_model(collection_id: str, model: str, a
                             backdrops.add(val)
     return backdrops
 
-async def _scan_offsets_for_model(collection_id: str, model: str, auth_token: str, *, cap: int = 800) -> list[dict]:
-    """Offset pagination for a single model (no backdrop sharding), up to cap (800)."""
+async def _scan_offsets_for_model(collection_id: str, model: str, auth_token: str, *, cap: int = MAX_OFFSET) -> list[dict]:
+    """Offset pagination for a single model (no backdrop sharding), up to cap (MAX_OFFSET)."""
     headers = {"Authorization": f"tma {auth_token}", "User-Agent": "TelegramBot", "Accept": "application/json"}
     items: list[dict] = []
     seen_ids: set[str] = set()
     collection = quote_plus(collection_id)
     async with aiohttp.ClientSession() as session:
         dup_pages = 0
-        for offset in range(0, cap, OFFSET_STEP):
+        for offset in range(0, MAX_OFFSET + OFFSET_STEP, OFFSET_STEP):
             url = (
                 f"{API_URL_PORTALS}/api/nfts/search?offset={offset}&limit={PAGE_LIMIT}&collection_id={collection}"
                 f"&status=listed&filter_by_models={quote_plus(model)}&sort_by=price+asc"
@@ -350,7 +356,7 @@ async def _scan_offsets_for_model(collection_id: str, model: str, auth_token: st
             await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     return items
 
-async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, threshold: int = 700) -> tuple[int, bool, list[dict]]:
+async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, threshold: int = BIG_THRESHOLD) -> tuple[int, bool, list[dict]]:
     """Probe whether a model has < threshold items by paging up to the threshold. If we reach threshold, it's big. Otherwise, it's small and returns all items."""
     headers = {"Authorization": f"tma {auth_token}", "User-Agent": "TelegramBot", "Accept": "application/json"}
     items: list[dict] = []
@@ -359,8 +365,8 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
     async with aiohttp.ClientSession() as session:
         dup_pages = 0
         count = 0
-        # Scan up to the threshold boundary (e.g., 700). If we reach it => big model.
-        for offset in range(0, threshold, OFFSET_STEP):
+        # Scan up to the threshold boundary (threshold). If we reach it => big model.
+        for offset in range(0, MAX_OFFSET + OFFSET_STEP, OFFSET_STEP):
             url = (
                 f"{API_URL_PORTALS}/api/nfts/search?offset={offset}&limit={PAGE_LIMIT}&collection_id={collection}"
                 f"&status=listed&filter_by_models={quote_plus(model)}&sort_by=price+asc"
@@ -382,7 +388,7 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
             items.extend(new_items)
             count = len(items)
             if count >= threshold:
-                # Big model: hit or crossed the 700 boundary
+                # Big model: hit or crossed the threshold boundary
                 return count, False, []
             await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     # We scanned up to the threshold and didn't reach it => small model; return all collected items
@@ -470,7 +476,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
     for model in models:
         try:
             logger.info(f"[BIG] Probing model {model} in {name or short or cid}")
-            count, is_small, items_if_small = await _probe_model_size(cid, model, auth_token, threshold=700)
+            count, is_small, items_if_small = await _probe_model_size(cid, model, auth_token, threshold=BIG_THRESHOLD)
             logger.info(f"[BIG] Model {model}: count={count}, is_small={is_small}")
             if is_small:
                 # Save full model scan (incremental upserts; do NOT reset whole collection)
@@ -621,7 +627,7 @@ async def fetch_all_collections(auth_token: str, limit: int = 500) -> list[dict]
             return []
         return data.get("collections", data) or []
 
-async def classify_all_collections(auth_token: str, threshold: int = 700) -> list[dict]:
+async def classify_all_collections(auth_token: str, threshold: int = BIG_THRESHOLD) -> list[dict]:
     """Classify all collections by threshold. Returns a list of classification dicts."""
     cols = await fetch_all_collections(auth_token)
     results: list[dict] = []
@@ -638,7 +644,7 @@ async def classify_all_collections(auth_token: str, threshold: int = 700) -> lis
         await asyncio.sleep(0.05)
     return results
 
-async def run_step1_branch_over_collections(auth_token: str, threshold: int = 700) -> list[dict]:
+async def run_step1_branch_over_collections(auth_token: str, threshold: int = BIG_THRESHOLD) -> list[dict]:
     """Fetch all collections, then for each collection
     run the Step‑1 threshold classification. If count >= threshold → process_big_collection();
     else → process_small_collection().
@@ -701,7 +707,7 @@ async def run_parser():
                 logger.error("Auth token was not obtained; aborting run")
                 return
             auth = auth_token
-            res = await classify_all_collections(auth, threshold=700)
+            res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
             print(_json.dumps(res, ensure_ascii=False, indent=2))
             logger.info("Parser run complete")
             return
@@ -727,7 +733,7 @@ async def run_parser():
                     logger.error("Auth token was not obtained; aborting run")
                     return
                 auth = auth_token
-            res = await run_step1_branch_over_collections(auth, threshold=700)
+            res = await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
             print(_json.dumps(res, ensure_ascii=False, indent=2))
             return
 
