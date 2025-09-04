@@ -579,10 +579,35 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
     # 3) Persist according to the rule: if zero items → do NOT reset existing DB
     saved = 0
     if count == 0:
-        logger.warning(f"[SMALL] {name or short or cid}: ZERO_RESULTS — preserving existing DB state (no reset)")
-        logger.warning(f"[SMALL] {name or short or cid}: FREEZE for {ZERO_RESULTS_FREEZE_SECONDS}s due to ZERO_RESULTS")
-        await asyncio.sleep(ZERO_RESULTS_FREEZE_SECONDS)
-        action = "preserved_existing_no_reset"
+        # Attempt a one-time session/token refresh and retry the scan before freezing
+        logger.warning(f"[SMALL] {name or short or cid}: ZERO_RESULTS — attempting session refresh and one retry")
+        try:
+            # Refresh auth token (same protocol as scraper)
+            new_auth = await _get_auth_token_with_retry()
+            # Retry a single offset scan with the fresh token
+            retry_headers = {
+                "Authorization": f"tma {new_auth}",
+                "User-Agent": "TelegramBot",
+                "Accept": "application/json",
+            }
+            retry_seen: Set[str] = set()
+            retry_items = await scan_offsets(cid, retry_headers, retry_seen, name)
+            retry_count = len(retry_items)
+            if retry_count > 0:
+                logger.info(f"[SMALL] {name or short or cid}: recovered {retry_count} items after session refresh")
+                # Use the recovered items for persistence below
+                items = retry_items
+                count = retry_count
+            else:
+                logger.warning(f"[SMALL] {name or short or cid}: still ZERO_RESULTS after refresh — preserving DB and freezing for {ZERO_RESULTS_FREEZE_SECONDS}s")
+                action = "preserved_existing_no_reset"
+                logger.warning(f"[SMALL] {name or short or cid}: FREEZE for {ZERO_RESULTS_FREEZE_SECONDS}s due to ZERO_RESULTS")
+                await asyncio.sleep(ZERO_RESULTS_FREEZE_SECONDS)
+        except Exception as e:
+            logger.error(f"[SMALL] {name or short or cid}: session refresh failed: {e}")
+            action = "preserved_existing_no_reset"
+            logger.warning(f"[SMALL] {name or short or cid}: FREEZE for {ZERO_RESULTS_FREEZE_SECONDS}s due to ZERO_RESULTS")
+            await asyncio.sleep(ZERO_RESULTS_FREEZE_SECONDS)
     else:
         try:
             if collection_uid:
