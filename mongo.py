@@ -646,6 +646,46 @@ async def reset_market_state_for_collection(collection_uid: str, market: str) ->
     return {"matched": res.matched_count, "modified": res.modified_count}
 
 
+# --- Model-scoped reset for a specific model in a collection ---
+async def reset_market_state_for_model(collection_uid: str, model: str, market: str = "portals") -> dict:
+    """
+    Remove/clear markets.<market> state for all NFTs in a *specific model* of a collection.
+    Use right before writing a fresh set for that model (only if you have >0 new items).
+    Returns basic stats {matched, modified}.
+    """
+    now = utc_ts()
+    # Match NFTs by collection + market-present + model. Prefer flattened `model`,
+    # but also support legacy traits[] fallback.
+    filt = {
+        "collection_uid": collection_uid,
+        f"markets.{market}": {"$exists": True},
+        "$or": [
+            {"model": model},
+            {"traits": {"$elemMatch": {"type": "model", "value": model}}},
+        ],
+    }
+    update = {"$unset": {f"markets.{market}": ""}, "$set": {"updated_at": now}}
+    res = await nfts_collection.update_many(filt, update)
+    return {"matched": res.matched_count, "modified": res.modified_count}
+
+
+# --- Optional: index helpers for model-scoped operations ---
+async def ensure_model_scoped_indexes():
+    """Create helpful indexes for model-scoped resets/lookups (idempotent)."""
+    # Speeds up queries on collection+model
+    await nfts_collection.create_index(
+        [("collection_uid", 1), ("model", 1)],
+        name="nfts_collection_model_flat",
+        background=True,
+    )
+    # If you frequently fall back to traits[] for model matching, this helps too
+    await nfts_collection.create_index(
+        [("collection_uid", 1), ("traits.type", 1), ("traits.value", 1)],
+        name="nfts_collection_traits_kv",
+        background=True,
+    )
+
+
 async def get_nft_by_id_or_name(gift_id: str):
     nft = await nfts_collection.find_one({"nft_id": gift_id})
     if nft:

@@ -1,12 +1,12 @@
 import asyncio
-from data_collection.portals import backdropsfiltered_scraper
+from data_collection.portals import parser
 from mongo import cleanup_empty_market_nfts, db
 
 
 async def update_db():
     while True:
         try:
-            await backdropsfiltered_scraper.run_portals_scraper()
+            await parser.run_parser()
         except Exception as e:
             print(f"[db_updater] error: {e!r}")
             await asyncio.sleep(100)
