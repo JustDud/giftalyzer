@@ -218,9 +218,9 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str], co
                 scan_offsets._dup_pages += 1  # type: ignore[attr-defined]
 
                 if scan_offsets._dup_pages >= 2:  # type: ignore[attr-defined]
-                    logger.info(
-                        f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id}"
-                        + (f" ({collection_name})" if collection_name else "")
+                    logger.debug(
+                        f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection"
+                        + (f" {collection_name}" if collection_name else "")
                     )
                     break
             else:
@@ -566,7 +566,7 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
         seen_ids: Set[str] = set()
         items = await scan_offsets(cid, headers, seen_ids)
     count = len(items)
-    logger.info(f"[SMALL] {name or short or cid}: offset scan collected {count} items")
+    logger.info(f"[SMALL] {name or short or cid}: collected {count} items")
 
     # 2) Ensure collection exists in DB and get its UID mapping
     try:
@@ -686,38 +686,62 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
 
 async def run_parser():
     args = sys.argv[1:]
+    run_mode_env = os.environ.get("PORTALS_RUN_MODE", "branch").strip().lower()
     logger.info(
         f"Config → BIG_THRESHOLD={BIG_THRESHOLD}, MAX_OFFSET={MAX_OFFSET}, DISCOVERY_LIMIT={DISCOVERY_LIMIT}"
     )
-    # Default: no args → classify ALL (Step 1 only)
+    # Default: no args → decide by env; default to full branch so programmatic callers run the whole pipeline
     if not args:
-        print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
-        api_id, api_hash = await get_auth_credentials()
-        auth_token = None
-        for attempt in range(3):
-            try:
-                auth_token = await get_portals_auth_token(api_id, api_hash)
-                break
-            except Exception as e:
-                if attempt == 2:
-                    logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
-                    raise
-                await _sleep_backoff(attempt)
-        if auth_token is None:
-            logger.error("Auth token was not obtained; aborting run")
+        # Decide default behavior by env; default to full branch so programmatic callers run the whole pipeline
+        if run_mode_env in {"branch", "run-step1-branch", "step1-branch"}:
+            print("No args provided — obtaining TMA token and running Step1+branch…")
+            api_id, api_hash = await get_auth_credentials()
+            auth_token = None
+            for attempt in range(3):
+                try:
+                    auth_token = await get_portals_auth_token(api_id, api_hash)
+                    break
+                except Exception as e:
+                    if attempt == 2:
+                        logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
+                        raise
+                    await _sleep_backoff(attempt)
+            if auth_token is None:
+                logger.error("Auth token was not obtained; aborting run")
+                return
+            auth = auth_token
+            await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
+            print("Step1+branch run complete.")
+            logger.info("Parser run complete")
             return
-        auth = auth_token
-        res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
-        print(f"Classification complete: {len(res)} collections (threshold={BIG_THRESHOLD}).")
-        logger.info("Parser run complete")
-        return
+        else:
+            print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
+            api_id, api_hash = await get_auth_credentials()
+            auth_token = None
+            for attempt in range(3):
+                try:
+                    auth_token = await get_portals_auth_token(api_id, api_hash)
+                    break
+                except Exception as e:
+                    if attempt == 2:
+                        logger.error(f"Failed to obtain auth token after {attempt+1} attempts: {e}")
+                        raise
+                    await _sleep_backoff(attempt)
+            if auth_token is None:
+                logger.error("Auth token was not obtained; aborting run")
+                return
+            auth = auth_token
+            res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
+            print(f"Classification complete: {len(res)} collections (threshold={BIG_THRESHOLD}).")
+            logger.info("Parser run complete")
+            return
 
     # run-step1-branch: fetch all, skip first, classify each, then branch to stub handlers
     if args[0] == "run-step1-branch":
         if len(args) == 2:
             auth = args[1]
         else:
-            print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
+            print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -742,7 +766,7 @@ async def run_parser():
         if len(args) == 2:
             auth = args[1]
         else:
-            print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
+            print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -771,7 +795,7 @@ async def run_parser():
         return
     elif len(args) == 1:
         coll = args[0]
-        print("No AUTH_TOKEN provided — using PORTALS_TMA_TOKEN/PORTALS_AUTH_TOKEN if set, or existing session; otherwise obtaining a TMA token…")
+        print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
         api_id, api_hash = await get_auth_credentials()
         auth_token = None
         for attempt in range(3):
