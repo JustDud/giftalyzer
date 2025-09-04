@@ -187,7 +187,7 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, headers: dict, *,
 
 
 # ---- EXACT working threshold logic (collection) reproduced ----
-async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) -> List[Dict]:
+async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str], collection_name: str | None = None) -> List[Dict]:
     """Offset paging up to 800 (limit=50) and early-stop on two duplicate pages.
     Copied from the working scraper so classification is identical.
     """
@@ -211,12 +211,14 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
             if not new_items and results:
                 scan_offsets._dup_pages += 1  # type: ignore[attr-defined]
                 logger.info(
-                    f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id} "
-                    f"[{scan_offsets._dup_pages} consecutive]"
+                    f"Duplicate page (all duplicates) at offset {offset} for collection {collection_id}"
+                    + (f" ({collection_name})" if collection_name else "")
+                    + f" [{scan_offsets._dup_pages} consecutive]"
                 )
                 if scan_offsets._dup_pages >= 2:  # type: ignore[attr-defined]
                     logger.info(
                         f"Early stop (2 consecutive duplicate pages) at offset {offset} for collection {collection_id}"
+                        + (f" ({collection_name})" if collection_name else "")
                     )
                     break
             else:
@@ -225,11 +227,14 @@ async def scan_offsets(collection_id: str, headers: dict, seen_ids: Set[str]) ->
                 seen_ids.add(it["id"])  # type: ignore[index]
             items.extend(new_items)
             await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
-    logger.info(f"Wide scan collected {len(items)} items")
+    logger.info(
+        f"Wide scan collected {len(items)} items for collection {collection_id}"
+        + (f" ({collection_name})" if collection_name else "")
+    )
     return items
 
 
-async def classify_collection_by_threshold(collection_id: str, auth_token: str, threshold: int = 700) -> dict:
+async def classify_collection_by_threshold(collection_id: str, auth_token: str, threshold: int = 700, collection_name: str | None = None) -> dict:
     """Step 1: EXACTLY the same decision criterion as the working code.
 
     Performs an offset scan (no filters) and uses the item count to decide
@@ -249,11 +254,13 @@ async def classify_collection_by_threshold(collection_id: str, auth_token: str, 
         "Accept": "application/json",
     }
     seen_ids: Set[str] = set()
-    items = await scan_offsets(collection_id, headers, seen_ids)
+    items = await scan_offsets(collection_id, headers, seen_ids, collection_name)
     count = len(items)
     is_small = count < threshold
     logger.info(
-        f"classify_collection_by_threshold: collection={collection_id} count={count} threshold={threshold} is_small={is_small}"
+        f"classify: collection={collection_id}"
+        + (f" ({collection_name})" if collection_name else "")
+        + f" count={count} threshold={threshold} is_small={is_small}"
     )
     return {
         "collection_id": collection_id,
@@ -623,7 +630,8 @@ async def classify_all_collections(auth_token: str, threshold: int = 700) -> lis
         if not cid:
             continue
         try:
-            klass = await classify_collection_by_threshold(str(cid), auth_token, threshold=threshold)
+            name = c.get("name") or (c.get("raw") or {}).get("name")
+            klass = await classify_collection_by_threshold(str(cid), auth_token, threshold=threshold, collection_name=name)
             results.append(klass)
         except Exception as e:
             logger.warning(f"classify_all_collections: Failed for collection {cid}: {e}")
@@ -648,8 +656,9 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = 70
             logger.warning(f"Skipping collection without id: {c}")
             continue
         try:
+            name = c.get("name") or (c.get("raw") or {}).get("name")
             # Step‑1: classify this collection
-            klass = await classify_collection_by_threshold(str(cid), auth_token, threshold=threshold)
+            klass = await classify_collection_by_threshold(str(cid), auth_token, threshold=threshold, collection_name=name)
             count_seen = int(klass.get("count_seen", 0))
             # Branch
             if count_seen >= threshold:
@@ -659,7 +668,11 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = 70
             # attach classification info for visibility
             res.update({"count_seen": count_seen, "threshold": threshold})
             results.append(res)
-            logger.info(f"Finished collection {cid}: action={res.get('action')}, count_seen={count_seen}, saved={res.get('saved', 0)}")
+            logger.info(
+                f"Finished collection {cid}"
+                + (f" ({name})" if name else "")
+                + f": action={res.get('action')}, count_seen={count_seen}, saved={res.get('saved', 0)}"
+            )
         except Exception as e:
             logger.warning(f"Branching failed for collection {cid}: {e}")
         await asyncio.sleep(0.05)

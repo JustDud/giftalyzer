@@ -27,7 +27,7 @@ load_dotenv()
 # NOTE: DB name is now "giftalyzer_db". Schema supports multi-market canonical IDs
 # for collections/nfts while remaining backward compatible with existing data loaders.
 client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
-db = client.giftalyzer_db
+db = client.test_db
 
 gifts_collection: AsyncIOMotorCollection = db.gifts
 nfts_collection: AsyncIOMotorCollection = db.nfts
