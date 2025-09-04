@@ -338,7 +338,14 @@ async def _scan_offsets_for_model(collection_id: str, model: str, auth_token: st
                 await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
                 continue
             results = data.get("results") or []
+            if not results:
+                break
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
+            if len(results) < PAGE_LIMIT:
+                for it in new_items:
+                    seen_ids.add(it.get("id"))
+                items.extend(new_items)
+                break
             if not new_items and results:
                 dup_pages += 1
                 if dup_pages >= 2:
@@ -349,6 +356,10 @@ async def _scan_offsets_for_model(collection_id: str, model: str, auth_token: st
                 seen_ids.add(it.get("id"))
             items.extend(new_items)
             await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
+    # If the scan resulted in zero items, pause before returning
+    if not items:
+        logger.warning(f"[_scan_offsets_for_model] Model {model} in collection {collection_id}: ZERO_RESULTS — pausing for {COOLDOWN_SECONDS}s before continuing")
+        await asyncio.sleep(COOLDOWN_SECONDS)
     return items
 
 async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, threshold: int = BIG_THRESHOLD) -> tuple[int, bool, list[dict]]:
@@ -371,13 +382,33 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
                 await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
                 continue
             results = data.get("results") or []
+            # Empty page ⇒ no more items
+            if not results:
+                logger.debug(f"[_probe_model_size] {model}: empty page at offset {offset} — stopping")
+                break
+
+            # Compute new items on this page
             new_items = [it for it in results if (it_id := it.get("id")) and it_id not in seen_ids]
-            if not new_items and results:
+
+            # If the page returned fewer than PAGE_LIMIT results, we've reached the tail
+            if len(results) < PAGE_LIMIT:
+                for it in new_items:
+                    seen_ids.add(it.get("id"))
+                items.extend(new_items)
+                count = len(items)
+                logger.debug(f"[_probe_model_size] {model}: short page (len={len(results)}) at offset {offset} — stopping with count={count}")
+                break
+
+            # Detect duplicate pages (all items already seen)
+            if not new_items:
                 dup_pages += 1
                 if dup_pages >= 2:
+                    logger.debug(f"[_probe_model_size] {model}: two consecutive duplicate pages by offset {offset} — stopping")
                     break
             else:
                 dup_pages = 0
+
+            # Accumulate and check threshold
             for it in new_items:
                 seen_ids.add(it.get("id"))
             items.extend(new_items)
@@ -385,8 +416,26 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
             if count >= threshold:
                 # Big model: hit or crossed the threshold boundary
                 return count, False, []
+
             await asyncio.sleep(BASE_DELAY_BETWEEN_REQUESTS + _jitter())
     # We scanned up to the threshold and didn't reach it => small model; return all collected items
+    # If the probe resulted in zero items, attempt a one-time session refresh and retry before pausing
+    if count == 0:
+        logger.warning(f"[_probe_model_size] Model {model} in collection {collection_id}: ZERO_RESULTS — attempting session refresh and one retry")
+        try:
+            new_auth = await _get_auth_token_with_retry()
+            # Re-scan this model with fresh auth, using the full model scan helper
+            retry_items = await _scan_offsets_for_model(collection_id, model, new_auth)
+            retry_count = len(retry_items)
+            if retry_count > 0:
+                logger.info(f"[_probe_model_size] Model {model} in collection {collection_id}: recovered {retry_count} items after session refresh")
+                return retry_count, True, retry_items
+            else:
+                logger.warning(f"[_probe_model_size] Model {model} in collection {collection_id}: still ZERO_RESULTS after refresh — pausing for {COOLDOWN_SECONDS}s before continuing")
+                await asyncio.sleep(COOLDOWN_SECONDS)
+        except Exception as e:
+            logger.error(f"[_probe_model_size] Model {model} in collection {collection_id}: session refresh failed: {e}")
+            await asyncio.sleep(COOLDOWN_SECONDS)
     return count, True, items
 
 async def _fetch_pairs_for_model_backdrops(collection_id: str, model: str, backdrops: set[str], auth_token: str, *, floor_only: bool = True, pages_per_bd: int = 1) -> list[dict]:
@@ -417,7 +466,7 @@ async def _fetch_pairs_for_model_backdrops(collection_id: str, model: str, backd
             else:
                 # small pagination per backdrop
                 dup_pages = 0
-                for offset in range(0, min(800, pages_per_bd * PAGE_LIMIT), OFFSET_STEP):
+                for offset in range(0, min(MAX_OFFSET + OFFSET_STEP, pages_per_bd * OFFSET_STEP), OFFSET_STEP):
                     url = (
                         f"{API_URL_PORTALS}/api/nfts/search?offset={offset}&limit={PAGE_LIMIT}&collection_id={collection}"
                         f"&status=listed&filter_by_models={quote_plus(model)}&filter_by_backdrops={bdq}&sort_by=price+asc"
@@ -477,7 +526,8 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
             if is_small:
                 # Save full model scan (incremental upserts; do NOT reset whole collection)
                 if not items_if_small:
-                    logger.info(f"[BIG][SMALL-MODEL] {name}/{model}: ZERO_RESULTS — preserving DB")
+                    logger.warning(f"[BIG][SMALL-MODEL] {name}/{model}: ZERO_RESULTS — pausing for {COOLDOWN_SECONDS}s before continuing")
+                    await asyncio.sleep(COOLDOWN_SECONDS)
                     per_model_stats.append({"model": model, "count": 0, "saved": 0, "mode": "model-scan"})
                 else:
                     if collection_uid:
@@ -564,7 +614,7 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
         items = items_precollected
     else:
         seen_ids: Set[str] = set()
-        items = await scan_offsets(cid, headers, seen_ids)
+        items = await scan_offsets(cid, headers, seen_ids, name)
     count = len(items)
     logger.info(f"[SMALL] {name or short or cid}: collected {count} items")
 
@@ -578,6 +628,7 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
 
     # 3) Persist according to the rule: if zero items → do NOT reset existing DB
     saved = 0
+    action = "noop"
     if count == 0:
         # Attempt a one-time session/token refresh and retry the scan before freezing
         logger.warning(f"[SMALL] {name or short or cid}: ZERO_RESULTS — attempting session refresh and one retry")
@@ -598,6 +649,21 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
                 # Use the recovered items for persistence below
                 items = retry_items
                 count = retry_count
+                if collection_uid:
+                    try:
+                        logger.info(
+                            f"[SMALL] {name or short or cid}: resetting and upserting {count} items (after refresh)")
+                        await reset_market_state_for_collection(collection_uid, market="portals")
+                        await upsert_nfts_for_collection(items, collection_uid, market="portals")
+                        saved = count
+                        action = "saved_offset_scan_refreshed"
+                    except Exception as e:
+                        logger.warning(f"[SMALL] {name or short or cid}: DB write failed after refresh: {e}")
+                        action = "db_write_failed_after_refresh"
+                else:
+                    logger.warning(
+                        f"[SMALL] {name or short or cid}: no collection UID mapping after refresh; skipping DB write")
+                    action = "missing_collection_uid_after_refresh"
             else:
                 logger.warning(f"[SMALL] {name or short or cid}: still ZERO_RESULTS after refresh — preserving DB and freezing for {ZERO_RESULTS_FREEZE_SECONDS}s")
                 action = "preserved_existing_no_reset"
@@ -683,6 +749,8 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
         if not cid:
             logger.warning(f"Skipping collection without id: {c}")
             continue
+        # Start time for per-collection stats
+        start_ts = time.monotonic()
         try:
             name = c.get("name") or (c.get("raw") or {}).get("name")
             # Step‑1: classify this collection
@@ -695,11 +763,18 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
                 res = await process_small_collection(c, auth_token, klass.get("items"))
             # attach classification info for visibility
             res.update({"count_seen": count_seen, "threshold": threshold})
+
+            # Compute per-collection stats: elapsed and items/sec
+            elapsed = max(1e-6, time.monotonic() - start_ts)
+            saved_total = res.get("saved", res.get("saved_total", 0)) or 0
+            ips = saved_total / elapsed
+            res.update({"elapsed_sec": elapsed, "items_per_sec": ips})
+
             results.append(res)
             logger.info(
                 f"Finished collection {cid}"
                 + (f" ({name})" if name else "")
-                + f": action={res.get('action')}, count_seen={count_seen}, saved={res.get('saved', 0)}"
+                + f": action={res.get('action')}, count_seen={count_seen}, saved={saved_total}, elapsed={elapsed:.2f}s, rate={ips:.2f} items/s"
             )
         except Exception as e:
             logger.warning(f"Branching failed for collection {cid}: {e}")
