@@ -424,6 +424,9 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
         logger.warning(f"[_probe_model_size] Model {model} in collection {collection_id}: ZERO_RESULTS — attempting session refresh and one retry")
         try:
             new_auth = await _get_auth_token_with_retry()
+            logger.info(
+                f"[_probe_model_size] Model {model} in collection {collection_id}: session refreshed — sleeping {COOLDOWN_SECONDS}s before retry")
+            # await asyncio.sleep(COOLDOWN_SECONDS)
             # Re-scan this model with fresh auth, using the full model scan helper
             retry_items = await _scan_offsets_for_model(collection_id, model, new_auth)
             retry_count = len(retry_items)
@@ -435,7 +438,7 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
                 await asyncio.sleep(COOLDOWN_SECONDS)
         except Exception as e:
             logger.error(f"[_probe_model_size] Model {model} in collection {collection_id}: session refresh failed: {e}")
-            await asyncio.sleep(COOLDOWN_SECONDS)
+            #await asyncio.sleep(COOLDOWN_SECONDS)
     return count, True, items
 
 async def _fetch_pairs_for_model_backdrops(collection_id: str, model: str, backdrops: set[str], auth_token: str, *, floor_only: bool = True, pages_per_bd: int = 1) -> list[dict]:
@@ -635,6 +638,9 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
         try:
             # Refresh auth token (same protocol as scraper)
             new_auth = await _get_auth_token_with_retry()
+            logger.info(
+                f"[SMALL] {name or short or cid}: session refreshed — sleeping {COOLDOWN_SECONDS}s before retry")
+            await asyncio.sleep(COOLDOWN_SECONDS)
             # Retry a single offset scan with the fresh token
             retry_headers = {
                 "Authorization": f"tma {new_auth}",
