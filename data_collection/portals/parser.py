@@ -32,7 +32,15 @@ except Exception:
 # ---- Config copied from existing working scraper ----
 API_URL_PORTALS = os.environ.get("API_URL_PORTALS") or "https://portals-market.com"
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+#
+# Logging setup: env-tunable for level and always logs to stdout.
+_log_level = os.environ.get("PORTALS_LOG_LEVEL", "INFO").upper()
+_log_stream = sys.stdout
+logging.basicConfig(
+    level=getattr(logging, _log_level, logging.INFO),
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    stream=_log_stream,
+)
 logger = logging.getLogger(__name__)
 
 OFFSET_STEP = 50
@@ -52,7 +60,33 @@ ZERO_RESULTS_FREEZE_SECONDS = int(os.environ.get("PORTALS_ZERO_RESULTS_FREEZE_SE
 # New global limits/thresholds
 MAX_OFFSET = int(os.environ.get("PORTALS_MAX_OFFSET", "600"))  # maximum offset value to request (inclusive)
 BIG_THRESHOLD = int(os.environ.get("PORTALS_BIG_THRESHOLD", "500"))  # >500 ⇒ big
+
 DISCOVERY_LIMIT = int(os.environ.get("PORTALS_DISCOVERY_LIMIT", str(MAX_OFFSET)))  # single-request discovery limit
+
+# ---- Refresh guard (per-run) ----
+REFRESH_MAX_PER_RUN = int(os.environ.get("PORTALS_REFRESH_MAX_PER_RUN", "1"))
+REFRESH_MIN_GAP_SEC = float(os.environ.get("PORTALS_REFRESH_MIN_GAP_SEC", "300"))  # 5 minutes
+
+class _RefreshGuard:
+    def __init__(self):
+        self.used = 0
+        self.last = 0.0
+        self.current_auth: str | None = None
+
+REFRESH = _RefreshGuard()
+
+def _can_refresh_now() -> bool:
+    # now = time.monotonic()
+    # if REFRESH.used >= REFRESH_MAX_PER_RUN:
+    #     return False
+    # if REFRESH.last and (now - REFRESH.last) < REFRESH_MIN_GAP_SEC:
+    #     return False
+    return True
+
+def _note_refresh(token: str):
+    REFRESH.used += 1
+    REFRESH.last = time.monotonic()
+    REFRESH.current_auth = token
 
 
 # ---- Minimal helper to obtain auth token with retry/backoff ----
@@ -421,12 +455,17 @@ async def _probe_model_size(collection_id: str, model: str, auth_token: str, *, 
     # We scanned up to the threshold and didn't reach it => small model; return all collected items
     # If the probe resulted in zero items, attempt a one-time session refresh and retry before pausing
     if count == 0:
+        if not _can_refresh_now():
+            logger.warning(f"[_probe_model_size] Model {model} in collection {collection_id}: refresh skipped (budget/lockout); pausing {COOLDOWN_SECONDS}s")
+            await asyncio.sleep(COOLDOWN_SECONDS)
+            return 0, True, []
         logger.warning(f"[_probe_model_size] Model {model} in collection {collection_id}: ZERO_RESULTS — attempting session refresh and one retry")
         try:
             new_auth = await _get_auth_token_with_retry()
+            _note_refresh(new_auth)
             logger.info(
                 f"[_probe_model_size] Model {model} in collection {collection_id}: session refreshed — sleeping {COOLDOWN_SECONDS}s before retry")
-            # await asyncio.sleep(COOLDOWN_SECONDS)
+            await asyncio.sleep(COOLDOWN_SECONDS)
             # Re-scan this model with fresh auth, using the full model scan helper
             retry_items = await _scan_offsets_for_model(collection_id, model, new_auth)
             retry_count = len(retry_items)
@@ -513,7 +552,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
     # Fetch model list via filters
     models = await _fetch_models_for_collection(short or name, auth_token)
     logger.info(f"[BIG] Starting processing for collection {name or short or cid} with {len(models)} models")
-    print(f"Processing models for {name or short or cid} (models={len(models)})…")
+    logger.info(f"Processing models for {name or short or cid} (models={len(models)})…")
     if not models:
         logger.warning(f"[BIG] {name or short or cid}: no models discovered via filters; skipping")
         return {"collection_id": cid, "name": name, "short_name": short, "action": "no_models"}
@@ -555,7 +594,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
             # Big model: discover active backdrops then fetch per pair (floors-only by default)
             active_bds = await _discover_active_backdrops_for_model(cid, model, auth_token)
             logger.info(f"[BIG][LARGE-MODEL] {name}/{model}: discovered {len(active_bds)} active backdrops")
-            print(f"Processing backdrops for {name}/{model} (backdrops={len(active_bds)})…")
+            logger.info(f"Processing backdrops for {name}/{model} (backdrops={len(active_bds)})…")
             if not active_bds:
                 logger.info(f"[BIG][LARGE-MODEL] {name}/{model}: no active backdrops discovered; skipping pairs")
                 per_model_stats.append({"model": model, "count": count, "saved": 0, "mode": "no-active-backdrops"})
@@ -595,7 +634,7 @@ async def process_big_collection(collection: dict, auth_token: str) -> dict:
         await upsert_collections_and_build_map([collection], market="portals")
     except Exception as e:
         logger.warning(f"[BIG] {name or short or cid}: final collection meta upsert failed: {e}")
-    logger.info(f"[BIG] Finished processing {name or short or cid}: total_saved={total_saved}, models={len(models)})")
+    logger.info(f"[BIG] Finished processing {name or short or cid}: total_saved={total_saved}, models={len(models)}")
     return {"collection_id": cid, "name": name, "short_name": short, "action": "process_big_collection(models)", "saved_total": total_saved, "models": per_model_stats}
 
 async def process_small_collection(collection: dict, auth_token: str, items_precollected: List[dict] | None = None) -> dict:
@@ -633,11 +672,25 @@ async def process_small_collection(collection: dict, auth_token: str, items_prec
     saved = 0
     action = "noop"
     if count == 0:
+        # Respect per-run refresh budget/lockout
+        if not _can_refresh_now():
+            logger.warning(f"[SMALL] {name or short or cid}: refresh skipped (budget/lockout). FREEZE for {ZERO_RESULTS_FREEZE_SECONDS}s")
+            action = "refresh_skipped_lockout"
+            await asyncio.sleep(ZERO_RESULTS_FREEZE_SECONDS)
+            return {
+                "collection_id": cid,
+                "name": name,
+                "short_name": short,
+                "action": action,
+                "count": count,
+                "saved": 0,
+            }
         # Attempt a one-time session/token refresh and retry the scan before freezing
         logger.warning(f"[SMALL] {name or short or cid}: ZERO_RESULTS — attempting session refresh and one retry")
         try:
             # Refresh auth token (same protocol as scraper)
             new_auth = await _get_auth_token_with_retry()
+            _note_refresh(new_auth)
             logger.info(
                 f"[SMALL] {name or short or cid}: session refreshed — sleeping {COOLDOWN_SECONDS}s before retry")
             await asyncio.sleep(COOLDOWN_SECONDS)
@@ -744,6 +797,8 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
     else → process_small_collection().
     """
     cols = await fetch_all_collections(auth_token)
+    # Seed the refresh guard with the initial token so subsequent calls can use the most recent one
+    REFRESH.current_auth = auth_token
     logger.info(f"Starting run_step1_branch_over_collections for {len(cols)} collections")
     if not cols:
         logger.warning("No collections fetched; nothing to do")
@@ -760,13 +815,14 @@ async def run_step1_branch_over_collections(auth_token: str, threshold: int = BI
         try:
             name = c.get("name") or (c.get("raw") or {}).get("name")
             # Step‑1: classify this collection
-            klass = await classify_collection_by_threshold(str(cid), auth_token, threshold=threshold, collection_name=name)
+            current_auth = REFRESH.current_auth or auth_token
+            klass = await classify_collection_by_threshold(str(cid), current_auth, threshold=threshold, collection_name=name)
             count_seen = int(klass.get("count_seen", 0))
             # Branch
             if count_seen >= threshold:
-                res = await process_big_collection(c, auth_token)
+                res = await process_big_collection(c, REFRESH.current_auth or auth_token)
             else:
-                res = await process_small_collection(c, auth_token, klass.get("items"))
+                res = await process_small_collection(c, REFRESH.current_auth or auth_token, klass.get("items"))
             # attach classification info for visibility
             res.update({"count_seen": count_seen, "threshold": threshold})
 
@@ -800,7 +856,7 @@ async def run_parser():
     if not args:
         # Decide default behavior by env; default to full branch so programmatic callers run the whole pipeline
         if run_mode_env in {"branch", "run-step1-branch", "step1-branch"}:
-            print("No args provided — obtaining TMA token and running Step1+branch…")
+            logger.info("No args provided — obtaining TMA token and running Step1+branch…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -816,12 +872,13 @@ async def run_parser():
                 logger.error("Auth token was not obtained; aborting run")
                 return
             auth = auth_token
+            REFRESH.current_auth = auth
             await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
-            print("Step1+branch run complete.")
+            logger.info("Step1+branch run complete.")
             logger.info("Parser run complete")
             return
         else:
-            print("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
+            logger.info("No args provided — obtaining TMA token and classifying ALL collections (Step 1)…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -838,7 +895,7 @@ async def run_parser():
                 return
             auth = auth_token
             res = await classify_all_collections(auth, threshold=BIG_THRESHOLD)
-            print(f"Classification complete: {len(res)} collections (threshold={BIG_THRESHOLD}).")
+            logger.info(f"Classification complete: {len(res)} collections (threshold={BIG_THRESHOLD}).")
             logger.info("Parser run complete")
             return
 
@@ -847,7 +904,7 @@ async def run_parser():
         if len(args) == 2:
             auth = args[1]
         else:
-            print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
+            logger.info("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -863,8 +920,9 @@ async def run_parser():
                 logger.error("Auth token was not obtained; aborting run")
                 return
             auth = auth_token
+        REFRESH.current_auth = auth
         res = await run_step1_branch_over_collections(auth, threshold=BIG_THRESHOLD)
-        print("Step1+branch run complete.")
+        logger.info("Step1+branch run complete.")
         return
 
     # list-collections mode
@@ -872,7 +930,7 @@ async def run_parser():
         if len(args) == 2:
             auth = args[1]
         else:
-            print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
+            logger.info("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
             api_id, api_hash = await get_auth_credentials()
             auth_token = None
             for attempt in range(3):
@@ -889,7 +947,7 @@ async def run_parser():
                 return
             auth = auth_token
         cols = await fetch_all_collections(auth)
-        print(f"Fetched {len(cols)} collections.")
+        logger.info(f"Fetched {len(cols)} collections.")
         return
 
     # Single collection classification modes
@@ -897,11 +955,11 @@ async def run_parser():
         auth, coll = args
         res = await classify_collection_by_threshold(coll, auth)
         name_for_log = res.get("name") or res.get("collection_name") or res.get("collection_id", "<unknown>")
-        print(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
+        logger.info(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
         return
     elif len(args) == 1:
         coll = args[0]
-        print("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
+        logger.info("No AUTH_TOKEN provided — obtaining a TMA token automatically…")
         api_id, api_hash = await get_auth_credentials()
         auth_token = None
         for attempt in range(3):
@@ -919,7 +977,7 @@ async def run_parser():
         auth = auth_token
         res = await classify_collection_by_threshold(coll, auth)
         name_for_log = res.get("name") or res.get("collection_name") or res.get("collection_id", "<unknown>")
-        print(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
+        logger.info(f"Classified {name_for_log}: count={res.get('count_seen')} threshold={res.get('threshold')} is_small={res.get('is_small')}")
         return
 
 
