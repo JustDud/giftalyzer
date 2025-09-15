@@ -6,9 +6,6 @@ from bot_manager.keyboards.default import get_main_menu
 
 router = Router()
 
-# def escape_md_v2(text):
-#     return re.sub(r'([\[\]\(\)\~\`\>\+\-\=\|\{\}\.\!\\])', r'\\\1', text)
-
 
 @router.message(F.state == "AIResultsState:displaying_results")
 async def show_ai_analysis_results(message: Message, state: FSMContext, t: dict):
@@ -20,7 +17,17 @@ async def show_ai_analysis_results(message: Message, state: FSMContext, t: dict)
     nft_details = t.get("nft_details", [])
     for nft in nft_details:
         ai_response = ai_response.replace(nft["nft_id"], nft["display_name"])
-        ai_response = ai_response.replace("*", "")
+
+    # Send NFT images (if available) with short captions before the analysis
+    for nft in nft_details:
+        img = (nft.get("media") or {}).get("image_url") or nft.get("image_url")
+        name = nft.get("display_name") or nft.get("name") or nft.get("nft_id")
+        if img:
+            caption = f"{name}"
+            try:
+                await message.answer_photo(photo=img, caption=caption[:1024])
+            except Exception as e:
+                print(f"[⚠] Failed to send NFT image for {name}: {e}")
 
     if len(ai_response) <= 4000:
         await message.answer(t["ai_analysis_result_prefix"] + "\n\n" + ai_response)
