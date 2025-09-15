@@ -52,7 +52,12 @@ async def show_filtered_nfts(call: CallbackQuery, state: FSMContext, t: dict):
                 {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}},
                 {"$elemMatch": {"type": "backdrop", "value": {"$in": selected_backdrops}}}
             ]
-        }
+        },
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
     }).limit(16)
 
     results = []

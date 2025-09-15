@@ -130,10 +130,14 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
         return
     collection_uid = collection["_id"]
 
-    nft_cursor = nfts_collection.find(
-        {"collection_uid": collection_uid, "markets": {"$exists": True}},
-        {"traits": 1}
-    )
+    nft_cursor = nfts_collection.find({
+        "collection_uid": collection_uid,
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
+    }, {"traits": 1})
     models = set()
     async for doc in nft_cursor:
         for trait in doc.get("traits", []):
@@ -214,10 +218,14 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
         return
 
     collection_uid = collection["_id"]
-    nft_cursor = nfts_collection.find(
-        {"collection_uid": collection_uid, "markets": {"$exists": True}},
-        {"traits": 1}
-    )
+    nft_cursor = nfts_collection.find({
+        "collection_uid": collection_uid,
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
+    }, {"traits": 1})
     models = set()
     async for doc in nft_cursor:
         for trait in doc.get("traits", []):
@@ -286,8 +294,12 @@ async def toggle_model_selection(call: CallbackQuery, state: FSMContext, t: dict
     collection_uid = collection["_id"]
     nft_cursor = nfts_collection.find({
         "collection_uid": collection_uid,
-        "markets": {"$exists": True},
-        "traits": {"$elemMatch": {"type": "model", "value": model}}
+        "traits": {"$elemMatch": {"type": "model", "value": model}},
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
     }, {"traits": 1})
     backdrops = set()
     async for doc in nft_cursor:
@@ -384,8 +396,12 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
 
     nft_cursor = nfts_collection.find({
         "collection_uid": collection_uid,
-        "markets": {"$exists": True},
-        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}}
+        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}},
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
     }, {"traits": 1})
     backdrops = set()
     async for doc in nft_cursor:

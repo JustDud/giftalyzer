@@ -695,7 +695,7 @@ async def process_small_collection(session: aiohttp.ClientSession, collection: d
                 "Accept": "application/json",
             }
             retry_seen: Set[str] = set()
-            retry_items = await scan_offsets(cid, retry_headers, retry_seen, name)
+            retry_items = await scan_offsets(session, cid, retry_headers, retry_seen, name)
             retry_count = len(retry_items)
             if retry_count > 0:
                 logger.info(f"[SMALL] {name or short or cid}: recovered {retry_count} items after session refresh")

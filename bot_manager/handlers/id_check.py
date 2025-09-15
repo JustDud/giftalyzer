@@ -148,7 +148,8 @@ async def process_gift_id(message: types.Message, state: FSMContext, t: dict):
         "price": price,
         "market_price": data["price"],
         "market": data["market"],
-        "nft_id": data["nft_id"]
+        "nft_id": data["nft_id"],
+        "image_url": (data.get("media", {}) or {}).get("image_url") or data.get("image_url")
     }, t)
 
 
@@ -194,10 +195,26 @@ async def send_gift_result(message: types.Message, gift: dict, t: dict):
         "nft_id": gift.get("nft_id") or gift.get("_id"),
     }
 
-    await message.answer(
-        t["gift_result"].format(**result),
-        reply_markup=get_check_again_keyboard(t)
+    # Try to display NFT image if available
+    image_url = (
+        (gift.get("media") or {}).get("image_url")
+        or gift.get("image_url")
     )
+
+    caption = t["gift_result"].format(**result)
+
+    if image_url:
+        await message.answer_photo(
+            photo=image_url,
+            caption=caption[:1024],  # Telegram caption limit for photos
+            parse_mode="HTML" if "<" in caption or ">" in caption else None,
+            reply_markup=get_check_again_keyboard(t)
+        )
+    else:
+        await message.answer(
+            caption,
+            reply_markup=get_check_again_keyboard(t)
+        )
 
 
 def register(dp):

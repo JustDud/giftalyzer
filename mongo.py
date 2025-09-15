@@ -188,7 +188,11 @@ def normalize_token_id(token: str | int) -> str:
 async def upsert_collection_market_snapshot(collection_uid: str, market: str, snapshot: Dict[str, Any]):
     """Update collections.markets[market] with latest snapshot (floor, listed_count, url, last_seen)."""
     now = utc_ts()
-    to_set = {f"markets.{market}": {**snapshot, "last_seen": snapshot.get("last_seen", now)}, "updated_at": now}
+    to_set = {
+        f"markets.{market}": {**snapshot, "last_seen": snapshot.get("last_seen", now)},
+        "market_updated_at": now,
+        "updated_at": now,
+    }
     await collections_collection.update_one(
         {"_id": collection_uid},
         {"$set": to_set},
@@ -218,6 +222,7 @@ async def upsert_nft_market_state(collection_uid: str, token_id: str, name: str 
         "$setOnInsert": set_on_insert,
         "$set": {
             f"markets.{market}": {**(market_state or {}), "last_seen": now},
+            "market_updated_at": now,
             "updated_at": now,
         },
     }
@@ -484,6 +489,7 @@ async def upsert_nfts_for_collection_bulk(
 
         update_set: Dict[str, Any] = {
             f"markets.{market}": market_state,
+            "market_updated_at": now,
             "updated_at": now,
         }
         if intrinsic_fields:
@@ -628,7 +634,7 @@ async def reconcile_delist_for_collection(collection_uid: str, market: str, seen
         f"markets.{market}.is_listed": True,
         "token_id": {"$nin": seen_list},
     }
-    update = {"$set": {f"markets.{market}.is_listed": False, f"markets.{market}.delisted_at": now, "updated_at": now}}
+    update = {"$set": {f"markets.{market}.is_listed": False, f"markets.{market}.delisted_at": now, "market_updated_at": now, "updated_at": now}}
     res = await nfts_collection.update_many(filt, update)
     return {"matched": res.matched_count, "modified": res.modified_count}
 
@@ -641,7 +647,7 @@ async def reset_market_state_for_collection(collection_uid: str, market: str) ->
     """
     now = utc_ts()
     filt = {"collection_uid": collection_uid, f"markets.{market}": {"$exists": True}}
-    update = {"$unset": {f"markets.{market}": ""}, "$set": {"updated_at": now}}
+    update = {"$unset": {f"markets.{market}": ""}, "$set": {"market_updated_at": now, "updated_at": now}}
     res = await nfts_collection.update_many(filt, update)
     return {"matched": res.matched_count, "modified": res.modified_count}
 
@@ -664,7 +670,7 @@ async def reset_market_state_for_model(collection_uid: str, model: str, market: 
             {"traits": {"$elemMatch": {"type": "model", "value": model}}},
         ],
     }
-    update = {"$unset": {f"markets.{market}": ""}, "$set": {"updated_at": now}}
+    update = {"$unset": {f"markets.{market}": ""}, "$set": {"market_updated_at": now, "updated_at": now}}
     res = await nfts_collection.update_many(filt, update)
     return {"matched": res.matched_count, "modified": res.modified_count}
 

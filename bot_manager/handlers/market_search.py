@@ -26,7 +26,14 @@ async def handle_back_to_models(call: CallbackQuery, state: FSMContext, t: dict)
     collection_uid = collection["_id"]
 
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_uid": collection_uid}, {"traits": 1})
+    nft_cursor = nfts_collection.find({
+        "collection_uid": collection_uid,
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
+    }, {"traits": 1})
     nfts = sorted({
         trait["value"]
         async for doc in nft_cursor
@@ -84,7 +91,14 @@ async def handle_collection_selection(call: CallbackQuery, state: FSMContext, t:
 
     collection_uid = collection["_id"]
     from mongo import nfts_collection
-    nft_cursor = nfts_collection.find({"collection_uid": collection_uid}, {"traits": 1})
+    nft_cursor = nfts_collection.find({
+        "collection_uid": collection_uid,
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
+    }, {"traits": 1})
     nfts = sorted({
         trait["value"]
         async for doc in nft_cursor
@@ -238,7 +252,12 @@ async def handle_backdrop_selection(call: CallbackQuery, state: FSMContext, t: d
     from mongo import nfts_collection
     nft_cursor = nfts_collection.find({
         "collection_uid": collection_uid,
-        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}}
+        "traits": {"$elemMatch": {"type": "model", "value": {"$in": selected_models}}},
+        "$or": [
+            {"market_data": {"$exists": True, "$nin": [None, [], {}]}},
+            {"markets": {"$exists": True, "$nin": [None, [], {}]}},
+            {"listings": {"$exists": True, "$nin": [None, [], {}]}}
+        ]
     }, {"traits": 1})
     backdrops = sorted({
         trait["value"]
