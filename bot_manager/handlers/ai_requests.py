@@ -113,6 +113,25 @@ async def process_link_input(message: Message, state: FSMContext, t: dict):
     await message.answer("⌛ Генерация анализа, пожалуйста подождите...")
     await state.set_state(AIRequestState.loading_results)
 
+    # Try to resolve and display NFT image before running analysis
+    try:
+        doc = await nfts_collection.find_one(
+            {
+                "$or": [
+                    {"_id": gift_id},
+                    {"external_ids.portals.id": gift_id},
+                    {"token_id": gift_id},
+                ]
+            },
+            {"media": 1, "name": 1}
+        )
+        if doc:
+            image_url = (doc.get("media") or {}).get("image_url")
+            if image_url:
+                await message.answer_photo(photo=image_url, caption=doc.get("name", ""))
+    except Exception as e:
+        print(f"[ai_requests] failed to pre-send NFT image: {e!r}")
+
     await analyse_ai_request(message, state, t, temp, gift_id=gift_id)
 
 
