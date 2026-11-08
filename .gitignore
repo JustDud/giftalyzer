@@ -25,3 +25,7 @@ data_collection/portals/nfts_output_old.csv
 /data_collection/portals/archive
 nft_price_output.csv
 /other
+
+# Telegram session files (contain login keys)
+*.session
+*.session-journal
